@@ -1,12 +1,11 @@
 import React from "react";
+import { SignUpForm } from "../components/Forms";
 
 const Signup = () => {
   return (
-    <div>
-      Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nesciunt itaque
-      praesentium dolorem facilis eveniet, exercitationem labore laboriosam ex
-      distinctio tempora? Lorem ipsum dolor sit amet consectetur adipisicing
-      elit. Exercitationem, perferendis?
+    <div className="md:mt-32 mt-36 md:px-[5rem] p-16 border-2 md:mx-[30rem] mx-[1rem] rounded-xl">
+      <h2 className="mb-10 flex justify-center text-xl">Sign Up</h2>
+      <SignUpForm />
     </div>
   );
 };
