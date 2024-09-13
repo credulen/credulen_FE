@@ -70,3 +70,10 @@ button:focus-visible {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom placeholder styling */
+.custom-placeholder::placeholder {
+  color: #0e54cd; /* Adjust color as needed */
+  font-size: 0.875rem; /* Adjust size as needed */
+  padding-left: 1rem; /* Adjust padding as needed */
+}
