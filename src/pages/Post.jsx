@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Snackbar, Alert } from "@mui/material";
+import { Snackbar, Alert, Grid } from "@mui/material";
 import {
   Typography,
   Box,
@@ -14,8 +14,22 @@ import {
   List,
   ListItem,
   ListItemText,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Card,
+  CardContent,
+  CardMedia,
 } from "@mui/material";
-import { ThumbUp, Edit, Delete, Send } from "@mui/icons-material";
+import {
+  ThumbUp,
+  Edit,
+  Delete,
+  Send,
+  ChatBubbleOutline,
+} from "@mui/icons-material";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.bubble.css";
 import { format } from "date-fns";
@@ -45,6 +59,124 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
   color: "#ffffff",
 }));
 
+const RelatedPostCard = styled(Card)(({ theme }) => ({
+  backgroundColor: "#2e2e2e",
+  color: "#ffffff",
+  height: "100%",
+}));
+
+const RelatedPosts = ({ category, currentPostId }) => {
+  const [relatedPosts, setRelatedPosts] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchRelatedPosts = async () => {
+      try {
+        const response = await fetch(
+          `${backendURL}/api/related-posts?category=${encodeURIComponent(
+            category
+          )}&currentPostId=${currentPostId}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch related posts");
+        }
+        const data = await response.json();
+        console.log(data, "related posts details");
+        setRelatedPosts(data);
+      } catch (error) {
+        console.error("Error fetching related posts:", error);
+      }
+    };
+
+    if (category && currentPostId) {
+      fetchRelatedPosts();
+    }
+  }, [category, currentPostId]);
+
+  const handlePostClick = (slug) => {
+    navigate(`/post/${slug}`);
+  };
+
+  return (
+    <Box sx={{ mt: 4 }}>
+      <Typography variant="h6" gutterBottom>
+        Related Posts
+      </Typography>
+      <Grid container spacing={2}>
+        {relatedPosts.map((post) => (
+          <Grid item xs={12} key={post._id}>
+            <Card
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                height: "100%",
+                bgcolor: "#2e2e2e",
+                color: "#ffffff",
+                cursor: "pointer",
+              }}
+              onClick={() => handlePostClick(post.slug)}
+            >
+              <CardContent sx={{ flex: "1 0 auto", p: 2 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <Avatar
+                    src={`${backendURL}${post.authorId.image}`}
+                    alt={post.authorId.name}
+                    sx={{ width: 40, height: 40, mr: 2 }}
+                  />
+                  <Box>
+                    <Typography variant="subtitle1" component="div">
+                      {post.authorId.name}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {moment(post.createdAt).fromNow()}
+                    </Typography>
+                  </Box>
+                </Box>
+                <Typography variant="h6" component="div" gutterBottom>
+                  {post.title}
+                </Typography>
+              </CardContent>
+              {post.image && (
+                <CardMedia
+                  component="img"
+                  sx={{ width: "100%", height: 140, objectFit: "cover" }}
+                  image={`${backendURL}${post.image}`}
+                  alt={post.title}
+                />
+              )}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  p: 2,
+                  justifyContent: "space-between",
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <IconButton size="small" sx={{ color: "white", mr: 1 }}>
+                    <ThumbUp fontSize="small" />
+                  </IconButton>
+                  <Typography variant="body2">
+                    {post.likes ? post.likes.length : 0}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <IconButton size="small" sx={{ color: "white", mr: 1 }}>
+                    <ChatBubbleOutline fontSize="small" />
+                  </IconButton>
+                  <Typography variant="body2">
+                    {post.comments ? post.comments.length : 0}
+                  </Typography>
+                </Box>
+              </Box>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
+  );
+};
+
 export default function Post() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -59,14 +191,15 @@ export default function Post() {
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const { profile } = useSelector((state) => state.profiles);
   const currentUser = useSelector((state) => state.auth);
-  const userId = currentUser.userInfo.user._id;
+  const userId = currentUser?.userInfo?.user._id;
   const email = currentUser.userInfo.user.email;
   const name = profile?.username;
   const image = profile?.image;
 
-  // console.log(profile?.username);
-  // console.log(profile?.image);
-  // console.log(email);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editedCommentContent, setEditedCommentContent] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [commentToDeleteId, setCommentToDeleteId] = useState(null);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -88,12 +221,33 @@ export default function Post() {
 
     fetchPost();
   }, [slug]);
-
   const handleLike = async () => {
-    setPost((prevPost) => ({
-      ...prevPost,
-      likes: (prevPost.likes || 0) + 1,
-    }));
+    try {
+      const response = await fetch(`${backendURL}/api/likePost/${postId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: currentUser.userInfo.user._id }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to like post");
+      }
+      const data = await response.json();
+      setPost((prevPost) => ({
+        ...prevPost,
+        likesCount: data.likesCount,
+        isLiked: data.isLiked,
+      }));
+      setSnackbarMessage(data.message);
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error("Error liking post:", error);
+      setSnackbarMessage("Failed to like post.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
   };
 
   const handleCommentSubmit = async (e) => {
@@ -103,7 +257,7 @@ export default function Post() {
       try {
         const commentData = {
           content: newComment,
-          postId: postId, // Use the postId state here
+          postId: postId,
           userId: userId,
         };
 
@@ -121,17 +275,24 @@ export default function Post() {
 
         const newCommentObj = await response.json();
 
-        setComments([...comments, newCommentObj]);
+        // Add user data to the new comment object
+        const commentWithUserData = {
+          ...newCommentObj,
+          userId: {
+            _id: userId,
+            username: name,
+            image: image,
+          },
+        };
+
+        setComments([...comments, commentWithUserData]);
         setNewComment("");
 
-        // Trigger success Snackbar
         setSnackbarMessage("Comment submitted successfully!");
         setSnackbarSeverity("success");
         setSnackbarOpen(true);
       } catch (error) {
         console.error("Error submitting comment:", error);
-
-        // Trigger error Snackbar
         setSnackbarMessage("Failed to submit comment.");
         setSnackbarSeverity("error");
         setSnackbarOpen(true);
@@ -139,21 +300,6 @@ export default function Post() {
     }
   };
 
-  // const fetchPostComments = async (postId) => {
-  //   try {
-  //     const response = await fetch(
-  //       `${backendURL}/api/getPostComments/${postId}`
-  //     );
-  //     if (!response.ok) {
-  //       throw new Error("Failed to fetch comments");
-  //     }
-  //     const data = await response.json();
-  //     setComments(data.comments || []);
-  //     console.log(data, "getPostComments");
-  //   } catch (error) {
-  //     console.error("Error fetching comments:", error);
-  //   }
-  // };
   const fetchPostComments = async (postId) => {
     try {
       const response = await fetch(
@@ -163,8 +309,30 @@ export default function Post() {
         throw new Error("Failed to fetch comments");
       }
       const data = await response.json();
-      setComments(data); // Assuming `data` is an array of comments
-      console.log(data, "getPostComments");
+
+      // Ensure each comment has user details
+      const commentsWithUsers = await Promise.all(
+        data.map(async (comment) => {
+          if (!comment.userId || typeof comment.userId === "string") {
+            const userResponse = await fetch(
+              `${backendURL}/api/users/${comment.userId}`
+            );
+            const userData = await userResponse.json();
+            return {
+              ...comment,
+              userId: {
+                _id: userData._id,
+                username: userData.username,
+                image: userData.image,
+              },
+            };
+          }
+          return comment;
+        })
+      );
+
+      setComments(commentsWithUsers);
+      console.log(commentsWithUsers, "getPostComments");
     } catch (error) {
       console.error("Error fetching comments:", error);
     }
@@ -177,12 +345,104 @@ export default function Post() {
     }
   }, [postId]);
 
-  const handleCommentEdit = (commentId) => {
-    console.log("Edit comment", commentId);
+  const handleCommentEdit = async (commentId, newContent) => {
+    try {
+      const response = await fetch(
+        `${backendURL}/api/editComment/${commentId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ content: newContent }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to edit comment");
+      }
+
+      const updatedComment = await response.json();
+
+      setComments(
+        comments.map((comment) =>
+          comment._id === commentId ? updatedComment : comment
+        )
+      );
+
+      setEditingCommentId(null);
+      setEditedCommentContent("");
+
+      // Trigger success Snackbar
+      setSnackbarMessage("Comment edited successfully!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error("Error editing comment:", error);
+
+      // Trigger error Snackbar
+      setSnackbarMessage("Failed to edit comment.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
   };
 
-  const handleCommentDelete = (commentId) => {
-    setComments(comments.filter((comment) => comment._id !== commentId));
+  const handleCommentDelete = async (commentId) => {
+    try {
+      const response = await fetch(
+        `${backendURL}/api/deleteComment/${commentId}`,
+        {
+          method: "DELETE",
+          headers: {},
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete comment");
+      }
+
+      setComments(comments.filter((comment) => comment._id !== commentId));
+
+      // Trigger success Snackbar
+      setSnackbarMessage("Comment deleted successfully!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+
+      // Trigger error Snackbar
+      setSnackbarMessage("Failed to delete comment.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
+  };
+
+  const handleEditClick = (comment) => {
+    setEditingCommentId(comment._id);
+    setEditedCommentContent(comment.content);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCommentId(null);
+    setEditedCommentContent("");
+  };
+
+  const handleDeleteClick = (commentId) => {
+    setCommentToDeleteId(commentId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (commentToDeleteId) {
+      handleCommentDelete(commentToDeleteId);
+      setDeleteDialogOpen(false);
+      setCommentToDeleteId(null);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setCommentToDeleteId(null);
   };
 
   const handleSnackbarClose = (event, reason) => {
@@ -192,136 +452,208 @@ export default function Post() {
     setSnackbarOpen(false);
   };
 
+  const handleCommentLike = async (commentId) => {
+    try {
+      const url = `${backendURL}/api/likeComment/${commentId}`;
+      console.log("Attempting to like comment at URL:", url);
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: currentUser.userInfo.user._id }),
+      });
+
+      if (!response.ok) {
+        console.error("Response status:", response.status);
+        console.error("Response text:", await response.text());
+        throw new Error("Failed to like comment");
+      }
+
+      const updatedComment = await response.json();
+
+      // Ensure the updated comment has user data
+      const updatedCommentWithUserData = {
+        ...updatedComment,
+        userId: comments.find((comment) => comment._id === commentId)
+          ?.userId || {
+          _id: userId,
+          username: name,
+          image: image,
+        },
+      };
+
+      setComments(
+        comments.map((comment) =>
+          comment._id === commentId ? updatedCommentWithUserData : comment
+        )
+      );
+
+      setSnackbarMessage(
+        updatedComment.likes.includes(userId)
+          ? "Comment liked!"
+          : "Comment unliked!"
+      );
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error("Error liking comment:", error);
+      setSnackbarMessage("Failed to like comment.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
+  };
+
   if (loading) return <Typography>Loading...</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
   if (!post) return <Typography>Post not found</Typography>;
 
   return (
-    <Box sx={{ maxWidth: 800, margin: "left", padding: 3 }}>
-      <Box sx={{ mb: 3 }}>
-        {post.image && (
-          <img
-            src={`${backendURL}${post.image}`}
-            alt={post.title}
-            style={{ width: "100%", height: "auto", borderRadius: "8px" }}
-          />
-        )}
-      </Box>
+    <Grid container spacing={3}>
+      <Grid item xs={12} md={8}>
+        <Box sx={{ maxWidth: 800, margin: "auto", padding: 3 }}>
+          {/* Keep all the existing content here */}
 
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          mb: 2,
-        }}
-      >
-        <Typography variant="h4" gutterBottom>
-          {post.title}
-        </Typography>
-
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Avatar
-            src={
-              post.author?.image
-                ? `${backendURL}${post.author.image}`
-                : "/default-avatar.jpg"
-            }
-            sx={{ mr: 1 }}
-          />
-          <Typography variant="subtitle1" sx={{ mr: 2 }}>
-            {post.author?.name || "Unknown Author"}
-          </Typography>
-        </Box>
-      </Box>
-
-      <Typography variant="subtitle2" color="text.secondary">
-        {moment(post.createdAt).format("MMMM D, YYYY")}
-      </Typography>
-
-      <Box sx={{ mb: 2 }}>
-        <Chip label={post.category} sx={{ mr: 1 }} />
-      </Box>
-
-      <ReactQuill value={post.content || ""} readOnly={true} theme="bubble" />
-
-      <Box sx={{ display: "flex", alignItems: "center", mt: 3, mb: 3 }}>
-        <IconButton onClick={handleLike}>
-          <ThumbUp />
-        </IconButton>
-        <Typography variant="body2">{post.likes || 0} likes</Typography>
-      </Box>
-
-      <Divider sx={{ mb: 3 }} />
-
-      <DarkBox>
-        <Box display="flex" justifyContent="space-between" marginBottom={2}>
-          <Typography variant="body2">{comments.length} Comments</Typography>
-          <Box>
-            <StyledIconButton>⬆️</StyledIconButton>
-            <StyledIconButton>⬇️</StyledIconButton>
-            <StyledIconButton>🔖</StyledIconButton>
-            <StyledIconButton>🔗</StyledIconButton>
+          <Box sx={{ mb: 3 }}>
+            {post.image && (
+              <img
+                src={`${backendURL}${post.image}`}
+                alt={post.title}
+                style={{ width: "100%", height: "auto", borderRadius: "8px" }}
+              />
+            )}
           </Box>
-        </Box>
-        <Box display="flex" alignItems="flex-start" marginBottom={2}>
-          <Avatar
-            src={`${backendURL}/uploads/${profile.image}`}
-            alt={currentUser?.name}
-            sx={{ marginRight: 1 }}
-          />
-          <TextField
-            fullWidth
-            multiline
-            rows={3}
-            placeholder="Share your thoughts"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            variant="outlined"
+
+          <Box
             sx={{
-              backgroundColor: "#2e2e2e",
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "#3e3e3e" },
-                "&:hover fieldset": { borderColor: "#4e4e4e" },
-                "&.Mui-focused fieldset": { borderColor: "#5e5e5e" },
-              },
-              "& .MuiInputBase-input": { color: "#ffffff" },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              mb: 2,
             }}
-          />
-        </Box>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Box>
-            <StyledIconButton>💬</StyledIconButton>
-            <StyledIconButton>🔗</StyledIconButton>
-            <StyledIconButton>@</StyledIconButton>
-            <StyledIconButton>GIF</StyledIconButton>
-          </Box>
-          <StyledButton variant="contained" onClick={handleCommentSubmit}>
-            Comment
-          </StyledButton>
-        </Box>
-      </DarkBox>
-
-      <List>
-        {comments.map((comment) => (
-          <ListItem
-            key={comment._id}
-            alignItems="flex-start"
-            sx={{ border: "1px solid #e0e0e0", borderRadius: "4px", mb: 1 }}
           >
-            <ListItemText
-              primary={
+            <Typography variant="h4" gutterBottom>
+              {post.title}
+            </Typography>
+
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Avatar
+                src={
+                  post.author?.image
+                    ? `${backendURL}${post.author.image}`
+                    : "/default-avatar.jpg"
+                }
+                sx={{ mr: 1 }}
+              />
+              <Typography variant="subtitle1" sx={{ mr: 2 }}>
+                {post.author?.name || "Unknown Author"}
+              </Typography>
+            </Box>
+          </Box>
+
+          <Typography variant="subtitle2" color="text.secondary">
+            {moment(post.createdAt).format("MMMM D, YYYY")}
+          </Typography>
+
+          <Box sx={{ mb: 2 }}>
+            <Chip label={post.category} sx={{ mr: 1 }} />
+          </Box>
+
+          <ReactQuill
+            value={post.content || ""}
+            readOnly={true}
+            theme="bubble"
+          />
+
+          <Box sx={{ display: "flex", alignItems: "center", mt: 3, mb: 3 }}>
+            <IconButton onClick={handleLike}>
+              <ThumbUp color={post.isLiked ? "primary" : "inherit"} />
+            </IconButton>
+            <Typography variant="body2">
+              {post.likesCount || 0} likes
+            </Typography>
+          </Box>
+
+          <Divider sx={{ mb: 3 }} />
+
+          <DarkBox>
+            <Box display="flex" justifyContent="space-between" marginBottom={2}>
+              <Typography variant="body2">
+                {comments.length} Comments
+              </Typography>
+              <Box>
+                <StyledIconButton>⬆️</StyledIconButton>
+                <StyledIconButton>⬇️</StyledIconButton>
+                <StyledIconButton>🔖</StyledIconButton>
+                <StyledIconButton>🔗</StyledIconButton>
+              </Box>
+            </Box>
+            <Box display="flex" alignItems="flex-start" marginBottom={2}>
+              <Avatar
+                src={`${backendURL}/uploads/${profile?.image}`}
+                alt={currentUser?.name}
+                sx={{ marginRight: 1 }}
+              />
+              <TextField
+                fullWidth
+                multiline
+                rows={3}
+                placeholder="Share your thoughts"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                variant="outlined"
+                sx={{
+                  backgroundColor: "#2e2e2e",
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#3e3e3e" },
+                    "&:hover fieldset": { borderColor: "#4e4e4e" },
+                    "&.Mui-focused fieldset": { borderColor: "#5e5e5e" },
+                  },
+                  "& .MuiInputBase-input": { color: "#ffffff" },
+                }}
+              />
+            </Box>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Box>
+                <StyledIconButton>💬</StyledIconButton>
+                <StyledIconButton>🔗</StyledIconButton>
+                <StyledIconButton>@</StyledIconButton>
+                <StyledIconButton>GIF</StyledIconButton>
+              </Box>
+              <StyledButton variant="contained" onClick={handleCommentSubmit}>
+                Comment
+              </StyledButton>
+            </Box>
+          </DarkBox>
+
+          <List>
+            {comments.map((comment) => (
+              <ListItem
+                key={comment._id}
+                sx={{
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  mb: 2,
+                  p: 2,
+                  bgcolor: "background.paper",
+                  borderRadius: 1,
+                  border: "1px solid gray",
+                }}
+              >
                 <Box
                   sx={{
-                    // display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
                     display: "flex",
-                    alignItems: "center",
-                    gap: 1,
+                    justifyContent: "space-between",
+                    width: "100%",
+                    mb: 1,
                   }}
                 >
-                  <span className="flex">
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
                     <Avatar
                       src={
                         comment.userId?.image
@@ -329,56 +661,140 @@ export default function Post() {
                           : "/default-avatar.jpg"
                       }
                       alt={comment.userId?.username || "Anonymous"}
-                      sx={{ width: 20, height: 20 }}
+                      sx={{ width: 32, height: 32, mr: 1 }}
                     />
-
-                    <Typography
-                      variant="caption"
-                      sx={{ fontSize: "0.675rem", padding: "3px" }}
-                    >
-                      {comment.userId?.username || "Anonymous"}{" "}
-                      {/* Reduced text size */}
+                    <Typography variant="subtitle2">
+                      {comment.userId?.username || "Anonymous"}
                     </Typography>
-                  </span>
-                  {currentUser && currentUser.id === comment.author?.id && (
+                  </Box>
+                  {(currentUser.userInfo.user._id === comment.userId._id ||
+                    currentUser.userInfo.user.isAdmin) && (
                     <Box>
                       <IconButton
                         size="small"
-                        onClick={() => handleCommentEdit(comment._id)}
+                        onClick={() => handleEditClick(comment)}
+                        sx={{ mr: 1 }}
                       >
-                        <Edit fontSize="small" />
+                        <Edit size={16} />
                       </IconButton>
                       <IconButton
                         size="small"
-                        onClick={() => handleCommentDelete(comment._id)}
+                        onClick={() => handleDeleteClick(comment._id)}
                       >
-                        <Delete fontSize="small" />
+                        <Delete size={16} />
                       </IconButton>
                     </Box>
                   )}
                 </Box>
-              }
-              secondary={
-                <>
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    color="text.primary"
-                  >
+
+                {editingCommentId === comment._id ? (
+                  <Box sx={{ width: "100%" }}>
+                    <TextField
+                      fullWidth
+                      multiline
+                      rows={3}
+                      value={editedCommentContent}
+                      onChange={(e) => setEditedCommentContent(e.target.value)}
+                      variant="outlined"
+                      sx={{ mb: 1 }}
+                    />
+                    <Button
+                      onClick={() =>
+                        handleCommentEdit(comment._id, editedCommentContent)
+                      }
+                      sx={{ mr: 1 }}
+                    >
+                      Save
+                    </Button>
+                    <Button onClick={handleCancelEdit}>Cancel</Button>
+                  </Box>
+                ) : (
+                  <Typography variant="body1" sx={{ mb: 1, width: "100%" }}>
                     {comment.content}
                   </Typography>
-                  <Typography variant="caption" display="block">
-                    {/* {format(new Date(comment.createdAt), "MMM d, yyyy h:mm a")} */}
+                )}
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "100%",
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <IconButton
+                      onClick={() => handleCommentLike(comment._id)}
+                      size="small"
+                    >
+                      <ThumbUp
+                        color={
+                          comment.likes.includes(currentUser.userInfo.user._id)
+                            ? "primary"
+                            : "inherit"
+                        }
+                        size={16}
+                      />
+                    </IconButton>
+                    <Typography variant="caption" sx={{ ml: 1 }}>
+                      {comment.likes.length} likes
+                    </Typography>
+                  </Box>
+                  <Typography variant="caption" color="text.secondary">
                     {formatDistanceToNow(new Date(comment.createdAt), {
                       addSuffix: true,
                     })}
                   </Typography>
-                </>
-              }
-            />
-          </ListItem>
-        ))}
-      </List>
+                </Box>
+              </ListItem>
+            ))}
+          </List>
+
+          <Divider sx={{ my: 4 }} />
+          {/* Add the RelatedPosts component at the bottom */}
+          {/* <RelatedPosts category={post.category} currentPostId={post._id} /> */}
+        </Box>
+      </Grid>
+
+      <Grid
+        item
+        xs={12}
+        md={4}
+        className="bg-gray-5 p-5  align-middle items-start "
+      >
+        <Box
+          sx={{
+            position: "",
+            top: 20,
+            padding: 1,
+            alignContent: "center",
+            flexGrow: 1,
+          }}
+        >
+          <RelatedPosts category={post.category} currentPostId={post._id} />
+        </Box>
+      </Grid>
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Delete Comment?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this comment? This action cannot be
+            undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel}>Cancel</Button>
+          <Button onClick={handleDeleteConfirm} autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={4000}
@@ -393,6 +809,6 @@ export default function Post() {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-    </Box>
+    </Grid>
   );
 }

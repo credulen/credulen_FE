@@ -31,7 +31,7 @@ import CreateAuthor from "./pages/AdminDashBoardPages/CreateAuthor";
 const App = () => {
   return (
     <BrowserRouter>
-      <Navbar />
+      {/* <Navbar /> */}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/Post/:slug" element={<Post />} />
