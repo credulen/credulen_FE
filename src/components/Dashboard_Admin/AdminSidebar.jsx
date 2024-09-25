@@ -108,6 +108,19 @@ const AdminSidebar = () => {
               <span className="text-[16px] my-auto">Posts</span>
             </Link>
             <Link
+              to="/DashBoard/Admin/Events"
+              style={{
+                color: "white",
+                backgroundColor:
+                  activeLink === "/DashBoard/Admin/Events" ? "#ffffff66 " : "",
+              }}
+              className="mb-3 flex gap-3 rounded-md p-2"
+              onClick={() => handleLinkClick("/DashBoard/Admin/Events")}
+            >
+              <CiViewList className="text-white w-6 h-6" />
+              <span className="text-[16px] my-auto">Events</span>
+            </Link>
+            <Link
               to="/DashBoard/Admin/Authors"
               style={{
                 color: "white",
@@ -119,6 +132,21 @@ const AdminSidebar = () => {
             >
               <CiViewList className="text-white w-6 h-6" />
               <span className="text-[16px] my-auto">Authors</span>
+            </Link>
+            <Link
+              to="/DashBoard/Admin/SpeakerList"
+              style={{
+                color: "white",
+                backgroundColor:
+                  activeLink === "/DashBoard/Admin/SpeakerList"
+                    ? "#ffffff66 "
+                    : "",
+              }}
+              className="mb-3 flex gap-3 rounded-md p-2"
+              onClick={() => handleLinkClick("/DashBoard/Admin/SpeakerList")}
+            >
+              <CiViewList className="text-white w-6 h-6" />
+              <span className="text-[16px] my-auto">Speaker</span>
             </Link>
 
             <Link

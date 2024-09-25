@@ -268,30 +268,22 @@ export default function CreateAuthor() {
               className="w-full h-[30rem] object-cover"
             />
           )}
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={loading}
-          >
-            {loading ? (
-              <CircularProgress size={24} />
-            ) : authorId ? (
-              "Update Author"
-            ) : (
-              "Create Author"
-            )}
-          </Button>
-          {authorId && (
+          <span className="my-4">
             <Button
-              variant="outlined"
-              color="secondary"
-              onClick={handleDelete}
+              type="submit"
+              variant="contained"
+              color="primary"
               disabled={loading}
             >
-              Delete Author
+              {loading ? (
+                <CircularProgress size={24} />
+              ) : authorId ? (
+                "Update Author"
+              ) : (
+                "Create Author"
+              )}
             </Button>
-          )}
+          </span>
         </form>
         <Snackbar
           open={snackbar.open}

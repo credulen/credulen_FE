@@ -27,15 +27,21 @@ import Authors from "./pages/AdminDashBoardPages/DashBoardActivities";
 import Posts from "./pages/AdminDashBoardPages/Posts";
 import CreatePosts from "./pages/AdminDashBoardPages/CreatePosts";
 import CreateAuthor from "./pages/AdminDashBoardPages/CreateAuthor";
+import AdminEventLists from "./pages/AdminDashBoardPages/AdminEventLists";
+import CreateEvents from "./pages/AdminDashBoardPages/CreateEvents";
+import Speakers from "./pages/AdminDashBoardPages/SpeakerList";
+import CreateSpeaker from "./pages/AdminDashBoardPages/CreateSpeaker";
+import SingleEventPost from "./pages/SingleEventPost";
 
 const App = () => {
   return (
     <BrowserRouter>
-      {/* <Navbar /> */}
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/Post/:slug" element={<Post />} />
         <Route path="/blog" element={<Blog />} />
+        <Route path="/event/:slug" element={<SingleEventPost />} />
         <Route path="/webinars" element={<Webinar />} />
         <Route path="/conferences" element={<Conferences />} />
         <Route path="/solutions" element={<Solutions />} />
@@ -66,9 +72,15 @@ const App = () => {
               element={<AdminDashboard />}
             />
             <Route path="/DashBoard/AdminProfile" element={<AdminProfile />} />
+            <Route path="/DashBoard/Admin/SpeakerList" element={<Speakers />} />
+            <Route
+              path="/DashBoard/Admin/CreateSpeaker/:speakerId?"
+              element={<CreateSpeaker />}
+            />
             <Route path="/DashBoard/Users" element={<AdminUsersLists />} />
             <Route path="/DashBoard/Admin/Authors" element={<Authors />} />
             <Route path="/DashBoard/Admin/Posts" element={<Posts />} />
+
             <Route
               path="/DashBoard/Admin/CreatePosts/:postId?"
               element={<CreatePosts />}
@@ -76,6 +88,14 @@ const App = () => {
             <Route
               path="/DashBoard/Admin/CreateAuthor/:authorId?"
               element={<CreateAuthor />}
+            />
+            <Route
+              path="/DashBoard/Admin/Events"
+              element={<AdminEventLists />}
+            />
+            <Route
+              path="/DashBoard/Admin/CreateEvents/:eventId?"
+              element={<CreateEvents />}
             />
           </Route>
         </Route>

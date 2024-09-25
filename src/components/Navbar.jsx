@@ -16,10 +16,6 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeLink, setActiveLink] = useState(null);
 
-  const handleLogout = () => {
-    dispatch(logoutUser());
-  };
-
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -289,6 +285,10 @@ export function DropdownItems(handleLinkClick) {
       setUserOpen(false);
     }
   };
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    console.log("logout clicked");
+  };
 
   return (
     <div ref={menuRef}>
@@ -347,25 +347,24 @@ export function DropdownItems(handleLinkClick) {
               </div>
               <ul className="py-2 text-sm text-gray-700">
                 <li>
-                  <Link
+                  <NavLink
                     to={dashboardPath}
                     className="block px-4 py-2 text-black rounded hover:text-blue-700 md:dark:hover:bg-transparent font-semibold"
                     onClick={handleLinkClick}
                   >
                     DashBoard
-                  </Link>
+                  </NavLink>
                 </li>
                 <li>
-                  <Link
-                    to={`/DashBoard/profile`}
+                  <button
                     className="block px-4 py-2 text-black rounded hover:text-blue-700 md:dark:hover:bg-transparent font-semibold"
-                    onClick={handleLinkClick}
+                    onClick={handleLogout}
                   >
                     <div className="flex items-center space-x-2 justify-center">
                       <span>Logout</span>
                       <HiOutlineLogout className="text-black w-4 h-4" />
                     </div>
-                  </Link>
+                  </button>
                 </li>
               </ul>
             </div>

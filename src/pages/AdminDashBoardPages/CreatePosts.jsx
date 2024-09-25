@@ -43,43 +43,6 @@ export default function CreatePosts() {
   });
   const [authors, setAuthors] = useState([]);
 
-  //   useEffect(() => {
-  //     const fetchAuthors = async () => {
-  //       try {
-  //         const res = await fetch(`${backendURL}/api/getAllAuthors`);
-  //         const data = await res.json();
-  //         setAuthors(data);
-  //       } catch (error) {
-  //         console.error("Failed to fetch authors:", error);
-  //         showSnackbar("Failed to fetch authors", "error");
-  //       }
-  //     };
-
-  //     fetchAuthors();
-
-  // const fetchPost = async () => {
-  //   if (postId) {
-  //     try {
-  //       const res = await fetch(`${backendURL}/api/getPostById/${postId}`);
-  //       const post = await res.json();
-  //       console.log(post, "Post fetched");
-
-  //       if (post) {
-  //         setFormData({
-  //           title: post.title,
-  //           category: post.category,
-  //           content: post.content,
-  //           authorId: post.authorId,
-  //         });
-  //         setImagePreview(`${backendURL}${post.image}`);
-  //       }
-  //     } catch (error) {
-  //       showSnackbar("Failed to fetch post", "error");
-  //     }
-  //   }
-  // };
-  // fetchPost();
-  //   }, [postId]);
   useEffect(() => {
     const fetchAuthors = async () => {
       try {
@@ -98,24 +61,34 @@ export default function CreatePosts() {
     };
 
     fetchAuthors();
-
     const fetchPost = async () => {
       if (postId) {
         try {
           const res = await fetch(`${backendURL}/api/getPostById/${postId}`);
           const post = await res.json();
-          console.log(post, "Post fetched");
+          console.log("Raw API response:", post);
 
           if (post) {
-            setFormData({
-              title: post.title,
-              category: post.category,
-              content: post.content,
-              authorId: post.authorId,
+            console.log("Setting form data with:", {
+              title: post.title || "",
+              category: post.category || "uncategorized",
+              content: post.content || "",
+              authorId: post.authorId || "",
             });
-            setImagePreview(`${backendURL}${post.image}`);
+
+            setFormData({
+              title: post.title || "",
+              category: post.category || "uncategorized",
+              content: post.content || "",
+              authorId: post.authorId || "",
+            });
+
+            console.log("Form data after setting:", formData);
+
+            setImagePreview(post.image ? `${backendURL}${post.image}` : null);
           }
         } catch (error) {
+          console.error("Error fetching post:", error);
           showSnackbar("Failed to fetch post", "error");
         }
       }
