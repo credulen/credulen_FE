@@ -33,6 +33,8 @@ import {
   ChatBubbleOutline,
   MoreVert,
   Close,
+  Reply,
+  Margin,
 } from "@mui/icons-material";
 
 import ReactQuill from "react-quill";
@@ -89,6 +91,7 @@ export const RelatedPosts = ({ category, currentPostId }) => {
         }
         const data = await response.json();
         setRelatedPosts(data);
+        console.log(data, relatedPosts);
       } catch (error) {
         console.error("Error fetching related posts:", error);
       }
@@ -104,21 +107,90 @@ export const RelatedPosts = ({ category, currentPostId }) => {
   };
 
   return (
-    <Box sx={{ mt: 4, width: "100%" }}>
+    // <Box sx={{ mt: 0, width: "100%" }}>
+    //   <Typography variant="h6" gutterBottom>
+    //     Related Posts
+    //   </Typography>
+    //   {relatedPosts.map((post) => (
+    //     <Card
+    //       key={post._id}
+    //       sx={{
+    //         display: "flex",
+    //         flexDirection: "column",
+    //         mb: 3,
+    //         cursor: "pointer",
+    //       }}
+    //       onClick={() => handlePostClick(post.slug)}
+    //     >
+    //       {post.image && (
+    //         <CardMedia
+    //           component="img"
+    //           sx={{ width: "100%", height: 200, objectFit: "cover" }}
+    //           image={`${backendURL}${post.image}`}
+    //           alt={post.title}
+    //         />
+    //       )}
+    //       <CardContent sx={{ flexGrow: 1, p: 2 }}>
+    //         <Typography variant="h6" component="div" gutterBottom>
+    //           {post.title}
+    //         </Typography>
+    //         <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+    //           <Avatar
+    //             src={`${backendURL}${post.authorId.image}`}
+    //             alt={post.authorId.name}
+    //             sx={{ width: 24, height: 24, mr: 1 }}
+    //           />
+    //           <Typography variant="body2" color="text.secondary">
+    //             {post.authorId.name}
+    //           </Typography>
+    //         </Box>
+    //         <Typography
+    //           variant="caption"
+    //           color="text.secondary"
+    //           display="block"
+    //           mb={2}
+    //         >
+    //           {moment(post.createdAt).fromNow()}
+    //         </Typography>
+    //         <Box
+    //           sx={{
+    //             display: "flex",
+    //             alignItems: "center",
+    //             justifyContent: "space-between",
+    //           }}
+    //         >
+    //           <Box sx={{ display: "flex", alignItems: "center" }}>
+    //             <ThumbUp fontSize="small" sx={{ mr: 0.5 }} />
+    //             <Typography variant="body2">
+    //               {post.likes ? post.likes.length : 0}
+    //             </Typography>
+    //           </Box>
+    //           <Box sx={{ display: "flex", alignItems: "center" }}>
+    //             <ChatBubbleOutline fontSize="small" sx={{ mr: 0.5 }} />
+    //             <Typography variant="body2">
+    //               {post.comments ? post.comments.length : 0}
+    //             </Typography>
+    //           </Box>
+    //         </Box>
+    //       </CardContent>
+    //     </Card>
+    //   ))}
+    // </Box>
+    <Box sx={{ mt: 2, width: "100%" }}>
       <Typography variant="h6" gutterBottom>
         Related Posts
       </Typography>
       {relatedPosts.map((post) => (
         <Card
           key={post._id}
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            mb: 2,
-            cursor: "pointer",
-          }}
+          className="
+    flex flex-col mb-3 mx-auto cursor-pointer 
+    shadow-md hover:shadow-lg 
+    min-w-ful   minilg:max-w-[25rem] minilg:mb-10 container"
           onClick={() => handlePostClick(post.slug)}
         >
+          {/* Card content goes here */}
+
           {post.image && (
             <CardMedia
               component="img"
@@ -127,7 +199,9 @@ export const RelatedPosts = ({ category, currentPostId }) => {
               alt={post.title}
             />
           )}
-          <CardContent sx={{ flexGrow: 1, p: 2 }}>
+          <CardContent sx={{ flexGrow: 1, p: 1 }}>
+            {" "}
+            {/* Increased padding */}
             <Typography variant="h6" component="div" gutterBottom>
               {post.title}
             </Typography>
@@ -175,7 +249,14 @@ export const RelatedPosts = ({ category, currentPostId }) => {
     </Box>
   );
 };
-export const ExpandableCommentInput = ({ onSubmit, userAvatar }) => {
+
+export const ExpandableCommentInput = ({
+  onSubmit,
+  userAvatar,
+  commentsCount,
+  postId,
+  userId,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [comment, setComment] = useState("");
 
@@ -196,40 +277,105 @@ export const ExpandableCommentInput = ({ onSubmit, userAvatar }) => {
   };
 
   return (
-    <Box sx={{ display: "flex", alignItems: "flex-start", mt: 2 }}>
-      <Avatar src={userAvatar} sx={{ mr: 1 }} />
-      <Box sx={{ flexGrow: 1 }}>
-        <TextField
-          fullWidth
-          multiline
-          rows={isExpanded ? 3 : 1}
-          placeholder="Share your thoughts"
-          value={comment}
-          onChange={handleCommentChange}
+    <Box sx={{ mt: 2, width: "100%" }}>
+      {!isExpanded && (
+        <Box
           onClick={handleExpand}
-          variant="outlined"
           sx={{
-            backgroundColor: "background.paper",
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": { borderColor: "divider" },
-              "&:hover fieldset": { borderColor: "divider" },
-              "&.Mui-focused fieldset": { borderColor: "primary.main" },
+            display: "flex",
+            alignItems: "center",
+            borderRadius: "9px",
+            padding: "8px 16px",
+            cursor: "pointer",
+            border: "1px solid gray",
+            m: 1,
+            p: 2,
+            marginBottom: "20px",
+            "&:hover": {
+              transition: "all 0.3s ease",
+              border: "2px solid gray",
             },
           }}
-        />
-      </Box>
-      {isExpanded && (
-        <IconButton
-          onClick={handleSubmit}
-          color="primary"
-          sx={{ mt: 1, ml: 1 }}
         >
-          <Send />
-        </IconButton>
+          <Avatar
+            src={userAvatar}
+            sx={{ width: 32, height: 32, marginRight: "12px" }}
+          />
+          <Typography
+            sx={{
+              color: "#808080",
+              fontSize: "14px",
+              fontWeight: 500,
+            }}
+          >
+            Share your thoughts
+          </Typography>
+          <Box sx={{ flexGrow: 1 }} />
+          <Typography
+            sx={{
+              color: "#808080",
+              fontSize: "14px",
+              fontWeight: 500,
+              // backgroundColor: "#2a2a2a",
+              borderColor: "#2a2a2a",
+              borderWidth: "1px",
+              borderRadius: "4px",
+              padding: "4px 8px",
+            }}
+          >
+            Post
+          </Typography>
+        </Box>
+      )}
+      {isExpanded && (
+        <DarkBox>
+          <Box display="flex" justifyContent="end" marginBottom={2}>
+            <Box>
+              <Typography variant="body2">{commentsCount} Comments</Typography>
+            </Box>
+          </Box>
+          <Box display="flex" alignItems="flex-start" marginBottom={2}>
+            <Avatar src={userAvatar} sx={{ marginRight: 1 }} />
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              placeholder="Share your thoughts"
+              value={comment}
+              onChange={handleCommentChange}
+              variant="outlined"
+              sx={{
+                backgroundColor: "white",
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "white" },
+                  "&:hover fieldset": { borderColor: "white" },
+                  "&.Mui-focused fieldset": { borderColor: "white" },
+                },
+                "& .MuiInputBase-input": { color: "black" },
+              }}
+            />
+          </Box>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <StyledIconButton>⬆️</StyledIconButton>
+              <StyledIconButton>⬇️</StyledIconButton>
+              <StyledIconButton>🔗</StyledIconButton>
+              <StyledIconButton>@</StyledIconButton>
+            </Box>
+            <StyledButton variant="contained" onClick={handleSubmit}>
+              Comment
+            </StyledButton>
+          </Box>
+        </DarkBox>
       )}
     </Box>
   );
 };
+
 export default function Post() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -325,53 +471,47 @@ export default function Post() {
     }
   };
 
-  const handleCommentSubmit = async (e) => {
-    e.preventDefault();
+  const handleCommentSubmit = async (newComment) => {
+    try {
+      const commentData = {
+        content: newComment,
+        postId: postId,
+        userId: userId,
+      };
 
-    if (newComment.trim()) {
-      try {
-        const commentData = {
-          content: newComment,
-          postId: postId,
-          userId: userId,
-        };
+      const response = await fetch(`${backendURL}/api/createComment`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(commentData),
+      });
 
-        const response = await fetch(`${backendURL}/api/createComment`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(commentData),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to create comment");
-        }
-
-        const newCommentObj = await response.json();
-
-        // Add user data to the new comment object
-        const commentWithUserData = {
-          ...newCommentObj,
-          userId: {
-            _id: userId,
-            username: name,
-            image: image,
-          },
-        };
-
-        setComments([...comments, commentWithUserData]);
-        setNewComment("");
-
-        setSnackbarMessage("Comment submitted successfully!");
-        setSnackbarSeverity("success");
-        setSnackbarOpen(true);
-      } catch (error) {
-        console.error("Error submitting comment:", error);
-        setSnackbarMessage("Failed to submit comment.");
-        setSnackbarSeverity("error");
-        setSnackbarOpen(true);
+      if (!response.ok) {
+        throw new Error("Failed to create comment");
       }
+
+      const newCommentObj = await response.json();
+
+      const commentWithUserData = {
+        ...newCommentObj,
+        userId: {
+          _id: userId,
+          username: name,
+          image: image,
+        },
+      };
+
+      setComments([...comments, commentWithUserData]);
+
+      setSnackbarMessage("Comment submitted successfully!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error("Error submitting comment:", error);
+      setSnackbarMessage("Failed to submit comment.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
@@ -586,7 +726,7 @@ export default function Post() {
   console.log(post, "post details");
 
   return (
-    <Grid container spacing={3} sx={{ px: { xs: 2, md: 4 }, py: 4 }}>
+    <Grid container spacing={3} sx={{ px: { xs: 2, md: 4 }, py: 11.5 }}>
       <Grid item xs={12} md={8}>
         <Box sx={{ maxWidth: "100%", margin: "auto" }}>
           {post.image && (
@@ -602,9 +742,10 @@ export default function Post() {
                   md: "35vw",
                   lg: "35vw",
                 },
-                borderRadius: "8px",
+                borderRadius: "4px",
                 marginBottom: "1rem",
-                boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                // boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                objectFit: "cover", // Add this line
               }}
             />
           )}
@@ -645,7 +786,7 @@ export default function Post() {
                 {moment(post.createdAt).format("MMMM D, YYYY")}
               </Typography>
             </Box>
-            <Chip label={post.category} />
+            {/* <Chip label={post.category} /> */}
           </Box>
           <Box
             sx={{
@@ -664,6 +805,7 @@ export default function Post() {
             value={post.content || ""}
             readOnly={true}
             theme="bubble"
+            style={{ padding: "-5px" }} // This removes the padding
           />
 
           <Box sx={{ display: "flex", alignItems: "center", mt: 3, mb: 3 }}>
@@ -675,113 +817,101 @@ export default function Post() {
 
           <Divider sx={{ mb: 3 }} />
 
-          <DarkBox>
-            <Box display="flex" justifyContent="end" marginBottom={2}>
-              <Box>
-                <Typography variant="body2">
-                  {comments.length} Comments
-                </Typography>
-              </Box>
-            </Box>
-            <Box display="flex" alignItems="flex-start" marginBottom={2}>
-              <Avatar
-                src={`${backendURL}/uploads/${profile?.image}`}
-                alt={currentUser?.name}
-                sx={{ marginRight: 1 }}
-              />
-              <TextField
-                fullWidth
-                multiline
-                rows={3}
-                placeholder="Share your thoughts"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                variant="outlined"
-                sx={{
-                  backgroundColor: "white",
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": { borderColor: "white" },
-                    "&:hover fieldset": { borderColor: "white" },
-                    "&.Mui-focused fieldset": { borderColor: "white" },
-                  },
-                  "& .MuiInputBase-input": { color: "black" },
-                }}
-              />
-            </Box>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Box>
-                <StyledIconButton>⬆️</StyledIconButton>
-                <StyledIconButton>⬇️</StyledIconButton>
-                <StyledIconButton>🔗</StyledIconButton>
-                <StyledIconButton>@</StyledIconButton>
-              </Box>
-              <StyledButton variant="contained" onClick={handleCommentSubmit}>
-                Comment
-              </StyledButton>
-            </Box>
-          </DarkBox>
+          <ExpandableCommentInput
+            onSubmit={handleCommentSubmit}
+            userAvatar={`${backendURL}/uploads/${profile?.image}`}
+            commentsCount={comments.length}
+            postId={postId}
+            userId={userId}
+          />
 
-          {/* 
-
-
-          <List>
+          {/* ????????????? */}
+          <Box sx={{ width: "100%", bgcolor: "#f5f5f5", p: 2 }}>
             {comments.map((comment) => (
-              <ListItem
-                key={comment._id}
-                sx={{
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  mb: 2,
-                  p: 2,
-                  bgcolor: "background.paper",
-                  borderRadius: 1,
-                  border: "1px solid gray",
-                }}
+              <Box
+                key={comment.id}
+                sx={{ mb: 2, bgcolor: "white", borderRadius: 1, p: 2 }}
               >
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    mb: 1,
-                  }}
-                >
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Avatar
-                      src={
-                        comment.userId?.image
-                          ? `${backendURL}/uploads/${comment.userId.image}`
-                          : "/default-avatar.jpg"
-                      }
-                      alt={comment.userId?.username || "Anonymous"}
-                      sx={{ width: 32, height: 32, mr: 1 }}
-                    />
-                    <Typography variant="subtitle2">
-                      {comment.userId?.username || "Anonymous"}
-                    </Typography>
-                  </Box>
-                  {(currentUser.userInfo.user._id === comment.userId._id ||
-                    currentUser.userInfo.user.isAdmin) && (
-                    <Box>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleEditClick(comment)}
-                        sx={{ mr: 1 }}
+                {/* <Box sx={{ display: "", alignItems: "", mb: 1 }}>
+                  <Avatar
+                    src={`${backendURL}/uploads/${profile?.image}`}
+                    alt={comment.username}
+                    sx={{ width: 32, height: 32, mr: 1 }}
+                  />
+                </Box>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: "light  " }}
+                  >
+                    {comment.userId?.username || "Anonymous"}
+                  </Typography>
+
+                  <Typography
+                    variant="caption"
+                    sx={{ marginLeft: 1 }}
+                    color="text.secondary"
+                  >
+                    {" "}
+                    <span className="mx-1">-</span>
+                    {formatDistanceToNow(new Date(comment.createdAt), {
+                      addSuffix: true,
+                    })}
+                  </Typography>
+                </Box> */}
+                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                  {/* Avatar */}
+                  <Avatar
+                    src={`${backendURL}/uploads/${profile?.image}`}
+                    alt={comment.username}
+                    sx={{ width: 32, height: 32, mr: 1 }}
+                  />
+
+                  {/* Parent container with space between username/timestamp and the MoreVert icon */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      mb: 1,
+                      width: "100%",
+                    }}
+                  >
+                    {/* Text box containing the username and timestamp */}
+                    <Box sx={{ display: "flex", flexDirection: "row" }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ fontWeight: "light" }}
                       >
-                        <Edit size={16} />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDeleteClick(comment._id)}
+                        {comment.userId?.username || "Anonymous"}
+                      </Typography>
+
+                      <Typography
+                        variant="caption"
+                        sx={{ marginLeft: 1 }}
+                        color="text.secondary"
                       >
-                        <Delete size={16} />
-                      </IconButton>
+                        <span className="mx-1">-</span>
+                        {formatDistanceToNow(new Date(comment.createdAt), {
+                          addSuffix: true,
+                        })}
+                      </Typography>
                     </Box>
-                  )}
+
+                    {/* MoreVert icon button aligned to the right */}
+                    {currentUser?.userInfo?.user &&
+                      (currentUser.userInfo.user._id === comment.userId?._id ||
+                        currentUser.userInfo.user.isAdmin) && (
+                        <IconButton
+                          size="small"
+                          onClick={(event) =>
+                            handleMenuOpen(event, comment._id)
+                          }
+                        >
+                          <MoreVert />
+                        </IconButton>
+                      )}
+                  </Box>
                 </Box>
 
                 {editingCommentId === comment._id ? (
@@ -810,44 +940,29 @@ export default function Post() {
                     {comment.content}
                   </Typography>
                 )}
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                  }}
-                >
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <IconButton
-                      onClick={() => handleCommentLike(comment._id)}
-                      size="small"
-                    >
-                      <ThumbUp
-                        color={
-                          comment.likes.includes(currentUser.userInfo.user._id)
-                            ? "primary"
-                            : "inherit"
-                        }
-                        size={16}
-                      />
-                    </IconButton>
-                    <Typography variant="caption" sx={{ ml: 1 }}>
-                      {comment.likes.length} likes
-                    </Typography>
-                  </Box>
-                  <Typography variant="caption" color="text.secondary">
-                    {formatDistanceToNow(new Date(comment.createdAt), {
-                      addSuffix: true,
-                    })}
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <IconButton
+                    onClick={() => handleCommentLike(comment._id)}
+                    size="small"
+                  >
+                    <ThumbUp
+                      color={
+                        comment.likes.includes(currentUser?.userInfo?.user._id)
+                          ? "primary"
+                          : "inherit"
+                      }
+                      fontSize="small"
+                    />
+                  </IconButton>
+                  <Typography variant="caption" sx={{ ml: 1 }}>
+                    {comment.likes.length} likes
                   </Typography>
                 </Box>
-              </ListItem>
+              </Box>
             ))}
-          </List> */}
+          </Box>
 
-          <List>
+          {/* <List>
             {displayedComments.map((comment) => (
               <ListItem
                 key={comment._id}
@@ -955,7 +1070,8 @@ export default function Post() {
                 </Box>
               </ListItem>
             ))}
-          </List>
+          </List> */}
+
           {comments.length > 5 && (
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
               <Button onClick={toggleShowAllComments}>
@@ -998,27 +1114,6 @@ export default function Post() {
           <RelatedPosts category={post.category} currentPostId={post._id} />
         </Box>
       </Grid>
-
-      {/* <Dialog
-        open={deleteDialogOpen}
-        onClose={handleDeleteCancel}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"Delete Comment?"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this comment? This action cannot be
-            undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteCancel}>Cancel</Button>
-          <Button onClick={handleDeleteConfirm} autoFocus>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog> */}
 
       <Dialog open={deleteDialogOpen} onClose={handleDeleteCancel}>
         <DialogTitle>Are you sure you want to delete this comment?</DialogTitle>

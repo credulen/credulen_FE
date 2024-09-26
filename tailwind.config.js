@@ -43,7 +43,7 @@ module.exports = {
         // // => @media (min-width: 1536px) { ... }
         mod: { max: "639px" },
         expcard: { max: "1066px" },
-        minilg: { min: "850px" },
+        minilg: { max: "899px" },
         mid: { max: "767px" },
         Nlg: { max: "1023px" },
         // => @media (min-width: 0px and max-width: 639px) { ... }

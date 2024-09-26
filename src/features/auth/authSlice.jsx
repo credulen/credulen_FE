@@ -39,6 +39,7 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
+      console.log("User logged outfrom slice");
 
       // Optionally, clear tokens from localStorage
       localStorage.removeItem("accessToken");
