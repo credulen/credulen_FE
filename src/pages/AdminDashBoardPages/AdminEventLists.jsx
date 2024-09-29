@@ -633,15 +633,18 @@ export default function AdminEventLists() {
                     className="bg-white dark:border-gray-700 dark:bg-gray-800"
                   >
                     <Table.Cell>
-                      <img
-                        src={`${backendURL}${event.image}`}
-                        alt={event.title}
-                        className="w-20 h-20 object-cover bg-gray-500 rounded-full"
-                      />
+                      <div className="w-[3rem] h-[3rem] overflow-hidden rounded-full flex items-center justify-center bg-gray-500">
+                        <img
+                          src={`${backendURL}${event.image}`}
+                          alt={event.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                     </Table.Cell>
+
                     <Table.Cell>
                       <Link to={`/event/${event.slug}`}>
-                        <span className="font-medium text-gray-900 dark:text-white">
+                        <span className="font-medium text-gray-900 text-xs">
                           {event.title}
                         </span>
                       </Link>
@@ -652,12 +655,13 @@ export default function AdminEventLists() {
                         "EEE, MMM d • h:mm a 'GMT'xxx"
                       )}
                     </Table.Cell>
-                    <Table.Cell>{event.venue}</Table.Cell>
+                    <Table.Cell>{event.venue.slice(0, 20)}</Table.Cell>
+
                     <Table.Cell>{event.eventType}</Table.Cell>
                     <Table.Cell>
                       {event.speakers.map((speaker, index) => (
                         <span key={index}>
-                          {speaker.name}
+                          {speaker.name.slice(0, 20)}
                           {index < event.speakers.length - 1 && ", "}
                         </span>
                       ))}

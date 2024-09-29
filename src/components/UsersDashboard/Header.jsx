@@ -15,7 +15,7 @@ function Header() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
-  const userId = userInfo?.user._id;
+  const userId = userInfo?.user?._id;
   const { profile, loading, success, error } = useSelector(
     (state) => state.profiles
   );

@@ -28,6 +28,7 @@ export const loginUser = createAsyncThunk(
       );
 
       const { token, user } = response.data;
+      console.log(response.data, "returned login data");
 
       // Store the token in localStorage
       localStorage.setItem("userToken", token);
@@ -251,30 +252,15 @@ export const resendEmail = (storedEmail) => {
   };
 };
 
-// export const verifyAdminOTP = createAsyncThunk(
-//   "auth/verifyAdminOTP",
-//   async ({ email, otp }, { rejectWithValue }) => {
-//     try {
-//       const response = await axios.post(`${backendURL}/api/verify-otp`, {
-//         email,
-//         otp,
-//       });
-//       return response.data;
-//     } catch (error) {
-//       return rejectWithValue(error.response.data.message);
-//     }
-//   }
-// );
-
 export const verifyAdminOTP = createAsyncThunk(
   "auth/verifyAdminOTP",
-  async ({ email, otp }, thunkAPI) => {
+  async ({ userId, otp }, thunkAPI) => {
     try {
-      const response = await axios.post(`${backendURL}/api/verify-otp`, {
-        email,
+      const response = await axios.post(`${backendURL}/api/verifAdminyOTP`, {
+        userId,
         otp,
       });
-      return response.data; // or response.data.payload depending on your API response structure
+      return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }

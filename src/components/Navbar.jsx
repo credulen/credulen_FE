@@ -702,7 +702,6 @@ export function DropdownItems(handleLinkClick) {
   const { userInfo } = useSelector((state) => state.auth);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
-  console.log(userInfo);
 
   useEffect(() => {
     setIsLoggedIn(!!userInfo);
@@ -711,7 +710,7 @@ export function DropdownItems(handleLinkClick) {
   const { profile, loading, success, error } = useSelector(
     (state) => state.profiles
   );
-  const userId = userInfo?.user._id;
+  const userId = userInfo?.user?._id;
   const dashboardPath =
     userInfo?.user?.role === "admin"
       ? "/DashBoard/Admin_Dashboard"
@@ -809,7 +808,7 @@ export function DropdownItems(handleLinkClick) {
             >
               <div className="px-4 py-3 text-sm text-black">
                 <div className="font-medium truncate">
-                  {userInfo && userInfo?.user.email
+                  {userInfo && userInfo?.user?.email
                     ? userInfo?.user.email
                     : "User email not available"}
                 </div>

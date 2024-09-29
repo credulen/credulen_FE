@@ -63,7 +63,7 @@ const ProtectedRoute = ({ requiredRole }) => {
   }
 
   // Extract the user's role from userInfo
-  const userRole = userInfo?.user.role;
+  const userRole = userInfo?.user?.role;
 
   // Check if the user has the required role
   if (requiredRole && userRole !== requiredRole) {

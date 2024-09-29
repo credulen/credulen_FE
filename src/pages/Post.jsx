@@ -107,75 +107,6 @@ export const RelatedPosts = ({ category, currentPostId }) => {
   };
 
   return (
-    // <Box sx={{ mt: 0, width: "100%" }}>
-    //   <Typography variant="h6" gutterBottom>
-    //     Related Posts
-    //   </Typography>
-    //   {relatedPosts.map((post) => (
-    //     <Card
-    //       key={post._id}
-    //       sx={{
-    //         display: "flex",
-    //         flexDirection: "column",
-    //         mb: 3,
-    //         cursor: "pointer",
-    //       }}
-    //       onClick={() => handlePostClick(post.slug)}
-    //     >
-    //       {post.image && (
-    //         <CardMedia
-    //           component="img"
-    //           sx={{ width: "100%", height: 200, objectFit: "cover" }}
-    //           image={`${backendURL}${post.image}`}
-    //           alt={post.title}
-    //         />
-    //       )}
-    //       <CardContent sx={{ flexGrow: 1, p: 2 }}>
-    //         <Typography variant="h6" component="div" gutterBottom>
-    //           {post.title}
-    //         </Typography>
-    //         <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-    //           <Avatar
-    //             src={`${backendURL}${post.authorId.image}`}
-    //             alt={post.authorId.name}
-    //             sx={{ width: 24, height: 24, mr: 1 }}
-    //           />
-    //           <Typography variant="body2" color="text.secondary">
-    //             {post.authorId.name}
-    //           </Typography>
-    //         </Box>
-    //         <Typography
-    //           variant="caption"
-    //           color="text.secondary"
-    //           display="block"
-    //           mb={2}
-    //         >
-    //           {moment(post.createdAt).fromNow()}
-    //         </Typography>
-    //         <Box
-    //           sx={{
-    //             display: "flex",
-    //             alignItems: "center",
-    //             justifyContent: "space-between",
-    //           }}
-    //         >
-    //           <Box sx={{ display: "flex", alignItems: "center" }}>
-    //             <ThumbUp fontSize="small" sx={{ mr: 0.5 }} />
-    //             <Typography variant="body2">
-    //               {post.likes ? post.likes.length : 0}
-    //             </Typography>
-    //           </Box>
-    //           <Box sx={{ display: "flex", alignItems: "center" }}>
-    //             <ChatBubbleOutline fontSize="small" sx={{ mr: 0.5 }} />
-    //             <Typography variant="body2">
-    //               {post.comments ? post.comments.length : 0}
-    //             </Typography>
-    //           </Box>
-    //         </Box>
-    //       </CardContent>
-    //     </Card>
-    //   ))}
-    // </Box>
     <Box sx={{ mt: 2, width: "100%" }}>
       <Typography variant="h6" gutterBottom>
         Related Posts
@@ -278,6 +209,18 @@ export const ExpandableCommentInput = ({
 
   return (
     <Box sx={{ mt: 2, width: "100%" }}>
+      {commentsCount > 0 && (
+        <Box
+          display="flex"
+          alignItems="center" // Aligns items vertically centered
+          marginBottom={2}
+          marginLeft={1}
+        >
+          <ChatBubbleOutline style={{ marginRight: 4 }} />{" "}
+          {/* Space between icon and text */}
+          <Typography variant="body2">{commentsCount} Comments</Typography>
+        </Box>
+      )}
       {!isExpanded && (
         <Box
           onClick={handleExpand}
@@ -316,7 +259,7 @@ export const ExpandableCommentInput = ({
               color: "#808080",
               fontSize: "14px",
               fontWeight: 500,
-              // backgroundColor: "#2a2a2a",
+              backgroundColor: "",
               borderColor: "#2a2a2a",
               borderWidth: "1px",
               borderRadius: "4px",
@@ -327,13 +270,14 @@ export const ExpandableCommentInput = ({
           </Typography>
         </Box>
       )}
+
       {isExpanded && (
         <DarkBox>
-          <Box display="flex" justifyContent="end" marginBottom={2}>
+          {/* <Box display="flex" justifyContent="end" marginBottom={2}>
             <Box>
               <Typography variant="body2">{commentsCount} Comments</Typography>
             </Box>
-          </Box>
+          </Box> */}
           <Box display="flex" alignItems="flex-start" marginBottom={2}>
             <Avatar src={userAvatar} sx={{ marginRight: 1 }} />
             <TextField
@@ -390,8 +334,8 @@ export default function Post() {
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const { profile } = useSelector((state) => state.profiles);
   const currentUser = useSelector((state) => state.auth);
-  const userId = currentUser?.userInfo?.user._id;
-  const email = currentUser?.userInfo?.user.email;
+  const userId = currentUser?.userInfo?.user?._id;
+  const email = currentUser?.userInfo?.user?.email;
   const name = profile?.username;
   const image = profile?.image;
   const [likesCount, setLikesCount] = useState(0);
@@ -744,8 +688,7 @@ export default function Post() {
                 },
                 borderRadius: "4px",
                 marginBottom: "1rem",
-                // boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                objectFit: "cover", // Add this line
+                objectFit: "cover",
               }}
             />
           )}
@@ -825,40 +768,12 @@ export default function Post() {
             userId={userId}
           />
 
-          {/* ????????????? */}
           <Box sx={{ width: "100%", bgcolor: "#f5f5f5", p: 2 }}>
             {comments.map((comment) => (
               <Box
                 key={comment.id}
                 sx={{ mb: 2, bgcolor: "white", borderRadius: 1, p: 2 }}
               >
-                {/* <Box sx={{ display: "", alignItems: "", mb: 1 }}>
-                  <Avatar
-                    src={`${backendURL}/uploads/${profile?.image}`}
-                    alt={comment.username}
-                    sx={{ width: 32, height: 32, mr: 1 }}
-                  />
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontWeight: "light  " }}
-                  >
-                    {comment.userId?.username || "Anonymous"}
-                  </Typography>
-
-                  <Typography
-                    variant="caption"
-                    sx={{ marginLeft: 1 }}
-                    color="text.secondary"
-                  >
-                    {" "}
-                    <span className="mx-1">-</span>
-                    {formatDistanceToNow(new Date(comment.createdAt), {
-                      addSuffix: true,
-                    })}
-                  </Typography>
-                </Box> */}
                 <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                   {/* Avatar */}
                   <Avatar
@@ -947,7 +862,7 @@ export default function Post() {
                   >
                     <ThumbUp
                       color={
-                        comment.likes.includes(currentUser?.userInfo?.user._id)
+                        comment.likes.includes(currentUser?.userInfo?.user?._id)
                           ? "primary"
                           : "inherit"
                       }
@@ -961,116 +876,6 @@ export default function Post() {
               </Box>
             ))}
           </Box>
-
-          {/* <List>
-            {displayedComments.map((comment) => (
-              <ListItem
-                key={comment._id}
-                sx={{
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  mb: 2,
-                  p: 2,
-                  bgcolor: "background.paper",
-                  borderRadius: 1,
-                  border: "1px solid gray",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    mb: 1,
-                  }}
-                >
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Avatar
-                      src={
-                        comment.userId?.image
-                          ? `${backendURL}/uploads/${comment.userId.image}`
-                          : "/default-avatar.jpg"
-                      }
-                      alt={comment.userId?.username || "Anonymous"}
-                      sx={{ width: 32, height: 32, mr: 1 }}
-                    />
-                    <Typography variant="subtitle2">
-                      {comment.userId?.username || "Anonymous"}
-                    </Typography>
-                  </Box>
-                  {(currentUser.userInfo.user._id === comment.userId._id ||
-                    currentUser.userInfo.user.isAdmin) && (
-                    <IconButton
-                      size="small"
-                      onClick={(event) => handleMenuOpen(event, comment._id)}
-                    >
-                      <MoreVert />
-                    </IconButton>
-                  )}
-                </Box>
-
-                {editingCommentId === comment._id ? (
-                  <Box sx={{ width: "100%" }}>
-                    <TextField
-                      fullWidth
-                      multiline
-                      rows={3}
-                      value={editedCommentContent}
-                      onChange={(e) => setEditedCommentContent(e.target.value)}
-                      variant="outlined"
-                      sx={{ mb: 1 }}
-                    />
-                    <Button
-                      onClick={() =>
-                        handleCommentEdit(comment._id, editedCommentContent)
-                      }
-                      sx={{ mr: 1 }}
-                    >
-                      Save
-                    </Button>
-                    <Button onClick={handleCancelEdit}>Cancel</Button>
-                  </Box>
-                ) : (
-                  <Typography variant="body1" sx={{ mb: 1, width: "100%" }}>
-                    {comment.content}
-                  </Typography>
-                )}
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                  }}
-                >
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <IconButton
-                      onClick={() => handleCommentLike(comment._id)}
-                      size="small"
-                    >
-                      <ThumbUp
-                        color={
-                          comment.likes.includes(currentUser.userInfo.user._id)
-                            ? "primary"
-                            : "inherit"
-                        }
-                        fontSize="small"
-                      />
-                    </IconButton>
-                    <Typography variant="caption" sx={{ ml: 1 }}>
-                      {comment.likes.length} likes
-                    </Typography>
-                  </Box>
-                  <Typography variant="caption" color="text.secondary">
-                    {formatDistanceToNow(new Date(comment.createdAt), {
-                      addSuffix: true,
-                    })}
-                  </Typography>
-                </Box>
-              </ListItem>
-            ))}
-          </List> */}
 
           {comments.length > 5 && (
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>

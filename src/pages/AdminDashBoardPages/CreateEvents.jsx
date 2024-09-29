@@ -379,11 +379,13 @@ export default function CreateEvents() {
             value={formData.description}
             onChange={handleQuillChange}
           />
+
           <Button
             type="submit"
             variant="contained"
             color="primary"
             disabled={loading}
+            sx={{ marginTop: "16px" }}
           >
             {loading ? (
               <CircularProgress size={24} />
@@ -393,17 +395,6 @@ export default function CreateEvents() {
               "Create Event"
             )}
           </Button>
-          {eventId && (
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={handleDelete}
-              disabled={loading}
-            >
-              Delete Event
-            </Button>
-          )}
-          {/* ... (rest of the form fields) */}
         </form>
         <Snackbar
           open={snackbar.open}

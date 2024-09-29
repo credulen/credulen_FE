@@ -37,7 +37,7 @@ function DashBoardProfile() {
   const { profile, loading, success, error } = useSelector(
     (state) => state.profiles
   );
-  const userId = userInfo?.user._id;
+  const userId = userInfo?.user?._id;
   console.log(userInfo);
   const backendURL = import.meta.env.VITE_BACKEND_URL;
   const dispatch = useDispatch();

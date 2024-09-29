@@ -1,67 +1,107 @@
-<Box sx={{ display: "flex", alignItems: "flex-start", mt: 2 }}>
-  <Box sx={{ flexGrow: 1 }}>
-    {isExpanded ? (
-      <DarkBox>
-        <Box display="flex" justifyContent="end" marginBottom={2}>
-          <Box>
-            <Typography variant="body2">{commentsCount} Comments</Typography>
-          </Box>
-        </Box>
-        <Box display="flex" alignItems="flex-start" marginBottom={2}>
-          <Avatar src={userAvatar} sx={{ marginRight: 1 }} />
-          <TextField
-            fullWidth
-            multiline
-            rows={3}
-            placeholder="Share your thoughts"
-            value={comment}
-            onChange={handleCommentChange}
-            variant="outlined"
-            sx={{
-              backgroundColor: "white",
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "white" },
-                "&:hover fieldset": { borderColor: "white" },
-                "&.Mui-focused fieldset": { borderColor: "white" },
-              },
-              "& .MuiInputBase-input": { color: "black" },
-            }}
-          />
-        </Box>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Box>
-            <StyledIconButton>⬆️</StyledIconButton>
-            <StyledIconButton>⬇️</StyledIconButton>
-            <StyledIconButton>🔗</StyledIconButton>
-            <StyledIconButton>@</StyledIconButton>
-          </Box>
-          <StyledButton variant="contained" onClick={handleSubmit}>
-            Comment
-          </StyledButton>
-        </Box>
-      </DarkBox>
-    ) : (
-      <Box
-        onClick={handleExpand}
-        sx={{
-          display: "flex",
-          border: "1px solid",
-          borderColor: "divider",
-          borderRadius: "4px",
-          m: 0.5,
-          marginBottom: "20px",
-          p: 1,
-          alignItems: "center",
-          cursor: "text",
-          color: "text.secondary",
-          "&:hover": {
-            backgroundColor: "action.hover",
-          },
-        }}
-      >
-        <Avatar src={userAvatar} sx={{ mr: 1 }} />
-        Share your thoughts
+ import React, { useState, useEffect } from "react";
+import moment from "moment";
+import {
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
+  Typography,
+  Button,
+  Box,
+  TextField,
+  Avatar,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { Link } from "react-router-dom";
+import { TextInput } from "flowbite-react";
+import { HiOutlineSearch } from "react-icons/hi";
+import NoResult from "../assets/noResult.png";
+import Pagination from "./Pagination"; // Import the new Pagination component
+
+const backendURL = import.meta.env.VITE_BACKEND_URL;
+
+// ... (FilterSection and NoResultsMessage components remain the same)
+
+const BlogList = () => {
+  const [posts, setPosts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [timeFilter, setTimeFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [postsPerPage] = useState(9); // Adjust this value as needed
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    try {
+      const response = await fetch(`${backendURL}/api/getPosts`);
+      const data = await response.json();
+      console.log(data);
+      setPosts(data.posts || []);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  };
+
+  const categories = [...new Set(posts.map((post) => post.category))];
+
+  const filteredPosts = posts.filter((post) => {
+    // ... (filtering logic remains the same)
+  });
+
+  // Get current posts
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // ... (stripHtmlTags and trimContent functions remain the same)
+
+  return (
+    <section className="mt-24">
+      <Box sx={{ padding: 3 }}>
+        {/* ... (search input and filters remain the same) */}
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={9}>
+            {currentPosts.length > 0 ? (
+              <Grid container spacing={3}>
+                {currentPosts.map((post) => (
+                  // ... (post card rendering remains the same)
+                ))}
+              </Grid>
+            ) : (
+              <NoResultsMessage />
+            )}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(filteredPosts.length / postsPerPage)}
+              onPageChange={paginate}
+            />
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            md={3}
+            sx={{ display: { xs: "none", md: "block" } }}
+          >
+            <FilterSection
+              categories={categories}
+              onCategoryChange={setSelectedCategory}
+              onTimeFilterChange={setTimeFilter}
+            />
+          </Grid>
+        </Grid>
       </Box>
-    )}
-  </Box>
-</Box>;
+    </section>
+  );
+};
+
+export default BlogList;
