@@ -150,17 +150,19 @@ const AdminSidebar = () => {
             </Link>
 
             <Link
-              to="/DashBoard/Notifications"
+              to="/DashBoard/Admin/Solutions"
               style={{
                 color: "white",
                 backgroundColor:
-                  activeLink === "/DashBoard/Notifications" ? "#ffffff66 " : "",
+                  activeLink === "/DashBoard/Admin/Solutions"
+                    ? "#ffffff66 "
+                    : "",
               }}
               className="mb-3 flex gap-3 rounded-md p-2"
-              onClick={() => handleLinkClick("/DashBoard/Notifications")}
+              onClick={() => handleLinkClick("/DashBoard/Admin/Solutions")}
             >
               <IoMdNotificationsOutline className="text-white w-6 h-6" />
-              <span className="text-[16px] my-auto">Notifications</span>
+              <span className="text-[16px] my-auto">Solutions</span>
             </Link>
           </div>
           {/* Links */}

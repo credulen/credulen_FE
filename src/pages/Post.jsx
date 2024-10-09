@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Snackbar, Alert, Grid } from "@mui/material";
+import ModeCommentOutlined from "@mui/icons-material/ModeCommentOutlined";
+import { Twitter, Facebook, LinkedIn, WhatsApp } from "@mui/icons-material";
 import {
   Typography,
   Box,
@@ -25,6 +27,7 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
+import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import {
   ThumbUp,
   Edit,
@@ -107,76 +110,62 @@ export const RelatedPosts = ({ category, currentPostId }) => {
   };
 
   return (
-    <Box sx={{ mt: 2, width: "100%" }}>
-      <Typography variant="h6" gutterBottom>
+    <Box className="mt-8 w-full">
+      <Typography variant="h5" className="mb-4">
         Related Posts
       </Typography>
-      {relatedPosts.map((post) => (
-        <Card
-          key={post._id}
-          className="
-    flex flex-col mb-3 mx-auto cursor-pointer 
-    shadow-md hover:shadow-lg 
-    min-w-ful   minilg:max-w-[25rem] minilg:mb-10 container"
-          onClick={() => handlePostClick(post.slug)}
-        >
-          {/* Card content goes here */}
-
-          {post.image && (
-            <CardMedia
-              component="img"
-              sx={{ width: "100%", height: 200, objectFit: "cover" }}
-              image={`${backendURL}${post.image}`}
-              alt={post.title}
-            />
-          )}
-          <CardContent sx={{ flexGrow: 1, p: 1 }}>
-            {" "}
-            {/* Increased padding */}
-            <Typography variant="h6" component="div" gutterBottom>
-              {post.title}
-            </Typography>
-            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-              <Avatar
-                src={`${backendURL}${post.authorId.image}`}
-                alt={post.authorId.name}
-                sx={{ width: 24, height: 24, mr: 1 }}
-              />
-              <Typography variant="body2" color="text.secondary">
-                {post.authorId.name}
+      <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4 minilg:grid-cols-1">
+        {relatedPosts.map((post) => (
+          <Card
+            key={post._id}
+            className="flex flex-col cursor-pointer transition-all duration-300 ease-in-out 
+                       hover:shadow-md hover:border-gray-300"
+            onClick={() => handlePostClick(post.slug)}
+          >
+            <CardContent className="flex-grow p-4">
+              <Typography
+                className="font-semibold mb-2 hover:text-blue-600 transition-colors duration-300"
+                variant="h6"
+              >
+                {post.title}
               </Typography>
-            </Box>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              display="block"
-              mb={2}
-            >
-              {moment(post.createdAt).fromNow()}
-            </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <ThumbUp fontSize="small" sx={{ mr: 0.5 }} />
-                <Typography variant="body2">
-                  {post.likes ? post.likes.length : 0}
+              <Box className="flex items-center mb-2">
+                <Avatar
+                  src={`${backendURL}${post.authorId.image}`}
+                  alt={post.authorId.name}
+                  className="w-5 h-5 mr-2"
+                />
+                <Typography variant="body2" className="text-gray-600">
+                  {post.authorId.name}
                 </Typography>
               </Box>
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <ChatBubbleOutline fontSize="small" sx={{ mr: 0.5 }} />
-                <Typography variant="body2">
-                  {post.comments ? post.comments.length : 0}
+              <Typography
+                variant="caption"
+                className="text-gray-500 mb-2 block"
+              >
+                {moment(post.createdAt).format("MMMM D, YYYY")}
+              </Typography>
+              <Box className="flex items-center text-gray-500 mt-1">
+                <FavoriteBorder
+                  fontSize="small"
+                  sx={{ fontSize: 16, mr: 0.3 }}
+                />
+                <Typography variant="caption" sx={{}}>
+                  {post.likes ? post.likes.length : 0} likes{" "}
+                  <span className="mx-2">|</span>
+                </Typography>
+                <ChatBubbleOutline
+                  fontSize="small"
+                  sx={{ fontSize: 16, mr: 0.3, ml: 0 }}
+                />
+                <Typography variant="caption">
+                  {post.comments ? post.comments.length : 0} comments
                 </Typography>
               </Box>
-            </Box>
-          </CardContent>
-        </Card>
-      ))}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </Box>
   );
 };
@@ -210,17 +199,16 @@ export const ExpandableCommentInput = ({
   return (
     <Box sx={{ mt: 2, width: "100%" }}>
       {commentsCount > 0 && (
-        <Box
-          display="flex"
-          alignItems="center" // Aligns items vertically centered
-          marginBottom={2}
-          marginLeft={1}
-        >
-          <ChatBubbleOutline style={{ marginRight: 4 }} />{" "}
-          {/* Space between icon and text */}
-          <Typography variant="body2">{commentsCount} Comments</Typography>
+        <Box display="flex" alignItems="center" marginBottom={2} marginLeft={1}>
+          <ModeCommentOutlined
+            style={{ marginRight: 4, fontSize: "1.1rem" }} // Adjust the icon size
+          />
+          <Typography variant="body2">
+            {commentsCount} Comment{commentsCount > 1 ? "s" : ""}
+          </Typography>
         </Box>
       )}
+
       {!isExpanded && (
         <Box
           onClick={handleExpand}
@@ -273,11 +261,6 @@ export const ExpandableCommentInput = ({
 
       {isExpanded && (
         <DarkBox>
-          {/* <Box display="flex" justifyContent="end" marginBottom={2}>
-            <Box>
-              <Typography variant="body2">{commentsCount} Comments</Typography>
-            </Box>
-          </Box> */}
           <Box display="flex" alignItems="flex-start" marginBottom={2}>
             <Avatar src={userAvatar} sx={{ marginRight: 1 }} />
             <TextField
@@ -378,7 +361,7 @@ export default function Post() {
         setPost(data);
         setPostId(data._id);
         setLikesCount(data.likes.length || 0);
-        setIsLiked(data.isLiked || false);
+        setIsLiked(data.likes.includes(userId));
       } catch (err) {
         setError(err.message);
       } finally {
@@ -389,6 +372,36 @@ export default function Post() {
     fetchPost();
   }, [slug]);
 
+  const handleShare = (platform) => {
+    if (!post) {
+      console.error("Post data is not available");
+      return;
+    }
+
+    const url = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent(post.title);
+    let shareUrl;
+
+    switch (platform) {
+      case "twitter":
+        shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
+        break;
+      case "facebook":
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        break;
+      case "linkedin":
+        shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}`;
+        break;
+      case "whatsapp":
+        shareUrl = `https://api.whatsapp.com/send?text=${title} ${url}`;
+        break;
+      default:
+        return;
+    }
+
+    window.open(shareUrl, "_blank");
+  };
+
   const handleLike = async () => {
     try {
       const response = await fetch(`${backendURL}/api/likePost/${postId}`, {
@@ -398,9 +411,11 @@ export default function Post() {
         },
         body: JSON.stringify({ userId: currentUser.userInfo.user._id }),
       });
+
       if (!response.ok) {
         throw new Error("Failed to like post");
       }
+
       const data = await response.json();
       setLikesCount(data.likesCount);
       setIsLiked(data.isLiked);
@@ -693,54 +708,80 @@ export default function Post() {
             />
           )}
 
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              mb: 2,
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Avatar
-                src={
-                  post.authorId?.image
-                    ? `${backendURL}${post.authorId.image}`
-                    : "/default-avatar.jpg"
-                }
-                sx={{ width: 30, height: 30, mr: 2 }}
-              />
-              <Typography variant="subtitle1" sx={{ mr: 2 }}>
-                {post.authorId?.name || "Unknown Author"}
-              </Typography>
-              <Typography
-                variant="subtitle2"
-                color="text.secondary"
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  "&::before": {
-                    content: "'|'",
-                    mx: 1,
-                  },
-                }}
-              >
-                {moment(post.createdAt).format("MMMM D, YYYY")}
-              </Typography>
-            </Box>
-            {/* <Chip label={post.category} /> */}
+          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+            <Avatar
+              src={
+                post.authorId?.image
+                  ? `${backendURL}${post.authorId.image}`
+                  : "/default-avatar.jpg"
+              }
+              sx={{ width: 30, height: 30, mr: 2 }}
+            />
+            <Typography variant="subtitle1" sx={{ mr: 2 }}>
+              {post.authorId?.name || "Unknown Author"}
+            </Typography>
+            <Typography
+              variant="subtitle2"
+              color="text.secondary"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                "&::before": {
+                  content: "'|'",
+                  mx: 1,
+                },
+              }}
+            >
+              {moment(post.createdAt).format("MMMM D, YYYY")}
+            </Typography>
           </Box>
+
+          <Typography variant="h4" gutterBottom>
+            {post.title}
+          </Typography>
+
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between",
               mb: 2,
+              ml: -1,
+              pl: 0,
+              width: "100%",
             }}
           >
-            <Typography variant="h4" gutterBottom>
-              {post.title}
+            <IconButton
+              onClick={handleLike}
+              size="small"
+              sx={{
+                transition:
+                  "color 0.3s ease-in-out, transform 0.3s ease-in-out",
+                color: isLiked ? "#" : "inherit",
+                "&:hover": {
+                  color: "#e57373", // Always use red on hover
+                  transform: "scale(1.2)",
+                },
+              }}
+            >
+              {isLiked ? (
+                <Favorite fontSize="small" />
+              ) : (
+                <FavoriteBorder fontSize="small" />
+              )}
+            </IconButton>
+            <Typography
+              sx={{
+                transition:
+                  "color 0.3s ease-in-out, transform 0.3s ease-in-out",
+                "&:hover": {
+                  color: isLiked ? "#e57373" : "inherit",
+                  transform: "scale(1.1)",
+                },
+                ml: 0,
+              }}
+              variant="body2"
+            >
+              {likesCount} likes
             </Typography>
           </Box>
 
@@ -748,14 +789,38 @@ export default function Post() {
             value={post.content || ""}
             readOnly={true}
             theme="bubble"
-            style={{ padding: "-5px" }} // This removes the padding
+            className="custom-quill mb-5" // Add a custom class
           />
 
-          <Box sx={{ display: "flex", alignItems: "center", mt: 3, mb: 3 }}>
-            <IconButton onClick={handleLike}>
-              <ThumbUp color={isLiked ? "primary" : "inherit"} />
+          {/* Share buttons */}
+          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+            <Typography variant="body2" sx={{ mr: 2 }}>
+              Share this:
+            </Typography>
+            <IconButton
+              onClick={() => handleShare("twitter")}
+              size="small"
+              sx={{ mr: 1 }}
+            >
+              <Twitter fontSize="small" sx={{ color: "#1DA1F2" }} />
             </IconButton>
-            <Typography variant="body2">{likesCount} likes</Typography>
+            <IconButton
+              onClick={() => handleShare("facebook")}
+              size="small"
+              sx={{ mr: 1 }}
+            >
+              <Facebook fontSize="small" sx={{ color: "#4267B2" }} />
+            </IconButton>
+            <IconButton
+              onClick={() => handleShare("linkedin")}
+              size="small"
+              sx={{ mr: 1 }}
+            >
+              <LinkedIn fontSize="small" sx={{ color: "#0077b5" }} />
+            </IconButton>
+            <IconButton onClick={() => handleShare("whatsapp")} size="small">
+              <WhatsApp fontSize="small" sx={{ color: "#25D366" }} />
+            </IconButton>
           </Box>
 
           <Divider sx={{ mb: 3 }} />
@@ -768,114 +833,159 @@ export default function Post() {
             userId={userId}
           />
 
-          <Box sx={{ width: "100%", bgcolor: "#f5f5f5", p: 2 }}>
-            {comments.map((comment) => (
-              <Box
-                key={comment.id}
-                sx={{ mb: 2, bgcolor: "white", borderRadius: 1, p: 2 }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                  {/* Avatar */}
-                  <Avatar
-                    src={`${backendURL}/uploads/${profile?.image}`}
-                    alt={comment.username}
-                    sx={{ width: 32, height: 32, mr: 1 }}
-                  />
+          {comments.length > 0 ? (
+            <Box sx={{ width: "100%", bgcolor: "#f5f5f5", p: 2 }}>
+              {comments.map((comment) => (
+                <Box
+                  key={comment.id}
+                  sx={{ mb: 2, bgcolor: "white", borderRadius: 1, p: 2 }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                    {/* Avatar */}
+                    <Avatar
+                      src={`${backendURL}/uploads/${profile?.image}`}
+                      alt={comment.username}
+                      sx={{ width: 22, height: 22, mr: 1, mb: 1 }}
+                    />
 
-                  {/* Parent container with space between username/timestamp and the MoreVert icon */}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        mb: 1,
+                        width: "100%",
+                      }}
+                    >
+                      {/* Text box containing the username and timestamp */}
+                      <Box sx={{ display: "flex", flexDirection: "row" }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: "light" }}
+                        >
+                          {comment.userId?.username || "Anonymous"}
+                        </Typography>
+
+                        <Typography
+                          variant="caption"
+                          sx={{ marginLeft: 1, marginTop: 0.1 }}
+                          color="text.secondary"
+                        >
+                          <span className="mx-1 ">-</span>
+                          {formatDistanceToNow(new Date(comment.createdAt), {
+                            addSuffix: true,
+                          })}
+                        </Typography>
+                      </Box>
+
+                      {/* MoreVert icon button aligned to the right */}
+                      {currentUser?.userInfo?.user &&
+                        (currentUser.userInfo.user._id ===
+                          comment.userId?._id ||
+                          currentUser.userInfo.user.isAdmin) && (
+                          <IconButton
+                            size="small"
+                            onClick={(event) =>
+                              handleMenuOpen(event, comment._id)
+                            }
+                          >
+                            <MoreVert />
+                          </IconButton>
+                        )}
+                    </Box>
+                  </Box>
+
+                  {editingCommentId === comment._id ? (
+                    <Box sx={{ width: "100%" }}>
+                      <TextField
+                        fullWidth
+                        multiline
+                        rows={3}
+                        value={editedCommentContent}
+                        onChange={(e) =>
+                          setEditedCommentContent(e.target.value)
+                        }
+                        variant="outlined"
+                        sx={{ mb: 1 }}
+                      />
+                      <Button
+                        onClick={() =>
+                          handleCommentEdit(comment._id, editedCommentContent)
+                        }
+                        sx={{ mr: 1 }}
+                      >
+                        Save
+                      </Button>
+                      <Button onClick={handleCancelEdit}>Cancel</Button>
+                    </Box>
+                  ) : (
+                    <Typography
+                      className="commentStyles"
+                      variant="body1"
+                      sx={{
+                        mb: 1,
+                        width: "100%",
+                        fontSize: "0.9rem", // Apply font size
+                        lineHeight: "1.6", // Apply line height
+                        color: "#201f1f", // Apply color if needed
+                      }}
+                    >
+                      {comment.content}
+                    </Typography>
+                  )}
+
                   <Box
                     sx={{
                       display: "flex",
-                      justifyContent: "space-between",
                       alignItems: "center",
-                      mb: 1,
+                      mb: 2,
+                      ml: -1,
+                      pl: 0,
                       width: "100%",
                     }}
                   >
-                    {/* Text box containing the username and timestamp */}
-                    <Box sx={{ display: "flex", flexDirection: "row" }}>
-                      <Typography
-                        variant="subtitle2"
-                        sx={{ fontWeight: "light" }}
-                      >
-                        {comment.userId?.username || "Anonymous"}
-                      </Typography>
-
-                      <Typography
-                        variant="caption"
-                        sx={{ marginLeft: 1 }}
-                        color="text.secondary"
-                      >
-                        <span className="mx-1">-</span>
-                        {formatDistanceToNow(new Date(comment.createdAt), {
-                          addSuffix: true,
-                        })}
-                      </Typography>
-                    </Box>
-
-                    {/* MoreVert icon button aligned to the right */}
-                    {currentUser?.userInfo?.user &&
-                      (currentUser.userInfo.user._id === comment.userId?._id ||
-                        currentUser.userInfo.user.isAdmin) && (
-                        <IconButton
-                          size="small"
-                          onClick={(event) =>
-                            handleMenuOpen(event, comment._id)
-                          }
-                        >
-                          <MoreVert />
-                        </IconButton>
-                      )}
-                  </Box>
-                </Box>
-
-                {editingCommentId === comment._id ? (
-                  <Box sx={{ width: "100%" }}>
-                    <TextField
-                      fullWidth
-                      multiline
-                      rows={3}
-                      value={editedCommentContent}
-                      onChange={(e) => setEditedCommentContent(e.target.value)}
-                      variant="outlined"
-                      sx={{ mb: 1 }}
-                    />
-                    <Button
-                      onClick={() =>
-                        handleCommentEdit(comment._id, editedCommentContent)
-                      }
-                      sx={{ mr: 1 }}
+                    <IconButton
+                      onClick={() => handleCommentLike(comment._id)}
+                      size="small"
+                      sx={{
+                        transition:
+                          "color 0.3s ease-in-out, transform 0.3s ease-in-out",
+                        color: isLiked ? "#" : "inherit",
+                        "&:hover": {
+                          color: "#e57373", // Always use red on hover
+                          transform: "scale(1.2)",
+                        },
+                      }}
                     >
-                      Save
-                    </Button>
-                    <Button onClick={handleCancelEdit}>Cancel</Button>
+                      {isLiked ? (
+                        <Favorite fontSize="small" />
+                      ) : (
+                        <FavoriteBorder fontSize="small" />
+                      )}
+                    </IconButton>
+                    <Typography
+                      sx={{
+                        transition:
+                          "color 0.3s ease-in-out, transform 0.3s ease-in-out",
+                        "&:hover": {
+                          color: isLiked ? "#e57373" : "inherit",
+                          transform: "scale(1.1)",
+                        },
+                        ml: 0,
+                      }}
+                      variant="body2"
+                    >
+                      {comment.likes.length} likes
+                    </Typography>
                   </Box>
-                ) : (
-                  <Typography variant="body1" sx={{ mb: 1, width: "100%" }}>
-                    {comment.content}
-                  </Typography>
-                )}
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <IconButton
-                    onClick={() => handleCommentLike(comment._id)}
-                    size="small"
-                  >
-                    <ThumbUp
-                      color={
-                        comment.likes.includes(currentUser?.userInfo?.user?._id)
-                          ? "primary"
-                          : "inherit"
-                      }
-                      fontSize="small"
-                    />
-                  </IconButton>
-                  <Typography variant="caption" sx={{ ml: 1 }}>
-                    {comment.likes.length} likes
-                  </Typography>
                 </Box>
-              </Box>
-            ))}
-          </Box>
+              ))}
+            </Box>
+          ) : (
+            <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
+              No comments yet. Be the first to comment!
+            </Typography>
+          )}
 
           {comments.length > 5 && (
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
@@ -910,10 +1020,9 @@ export default function Post() {
       <Grid item xs={12} md={4}>
         <Box
           sx={{
-            position: { md: "sticky" },
             top: 20,
             maxHeight: { md: "calc(100vh - 40px)" },
-            overflowY: "auto",
+            padding: { lg: "20px" },
           }}
         >
           <RelatedPosts category={post.category} currentPostId={post._id} />

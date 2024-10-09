@@ -1,107 +1,62 @@
- import React, { useState, useEffect } from "react";
-import moment from "moment";
-import {
-  Grid,
-  Card,
-  CardMedia,
-  CardContent,
-  Typography,
-  Button,
-  Box,
-  TextField,
-  Avatar,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-} from "@mui/material";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { Link } from "react-router-dom";
-import { TextInput } from "flowbite-react";
-import { HiOutlineSearch } from "react-icons/hi";
-import NoResult from "../assets/noResult.png";
-import Pagination from "./Pagination"; // Import the new Pagination component
+import React from "react";
+import { SmallBlogCards } from "../components/Cards";
 
-const backendURL = import.meta.env.VITE_BACKEND_URL;
-
-// ... (FilterSection and NoResultsMessage components remain the same)
-
-const BlogList = () => {
-  const [posts, setPosts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [timeFilter, setTimeFilter] = useState("all");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage] = useState(9); // Adjust this value as needed
-
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  const fetchPosts = async () => {
-    try {
-      const response = await fetch(`${backendURL}/api/getPosts`);
-      const data = await response.json();
-      console.log(data);
-      setPosts(data.posts || []);
-    } catch (error) {
-      console.error("Error fetching posts:", error);
-    }
-  };
-
-  const categories = [...new Set(posts.map((post) => post.category))];
-
-  const filteredPosts = posts.filter((post) => {
-    // ... (filtering logic remains the same)
-  });
-
-  // Get current posts
-  const indexOfLastPost = currentPage * postsPerPage;
-  const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
-
-  // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  // ... (stripHtmlTags and trimContent functions remain the same)
-
+const Solutions = () => {
   return (
-    <section className="mt-24">
-      <Box sx={{ padding: 3 }}>
-        {/* ... (search input and filters remain the same) */}
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={9}>
-            {currentPosts.length > 0 ? (
-              <Grid container spacing={3}>
-                {currentPosts.map((post) => (
-                  // ... (post card rendering remains the same)
-                ))}
-              </Grid>
-            ) : (
-              <NoResultsMessage />
-            )}
-            <Pagination
-              currentPage={currentPage}
-              totalPages={Math.ceil(filteredPosts.length / postsPerPage)}
-              onPageChange={paginate}
-            />
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            md={3}
-            sx={{ display: { xs: "none", md: "block" } }}
-          >
-            <FilterSection
-              categories={categories}
-              onCategoryChange={setSelectedCategory}
-              onTimeFilterChange={setTimeFilter}
-            />
-          </Grid>
-        </Grid>
-      </Box>
-    </section>
+    <div className="md:mt-32 mt-36 md:px-[5rem] px-4">
+      <div className="pb-12">
+        <h1 className="text-2xl font-semibold">Solutions</h1>
+        <p className="mt-3">
+          Credulen offers specialized training and consulting services designed
+          to equip you with the skills and strategies needed to excel in a
+          technology-driven world.
+        </p>
+      </div>
+
+      <div className="pb-12">
+        <h2 className="text-xl font-medium">Training School</h2>
+        <p className="mb-10">
+          Data Science & Engineering for Professionals: "Our comprehensive
+          training programs provide professionals with the skills needed to
+          excel in data science and engineering. Learn from industry experts and
+          gain practical experience through hands-on projects. " Using
+          Generative AI to Supercharge Productivity: "Discover how to leverage
+          Generative AI to enhance your productivity as an individual or
+          organization. Our training covers the latest AI tools and techniques
+          to help you stay ahead of the curve.
+        </p>
+        <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-12 my-5">
+          <SmallBlogCards />
+          <SmallBlogCards />
+          <SmallBlogCards />
+
+          <SmallBlogCards />
+          <SmallBlogCards />
+          <SmallBlogCards />
+        </div>
+      </div>
+
+      <div className="">
+        <h2 className="text-xl font-medium">Consulting Services</h2>
+        <p className="mb-10">
+          Data, Blockchain & AI Integration and Strategy: "We offer expert
+          consulting to help organizations integrate data, blockchain, and AI
+          technologies seamlessly. Our strategic guidance ensures that your
+          technology investments drive maximum value creation and business
+          growth.
+        </p>
+        <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-12 my-5">
+          <SmallBlogCards />
+          <SmallBlogCards />
+          <SmallBlogCards />
+
+          <SmallBlogCards />
+          <SmallBlogCards />
+          <SmallBlogCards />
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default BlogList;
+export default Solutions;

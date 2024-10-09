@@ -290,13 +290,14 @@ const BlogList = () => {
                         image={`${backendURL}${post.image}`}
                         alt={post.title}
                       />
-                      <CardContent sx={{ flexGrow: 1 }}>
+                      <CardContent sx={{ flexGrow: 1, p: 1 }}>
                         <Typography
                           gutterBottom
                           variant="h5"
                           fontSize="24px"
                           component="div"
-                          fontWeight="bold"
+                          fontWeight="600"
+                          color="#201F1F"
                         >
                           {post.title}
                         </Typography>
@@ -320,23 +321,42 @@ const BlogList = () => {
                           </Box>
                           <Typography variant="body2" color="text.secondary">
                             {moment(post.createdAt).fromNow()}
+                            {/* {moment(post.createdAt).format("DD, MMMM YYYY")} */}
                           </Typography>
                         </Box>
-                        <Typography variant="body2" className="text-black">
-                          {trimContent(post.content, 120)}
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: "#201F1F",
+                            fontSize: "14px", // Adjust font size (e.g., 1.25rem for text-xl)
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          {trimContent(post.content, 100)}
                         </Typography>
                       </CardContent>
-                      <Box sx={{ p: 2 }}>
-                        <Button
-                          component={Link}
+                      <Box sx={{ p: 1 }}>
+                        <Link
                           to={`/post/${post.slug}`}
-                          variant="contained"
-                          color="primary"
-                          endIcon={<ArrowForwardIcon />}
-                          className="hover:bg-blue-800"
+                          className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg   focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors duration-300 mt-auto self-start hover:text-blue-600 hover:bg-white hover:border-blue-600 hover:border-2 hover:font-semibold"
                         >
                           Read more
-                        </Button>
+                          <svg
+                            className="w-3.5 h-3.5 ms-2"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 14 10"
+                          >
+                            <path
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M1 5h12m0 0L9 1m4 4L9 9"
+                            />
+                          </svg>
+                        </Link>
                       </Box>
                     </Card>
                   </Grid>

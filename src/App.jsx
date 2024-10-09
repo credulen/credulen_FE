@@ -20,6 +20,7 @@ import HomeDashBoard from "./pages/UsersDashBoardPages/DashBoardProfile";
 import DashBoardActivities from "./pages/UsersDashBoardPages/DashBoardActivities";
 import DashBoardNotifications from "./pages/UsersDashBoardPages/DashBoardNotifications";
 import Post from "./pages/Post";
+import SolutionForm from "./pages/SolutionForm";
 // Admin
 import AdminLayout from "./components/Dashboard_Admin/AdminLayout";
 import AdminDashboard from "./pages/AdminDashBoardPages/AdminDashboard";
@@ -34,6 +35,8 @@ import CreateEvents from "./pages/AdminDashBoardPages/CreateEvents";
 import Speakers from "./pages/AdminDashBoardPages/SpeakerList";
 import CreateSpeaker from "./pages/AdminDashBoardPages/CreateSpeaker";
 import SingleEventPost from "./pages/SingleEventPost";
+import AdminSolutionList from "./pages/AdminDashBoardPages/AdminSolutionList";
+import CreateSolutions from "./pages/AdminDashBoardPages/CreateSolutions";
 
 const App = () => {
   return (
@@ -47,6 +50,7 @@ const App = () => {
         <Route path="/webinars" element={<Webinar />} />
         <Route path="/conferences" element={<Conferences />} />
         <Route path="/solutions" element={<Solutions />} />
+        <Route path="/SolutionForm/:slug?" element={<SolutionForm />} />
         <Route path="/contactus" element={<Contact />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/RegisterAdmin" element={<RegisterAdmin />} />
@@ -102,6 +106,14 @@ const App = () => {
             <Route
               path="/DashBoard/Admin/CreateEvents/:eventId?"
               element={<CreateEvents />}
+            />
+            <Route
+              path="/DashBoard/Admin/Solutions/"
+              element={<AdminSolutionList />}
+            />
+            <Route
+              path="/DashBoard/Admin/CreateSolutions/:slug?"
+              element={<CreateSolutions />}
             />
           </Route>
         </Route>

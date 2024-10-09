@@ -216,35 +216,6 @@ export default function CreateEvents() {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  const handleDelete = async () => {
-    if (!eventId) return;
-
-    if (window.confirm("Are you sure you want to delete this event?")) {
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `${backendURL}/api/deleteEvent/${eventId}`,
-          {
-            method: "DELETE",
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to delete event");
-        }
-
-        showSnackbar("Event deleted successfully", "success");
-        navigate("/DashBoard/Admin/Events");
-      } catch (error) {
-        console.error("Error deleting event:", error);
-        showSnackbar(error.message || "Failed to delete event", "error");
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
   const handleBackClick = () => {
     navigate(-1);
   };
@@ -306,10 +277,9 @@ export default function CreateEvents() {
             fullWidth
             required
           >
-            <MenuItem value="conference">Conference</MenuItem>
-            <MenuItem value="workshop">Workshop</MenuItem>
-            <MenuItem value="seminar">Seminar</MenuItem>
             <MenuItem value="webinar">Webinar</MenuItem>
+            <MenuItem value="conference">Conference</MenuItem>
+            <MenuItem value="workshop">solutions</MenuItem>
           </TextField>
           <FormControl fullWidth>
             <InputLabel id="speakers-select-label">Speakers</InputLabel>
