@@ -105,9 +105,9 @@
 //                 onClick={handleLinkClick}
 //                 to="/"
 //                 className={({ isActive }) =>
-//                   ` block py-2 px-3  rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-blue-700 md:p-0 ${
+//                   ` block py-2 px-3  rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
 //                     isActive
-//                       ? "text-blue-500  mid:bg-blue-500 mid:text-white"
+//                       ? "text-btColour  mid:bg-btColour mid:text-white"
 //                       : "text-black"
 //                   }`
 //                 }
@@ -121,9 +121,9 @@
 //               onClick={handleLinkClick}
 //               to="/blog"
 //               className={({ isActive }) =>
-//                 ` block py-2 px-3  rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-blue-700 md:p-0 ${
+//                 ` block py-2 px-3  rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
 //                   isActive
-//                     ? "text-blue-500  mid:bg-blue-500 mid:text-white"
+//                     ? "text-btColour  mid:bg-btColour mid:text-white"
 //                     : "text-black"
 //                 }`
 //               }
@@ -134,7 +134,7 @@
 
 //             <div className="relative" ref={userDropdownRef}>
 //               <div className="flex" onClick={toggleUserFile}>
-//                 <span className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-blue-700 md:p-0 cursor-pointer ">
+//                 <span className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 cursor-pointer ">
 //                   Events
 //                 </span>
 //                 <span className="mt-2 mid:mt-4">
@@ -171,9 +171,9 @@
 //                       onClick={handleLinkClick}
 //                       to="/webinars"
 //                       className={({ isActive }) =>
-//                         ` block py-2 px-3 mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-blue-700 md:p-0 ${
+//                         ` block py-2 px-3 mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
 //                           isActive
-//                             ? "text-blue-500  mid:bg-blue-500 mid:text-white"
+//                             ? "text-btColour  mid:bg-btColour mid:text-white"
 //                             : "text-black"
 //                         }`
 //                       }
@@ -187,9 +187,9 @@
 //                         onClick={handleLinkClick}
 //                         to="/conferences"
 //                         className={({ isActive }) =>
-//                           ` block px-4 py-2   rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-blue-700 md:p-0 ${
+//                           ` block px-4 py-2   rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
 //                             isActive
-//                               ? "text-blue-500  mid:bg-blue-500 mid:text-white"
+//                               ? "text-btColour  mid:bg-btColour mid:text-white"
 //                               : "text-black"
 //                           }`
 //                         }
@@ -207,9 +207,9 @@
 //                 onClick={handleLinkClick}
 //                 to="/Solutions"
 //                 className={({ isActive }) =>
-//                   ` block py-2 px-3 mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-blue-700 md:p-0 ${
+//                   ` block py-2 px-3 mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
 //                     isActive
-//                       ? "text-blue-500  mid:bg-blue-500 mid:text-white"
+//                       ? "text-btColour  mid:bg-btColour mid:text-white"
 //                       : "text-black"
 //                   }`
 //                 }
@@ -224,9 +224,9 @@
 //                 onClick={handleLinkClick}
 //                 to="/contactus"
 //                 className={({ isActive }) =>
-//                   ` block py-2 px-3 mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-blue-700 md:p-0 ${
+//                   ` block py-2 px-3 mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
 //                     isActive
-//                       ? "text-blue-500  mid:bg-blue-500 mid:text-white"
+//                       ? "text-btColour  mid:bg-btColour mid:text-white"
 //                       : "text-black"
 //                   }`
 //                 }
@@ -357,7 +357,7 @@
 //                 <li>
 //                   <NavLink
 //                     to={dashboardPath}
-//                     className="block px-4 py-2 text-black rounded hover:text-blue-700 md:dark:hover:bg-transparent font-semibold"
+//                     className="block px-4 py-2 text-black rounded hover:text-btColour md:dark:hover:bg-transparent font-semibold"
 //                     onClick={handleLinkClick}
 //                   >
 //                     DashBoard
@@ -365,7 +365,7 @@
 //                 </li>
 //                 <li>
 //                   <button
-//                     className="block px-4 py-2 text-black rounded hover:text-blue-700 md:dark:hover:bg-transparent font-semibold"
+//                     className="block px-4 py-2 text-black rounded hover:text-btColour md:dark:hover:bg-transparent font-semibold"
 //                     onClick={handleLogout}
 //                   >
 //                     <div className="flex items-center space-x-2 justify-center">
@@ -383,14 +383,14 @@
 //           <Link
 //             to="/signup"
 //             type="button"
-//             className="text-white bg-gradient-to-r from-cyan-500 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+//             className="text-white bg-gradient-to-r from-cyan-500 to-btColour hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
 //           >
 //             Sign Up
 //           </Link>
 
 //           <Link
 //             to="/login"
-//             className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800"
+//             className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-btColour group-hover:from-cyan-500 group-hover:to-btColour hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800"
 //           >
 //             <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
 //               Login
@@ -403,7 +403,7 @@
 // }
 
 import React, { useState, useEffect, useRef } from "react";
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../features/auth/authSlice";
@@ -428,6 +428,9 @@ const Navbar = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+
+  const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
 
   const navigate = useNavigate();
 
@@ -465,11 +468,31 @@ const Navbar = () => {
     setOpenSnackbar(false);
   };
 
-  // ... (rest of the component remains the same)
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  const navbarClass = `fixed w-full z-20 top-0 start-0 transition-all duration-300 ease-in-out ${
+    isScrolled || location.pathname !== "/"
+      ? "bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600"
+      : "bg-transparent text-white"
+  }`;
+  const scrlwhite = ` ${
+    isScrolled || location.pathname !== "/" ? "text-black" : " !text-white "
+  }`;
 
   return (
     <>
-      <nav className="bg-white dark:bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200 dark:border-gray-600 ">
+      <nav className={navbarClass}>
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           <Link
             to="/"
@@ -494,7 +517,7 @@ const Navbar = () => {
             onClick={toggleMenu}
             data-collapse-toggle="navbar-sticky"
             type="button"
-            className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+            className={`inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 ${scrlwhite}`}
             aria-controls="navbar-sticky"
             aria-expanded={isMenuOpen}
           >
@@ -524,16 +547,18 @@ const Navbar = () => {
             id="navbar-sticky"
             ref={menuRef}
           >
-            <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+            <ul
+              className={`flex flex-col p-4 md:p-0 mt-4 font-medium border  rounded-lg  md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0  ${scrlwhite}`}
+            >
               <li>
                 <NavLink
                   onClick={handleLinkClick}
                   to="/"
                   className={({ isActive }) =>
-                    ` block py-2 px-3  rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-blue-700 md:p-0 ${
+                    ` block py-2 px-3  rounded hover:bg-gray-10 md:hover:bg-transparent hover:text-btColour md:p-0 ${
                       isActive
-                        ? "text-blue-500  mid:bg-blue-500 mid:text-white"
-                        : "text-black"
+                        ? " mid:bg-btColour mid:text-white"
+                        : ` ${scrlwhite}`
                     }`
                   }
                   end
@@ -546,10 +571,10 @@ const Navbar = () => {
                 onClick={handleLinkClick}
                 to="/blog"
                 className={({ isActive }) =>
-                  ` block py-2 px-3  rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-blue-700 md:p-0 ${
+                  ` block py-2 px-3  rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
                     isActive
-                      ? "text-blue-500  mid:bg-blue-500 mid:text-white"
-                      : "text-black"
+                      ? "text-btColour   mid:text-white "
+                      : ` ${""} hover:text-btColour`
                   }`
                 }
                 end
@@ -559,7 +584,7 @@ const Navbar = () => {
 
               <div className="relative" ref={userDropdownRef}>
                 <div className="flex" onClick={toggleUserFile}>
-                  <span className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-blue-700 md:p-0 cursor-pointer ">
+                  <span className="block py-2 px-3  rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 cursor-pointer ">
                     Events
                   </span>
                   <span className="mt-2 mid:mt-4">
@@ -596,9 +621,9 @@ const Navbar = () => {
                         onClick={handleLinkClick}
                         to="/webinars"
                         className={({ isActive }) =>
-                          ` block py-2 px-3 mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-blue-700 md:p-0 ${
+                          ` block py-2 px-3 mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
                             isActive
-                              ? "text-blue-500  mid:bg-blue-500 mid:text-white"
+                              ? "text-btColour  mid:bg-btColour mid:text-white"
                               : "text-black"
                           }`
                         }
@@ -612,9 +637,9 @@ const Navbar = () => {
                           onClick={handleLinkClick}
                           to="/conferences"
                           className={({ isActive }) =>
-                            ` block px-4 py-2   rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-blue-700 md:p-0 ${
+                            ` block px-4 py-2   rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
                               isActive
-                                ? "text-blue-500  mid:bg-blue-500 mid:text-white"
+                                ? "text-btColour  mid:bg-btColour mid:text-white"
                                 : "text-black"
                             }`
                           }
@@ -632,10 +657,10 @@ const Navbar = () => {
                   onClick={handleLinkClick}
                   to="/Solutions"
                   className={({ isActive }) =>
-                    ` block py-2 px-3 mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-blue-700 md:p-0 ${
+                    ` block py-2 px-3 mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
                       isActive
-                        ? "text-blue-500  mid:bg-blue-500 mid:text-white"
-                        : "text-black"
+                        ? "text-btColour  mid:bg-btColour mid:text-white"
+                        : ""
                     }`
                   }
                   end
@@ -649,10 +674,10 @@ const Navbar = () => {
                   onClick={handleLinkClick}
                   to="/contactus"
                   className={({ isActive }) =>
-                    ` block py-2 px-3 mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-blue-700 md:p-0 ${
+                    ` block py-2 px-3 mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
                       isActive
-                        ? "text-blue-500  mid:bg-blue-500 mid:text-white"
-                        : "text-black"
+                        ? "text-btColour  mid:bg-btColour mid:text-white"
+                        : ""
                     }`
                   }
                   end
@@ -817,7 +842,7 @@ export function DropdownItems(handleLinkClick) {
                 <li>
                   <NavLink
                     to={dashboardPath}
-                    className="block px-4 py-2 text-black rounded hover:text-blue-700 md:dark:hover:bg-transparent font-semibold"
+                    className="block px-4 py-2 text-black rounded hover:text-btColour md:dark:hover:bg-transparent font-semibold"
                     onClick={handleLinkClick}
                   >
                     DashBoard
@@ -825,7 +850,7 @@ export function DropdownItems(handleLinkClick) {
                 </li>
                 <li>
                   <button
-                    className="block px-4 py-2 text-black rounded hover:text-blue-700 md:dark:hover:bg-transparent font-semibold"
+                    className="block px-4 py-2 text-black rounded hover:text-btColour md:dark:hover:bg-transparent font-semibold"
                     onClick={handleLogout}
                   >
                     <div className="flex items-center space-x-2 justify-center">
@@ -843,14 +868,14 @@ export function DropdownItems(handleLinkClick) {
           <Link
             to="/signup"
             type="button"
-            className="text-white bg-gradient-to-r from-cyan-500 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+            className="text-white bg-gradient-to-r from-cyan-500 to-btColour hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
           >
             Sign Up
           </Link>
 
           <Link
             to="/login"
-            className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800"
+            className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-btColour group-hover:from-cyan-500 group-hover:to-btColour hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800"
           >
             <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
               Login
