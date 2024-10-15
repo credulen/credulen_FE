@@ -42,6 +42,7 @@
 // };
 
 // export default Blog;
+
 import React, { useState, useEffect } from "react";
 import moment from "moment";
 import {
@@ -50,7 +51,6 @@ import {
   CardMedia,
   CardContent,
   Typography,
-  Button,
   Box,
   TextField,
   Avatar,
@@ -60,7 +60,6 @@ import {
   InputLabel,
   CircularProgress,
 } from "@mui/material";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Link } from "react-router-dom";
 import { TextInput } from "flowbite-react";
 import { HiOutlineSearch } from "react-icons/hi";
@@ -138,8 +137,8 @@ const NoResultsMessage = () => (
       alignItems: "center",
       justifyContent: "center",
       width: "70%",
-      height: "100vh", // Full viewport height
-      margin: "0 auto", // Center horizontally
+      height: "100vh",
+      margin: "0 auto",
     }}
   >
     <img
@@ -153,10 +152,16 @@ const NoResultsMessage = () => (
 const LoadingSpinner = () => (
   <Box
     sx={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      height: "100vh",
+      backgroundColor: "rgba(255, 255, 255, 0.7)", // semi-transparent white background
+      zIndex: 9999, // ensure it's on top of other elements
     }}
   >
     <CircularProgress />
@@ -244,141 +249,27 @@ const BlogList = () => {
 
   return (
     <section className="mt-24">
-      <Box sx={{ padding: 3 }}>
-        <div className="mb-4 ml-[-2.6rem] ">
-          <TextInput
-            id="search"
-            type="text"
-            icon={HiOutlineSearch}
-            placeholder="Search post"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="placeholder-gray-700 placeholder:text-base placeholder:m-10 md:w-[20rem] rounded-md  pl-10"
-          />
-        </div>
-        {/* Filters */}
-        <Grid
-          item
-          xs={12}
-          md={3}
-          sx={{ display: { xs: "block", md: "none", paddingBottom: "30px" } }}
-        >
-          <FilterSection
-            categories={categories}
-            onCategoryChange={setSelectedCategory}
-            onTimeFilterChange={setTimeFilter}
-          />
-        </Grid>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={9}>
-            {isLoading ? (
-              <LoadingSpinner />
-            ) : currentPosts.length > 0 ? (
-              <Grid container spacing={3}>
-                {currentPosts.map((post) => (
-                  <Grid item xs={12} sm={6} lg={4} key={post._id}>
-                    <Card
-                      sx={{
-                        height: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                      }}
-                    >
-                      <CardMedia
-                        component="img"
-                        sx={{ width: "100%", height: 250, objectFit: "cover" }}
-                        image={`${backendURL}${post.image}`}
-                        alt={post.title}
-                      />
-                      <CardContent sx={{ flexGrow: 1, p: 1 }}>
-                        <Typography
-                          gutterBottom
-                          variant="h5"
-                          fontSize="24px"
-                          component="div"
-                          fontWeight="600"
-                          color="#201F1F"
-                        >
-                          {post.title}
-                        </Typography>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            marginBottom: 1,
-                          }}
-                        >
-                          <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <Avatar
-                              src={`${backendURL}${post.authorId?.image}`}
-                              alt={post.authorId?.name}
-                              sx={{ width: 30, height: 30, marginRight: 1 }}
-                            />
-                            <Typography variant="body2" color="text.secondary">
-                              {post.authorId?.name}
-                            </Typography>
-                          </Box>
-                          <Typography variant="body2" color="text.secondary">
-                            {moment(post.createdAt).fromNow()}
-                            {/* {moment(post.createdAt).format("DD, MMMM YYYY")} */}
-                          </Typography>
-                        </Box>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: "#201F1F",
-                            fontSize: "14px", // Adjust font size (e.g., 1.25rem for text-xl)
-                            lineHeight: 1.5,
-                          }}
-                        >
-                          {trimContent(post.content, 100)}
-                        </Typography>
-                      </CardContent>
-                      <Box sx={{ p: 1 }}>
-                        <Link
-                          to={`/post/${post.slug}`}
-                          className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-btColour rounded-lg   focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors duration-300 mt-auto self-start hover:text-btColour hover:bg-white hover:border-btColour hover:border-2 hover:font-semibold"
-                        >
-                          Read more
-                          <svg
-                            className="w-3.5 h-3.5 ms-2"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 14 10"
-                          >
-                            <path
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M1 5h12m0 0L9 1m4 4L9 9"
-                            />
-                          </svg>
-                        </Link>
-                      </Box>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-            ) : (
-              <NoResultsMessage />
-            )}
-
-            {!isLoading && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={Math.ceil(filteredPosts.length / postsPerPage)}
-                onPageChange={paginate}
-              />
-            )}
-          </Grid>
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <Box sx={{ padding: 3 }}>
+          <div className="mb-4 ml-[-2.6rem] ">
+            <TextInput
+              id="search"
+              type="text"
+              icon={HiOutlineSearch}
+              placeholder="Search post"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="placeholder-gray-700 placeholder:text-base placeholder:m-10 md:w-[20rem] rounded-md  pl-10"
+            />
+          </div>
+          {/* Filters */}
           <Grid
             item
             xs={12}
             md={3}
-            sx={{ display: { xs: "none", md: "block" } }}
+            sx={{ display: { xs: "block", md: "none", paddingBottom: "30px" } }}
           >
             <FilterSection
               categories={categories}
@@ -386,8 +277,129 @@ const BlogList = () => {
               onTimeFilterChange={setTimeFilter}
             />
           </Grid>
-        </Grid>
-      </Box>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={9}>
+              {currentPosts.length > 0 ? (
+                <Grid container spacing={3}>
+                  {currentPosts.map((post) => (
+                    <Grid item xs={12} sm={6} lg={4} key={post._id}>
+                      <Card
+                        sx={{
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                        }}
+                      >
+                        <CardMedia
+                          component="img"
+                          sx={{
+                            width: "100%",
+                            height: 250,
+                            objectFit: "cover",
+                          }}
+                          image={`${backendURL}${post.image}`}
+                          alt={post.title}
+                        />
+                        <CardContent sx={{ flexGrow: 1, p: 1 }}>
+                          <Typography
+                            gutterBottom
+                            variant="h5"
+                            fontSize="24px"
+                            component="div"
+                            fontWeight="600"
+                            color="#201F1F"
+                          >
+                            {post.title}
+                          </Typography>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              marginBottom: 1,
+                            }}
+                          >
+                            <Box sx={{ display: "flex", alignItems: "center" }}>
+                              <Avatar
+                                src={`${backendURL}${post.authorId?.image}`}
+                                alt={post.authorId?.name}
+                                sx={{ width: 30, height: 30, marginRight: 1 }}
+                              />
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {post.authorId?.name}
+                              </Typography>
+                            </Box>
+                            <Typography variant="body2" color="text.secondary">
+                              {moment(post.createdAt).fromNow()}
+                              {/* {moment(post.createdAt).format("DD, MMMM YYYY")} */}
+                            </Typography>
+                          </Box>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: "#201F1F",
+                              fontSize: "14px",
+                              lineHeight: 1.5,
+                            }}
+                          >
+                            {trimContent(post.content, 100)}
+                          </Typography>
+                        </CardContent>
+                        <Box sx={{ p: 1 }}>
+                          <Link
+                            to={`/post/${post.slug}`}
+                            className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-btColour rounded-lg   focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors duration-300 mt-auto self-start hover:text-btColour hover:bg-white hover:border-btColour hover:border-2 hover:font-semibold"
+                          >
+                            Read more
+                            <svg
+                              className="w-3.5 h-3.5 ms-2"
+                              aria-hidden="true"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 14 10"
+                            >
+                              <path
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M1 5h12m0 0L9 1m4 4L9 9"
+                              />
+                            </svg>
+                          </Link>
+                        </Box>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              ) : (
+                <NoResultsMessage />
+              )}
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(filteredPosts.length / postsPerPage)}
+                onPageChange={paginate}
+              />
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              md={3}
+              sx={{ display: { xs: "none", md: "block" } }}
+            >
+              <FilterSection
+                categories={categories}
+                onCategoryChange={setSelectedCategory}
+                onTimeFilterChange={setTimeFilter}
+              />
+            </Grid>
+          </Grid>
+        </Box>
+      )}
     </section>
   );
 };

@@ -1,6 +1,183 @@
+// import React, { useState, useEffect } from "react";
+// import { useParams } from "react-router-dom";
+// import { Alert, AlertDescription } from "../components/tools/Alert";
+// import { Loader, CheckCircle, AlertCircle } from "lucide-react";
+
+// const backendURL = import.meta.env.VITE_BACKEND_URL;
+
+// const SolutionForm = () => {
+//   const { slug } = useParams();
+//   const [solution, setSolution] = useState(null);
+//   const [formData, setFormData] = useState({
+//     fullName: "",
+//     phoneNumber: "",
+//     email: "",
+//     employmentStatus: "",
+//     jobTitle: "",
+//     selectedSolution: "",
+//   });
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [alertInfo, setAlertInfo] = useState(null);
+//   const [showModal, setShowModal] = useState(false);
+
+//   useEffect(() => {
+//     fetchSolutionDetails();
+//   }, [slug]);
+
+//   const fetchSolutionDetails = async () => {
+//     try {
+//       const response = await fetch(
+//         `${backendURL}/api/getSolutionBySlug/${slug}`
+//       );
+//       if (!response.ok) throw new Error("Failed to fetch solution details");
+//       const data = await response.json();
+//       setSolution(data);
+//       setFormData((prev) => ({ ...prev, selectedSolution: data.title }));
+//     } catch (error) {
+//       console.error("Error fetching solution details:", error);
+//       setAlertInfo({
+//         message: "Failed to fetch solution details. Please try again.",
+//         variant: "destructive",
+//         icon: AlertCircle,
+//       });
+//     }
+//   };
+
+//   const handleInputChange = (e) => {
+//     const { name, value } = e.target;
+//     setFormData((prev) => ({ ...prev, [name]: value }));
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setIsLoading(true);
+//     try {
+//       const response = await fetch(`${backendURL}/api/submitSolutionForm`, {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ ...formData, slug }),
+//       });
+//       const data = await response.json();
+
+//       if (response.ok) {
+//         setAlertInfo({
+//           message: "Form submitted successfully!",
+//           variant: "success",
+//           icon: CheckCircle,
+//         });
+//         setFormData({
+//           fullName: "",
+//           phoneNumber: "",
+//           email: "",
+//           employmentStatus: "",
+//           jobTitle: "",
+//           selectedSolution: solution.title,
+//         });
+//       } else {
+//         setAlertInfo({
+//           message: data.message || "Failed to submit form. Please try again.",
+//           variant: data.message.includes("already submitted")
+//             ? "warning"
+//             : "destructive",
+//           icon: AlertCircle,
+//         });
+//       }
+//     } catch (error) {
+//       console.error("Error submitting form:", error);
+//       setAlertInfo({
+//         message: "An error occurred. Please try again.",
+//         variant: "destructive",
+//         icon: AlertCircle,
+//       });
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     if (alertInfo) {
+//       setShowModal(true);
+//       const timer = setTimeout(() => {
+//         setShowModal(false);
+//         setAlertInfo(null);
+//       }, 5000);
+//       return () => clearTimeout(timer);
+//     }
+//   }, [alertInfo]);
+
+//   if (!solution) return <div>Loading...</div>;
+
+//   return (
+//     <div className="container mx-auto px-12 py-8 max-w-2xl">
+//       <h1 className="text-2xl font-bold mb-6 text-center">
+//         Please Fill the Form to Register Your Interest in our Solutions for
+//         Individuals
+//       </h1>
+//       <h1 className="text-lg mx-auto mb-4 text-gray-500 text-center">
+//         {solution.title}
+//       </h1>
+//       <form
+//         onSubmit={handleSubmit}
+//         className="space-y-6 shadow-sm rounded-sm px-6 py-9 bg-gray-50"
+//       >
+//         {/* Form fields remain the same */}
+//         <button
+//           type="submit"
+//           className="text-white bg-[#198754] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center w-full"
+//           disabled={isLoading}
+//         >
+//           {isLoading ? (
+//             <>
+//               <Loader className="animate-spin mr-2 inline" size={20} />
+//               Submitting...
+//             </>
+//           ) : (
+//             "Submit"
+//           )}
+//         </button>
+//       </form>
+
+//       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+//         {alertInfo && (
+//           <Alert variant={alertInfo.variant} className="m-0">
+//             <div className="flex items-center gap-2">
+//               {alertInfo.icon && (
+//                 <alertInfo.icon className="h-5 w-5 flex-shrink-0" />
+//               )}
+//               <AlertDescription>{alertInfo.message}</AlertDescription>
+//             </div>
+//           </Alert>
+//         )}
+//       </Modal>
+//     </div>
+//   );
+// };
+
+// export default SolutionForm;
+
+// const Modal = ({ isOpen, onClose, children }) => {
+//   if (!isOpen) return null;
+
+//   return (
+//     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+//       <div className="bg-white rounded-lg p-4 max-w-sm w-full relative">
+//         <button
+//           onClick={onClose}
+//           className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+//           aria-label="Close"
+//         >
+//           <X size={20} />
+//         </button>
+//         {children}
+//       </div>
+//     </div>
+//   );
+// };
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import emailjs from "emailjs-com";
+import { Alert, AlertDescription } from "../components/tools/Alert";
+import { Loader, CheckCircle, AlertCircle, X } from "lucide-react";
+
 const backendURL = import.meta.env.VITE_BACKEND_URL;
 
 const SolutionForm = () => {
@@ -14,6 +191,9 @@ const SolutionForm = () => {
     jobTitle: "",
     selectedSolution: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [alertInfo, setAlertInfo] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     fetchSolutionDetails();
@@ -30,6 +210,11 @@ const SolutionForm = () => {
       setFormData((prev) => ({ ...prev, selectedSolution: data.title }));
     } catch (error) {
       console.error("Error fetching solution details:", error);
+      setAlertInfo({
+        message: "Failed to fetch solution details. Please try again.",
+        variant: "destructive",
+        icon: AlertCircle,
+      });
     }
   };
 
@@ -40,36 +225,66 @@ const SolutionForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
-      await emailjs.send(
-        "service_mfruavt",
-        "template_cst1uc9",
-        formData,
-        "9Tp4XEvOsWGi69ktz"
-      );
-
-      // Save form data to database
-      const response = await fetch(`${backendURL}/api/submitSolutionForm`, {
+      const response = await fetch(`${backendURL}/api/registerForSolution`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, slug }),
       });
+      const data = await response.json();
 
-      if (!response.ok) throw new Error("Failed to submit form");
-
-      alert("Form submitted successfully!");
-      // Reset form or redirect user
+      if (response.ok) {
+        setAlertInfo({
+          message: "Form submitted successfully!",
+          variant: "success",
+          icon: CheckCircle,
+        });
+        setFormData({
+          fullName: "",
+          phoneNumber: "",
+          email: "",
+          employmentStatus: "",
+          jobTitle: "",
+          selectedSolution: solution.title,
+        });
+      } else {
+        setAlertInfo({
+          message: data.message || "Failed to submit form. Please try again.",
+          variant: data.message.includes("already submitted")
+            ? "warning"
+            : "destructive",
+          icon: AlertCircle,
+        });
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
-      alert("Failed to submit form. Please try again.");
+      setAlertInfo({
+        message: "An error occurred. Please try again.",
+        variant: "destructive",
+        icon: AlertCircle,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (alertInfo) {
+      setShowModal(true);
+      const timer = setTimeout(() => {
+        setShowModal(false);
+        setAlertInfo(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [alertInfo]);
 
   if (!solution) return <div>Loading...</div>;
 
   return (
-    <div className="container mx-auto px-12 py-8 max-w-2xl">
-      <h1 className="text-2xl font-bold mb-6 text-center">
+    <div className="container mx-auto px-12 py-8 max-w-2xl mt-[6rem]">
+      <h1 className="text-2xl font-semibold text-btColour mb-6 text-center">
         Please Fill the Form to Register Your Interest in our Solutions for
         Individuals
       </h1>
@@ -93,14 +308,15 @@ const SolutionForm = () => {
             name="fullName"
             value={formData.fullName}
             onChange={handleInputChange}
+            className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-700 focus:border-teal-700  dark:bg-gray-700 dark:border-gray-600 placeholder-gray-400 dark:text-white "
+            placeholder="Your full name"
             required
-            className="bg-gray-50 border border-[#0FEA84] text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black block w-full p-2.5"
           />
         </div>
         <div>
           <label
             htmlFor="phoneNumber"
-            className="block mb-2 text-sm font-medium text-gray-900 border-[#0FEA84]"
+            className="block mb-2 text-sm font-medium text-gray-900"
           >
             Phone Number
           </label>
@@ -110,8 +326,9 @@ const SolutionForm = () => {
             name="phoneNumber"
             value={formData.phoneNumber}
             onChange={handleInputChange}
+            className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-700 focus:border-teal-700  dark:bg-gray-700 dark:border-gray-600 placeholder-gray-400 dark:text-white "
+            placeholder="Your phone number"
             required
-            className="bg-gray-50 border border-[#0FEA84] text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black block w-full p-2.5"
           />
         </div>
         <div>
@@ -119,7 +336,7 @@ const SolutionForm = () => {
             htmlFor="email"
             className="block mb-2 text-sm font-medium text-gray-900"
           >
-            Email address
+            Email Address
           </label>
           <input
             type="email"
@@ -127,12 +344,10 @@ const SolutionForm = () => {
             name="email"
             value={formData.email}
             onChange={handleInputChange}
+            className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-700 focus:border-teal-700  dark:bg-gray-700 dark:border-gray-600 placeholder-gray-400 dark:text-white "
+            placeholder="Your email address"
             required
-            className="bg-gray-50 border border-[#0FEA84] text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black block w-full p-2.5"
           />
-          <p className="mt-2 text-sm text-gray-600">
-            We'll never share your email with anyone else.
-          </p>
         </div>
         <div>
           <label
@@ -146,13 +361,14 @@ const SolutionForm = () => {
             name="employmentStatus"
             value={formData.employmentStatus}
             onChange={handleInputChange}
+            className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-700 focus:border-teal-700  dark:bg-gray-700 dark:border-gray-600 placeholder-gray-400 dark:text-white "
             required
-            className="bg-gray-50 border border-[#0FEA84] text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black block w-full p-2.5"
           >
-            <option value="">Please Select your Employment Status</option>
+            <option value="">Select status</option>
             <option value="employed">Employed</option>
             <option value="unemployed">Unemployed</option>
             <option value="student">Student</option>
+            <option value="retired">Retired</option>
           </select>
         </div>
         <div>
@@ -168,48 +384,59 @@ const SolutionForm = () => {
             name="jobTitle"
             value={formData.jobTitle}
             onChange={handleInputChange}
-            className="bg-gray-50 border border-[#0FEA84] text-gray-900 text-sm rounded-lg focus:ring-black focus:border-black block w-full p-2.5"
+            className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-700 focus:border-teal-700  dark:bg-gray-700 dark:border-gray-600 placeholder-gray-400 dark:text-white "
+            placeholder="Your job title"
           />
         </div>
         <button
           type="submit"
-          className=" text-white bg-[#198754] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+          className="text-white bg-[#198754] hover:text-[#198754] hover:bg-transparent hover:font-bold hover:border hover:border-[#198754] font-medium rounded-lg text-sm px-5 py-2.5 text-center w-full"
+          disabled={isLoading}
         >
-          Submit
+          {isLoading ? (
+            <>
+              <Loader className="animate-spin mr-2 inline" size={20} />
+              Submitting...
+            </>
+          ) : (
+            "Submit"
+          )}
         </button>
       </form>
+
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+        {alertInfo && (
+          <Alert variant={alertInfo.variant} className="m-0">
+            <div className="flex items-center gap-2">
+              {alertInfo.icon && (
+                <alertInfo.icon className="h-5 w-5 flex-shrink-0" />
+              )}
+              <AlertDescription>{alertInfo.message}</AlertDescription>
+            </div>
+          </Alert>
+        )}
+      </Modal>
+    </div>
+  );
+};
+
+const Modal = ({ isOpen, onClose, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-4 max-w-sm w-full relative">
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+          aria-label="Close"
+        >
+          <X size={20} />
+        </button>
+        {children}
+      </div>
     </div>
   );
 };
 
 export default SolutionForm;
-
-//  const sendEmail = async (e) => {
-//    e.preventDefault();
-//    setIsLoading(true);
-//    setError("");
-
-//    try {
-//      const templateParams = {
-//        to_name: "Peter Uche",
-//        from_name: email,
-//        message,
-//      };
-
-//      await emailjs.send(
-//        "service_mfruavt",
-//        "template_cst1uc9",
-//        templateParams,
-//        "9Tp4XEvOsWGi69ktz"
-//      );
-//      toast.success("Message sent successfully! 📧");
-//    } catch (error) {
-//      setError("Failed to send message. Please try again.");
-//      toast.error("Failed to send message. Please try again.");
-//    } finally {
-//      setIsLoading(false);
-//    }
-
-//    setEmail("");
-//    setMessage("");
-//  };

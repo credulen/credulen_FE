@@ -11,6 +11,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { IoClose } from "react-icons/io5";
 import { AiTwotoneDelete } from "react-icons/ai";
 import { BiMessageSquareAdd } from "react-icons/bi";
+import { HiOutlineUserCircle, HiOutlineSearch } from "react-icons/hi";
 
 const backendURL = import.meta.env.VITE_BACKEND_URL;
 
@@ -86,14 +87,16 @@ export default function Authors() {
 
   return (
     <>
-      <Link to="/DashBoard/Admin/CreateAuthor">
-        <button className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-[20%] mid:w-[30%] py-2 text-center transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center mx-3 mb-7">
-          <span className="flex whitespace-nowrap">
-            <BiMessageSquareAdd className="mr-2" size={20} />
-            Create Author
-          </span>
-        </button>
-      </Link>
+      <div className="my-5 ml-3">
+        <Link to="/DashBoard/Admin/CreateAuthor">
+          <button className=" text-btColour border border-btColour p-1 rounded-lg hover:font-semibold">
+            <span className="flex whitespace-nowrap">
+              <BiMessageSquareAdd className="mr-2 mt-1" size={16} />
+              Create Author
+            </span>
+          </button>
+        </Link>
+      </div>
       <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
         {authors?.length > 0 ? (
           <>
@@ -114,25 +117,38 @@ export default function Authors() {
                   >
                     <Table.Cell>{author.name}</Table.Cell>
                     <Table.Cell>
-                      <img
-                        src={`${backendURL}${author.image}`}
-                        alt={author.name}
-                        className="w-20 h-20 object-cover bg-gray-500 rounded-full"
-                      />
+                      {author.image ? (
+                        <img
+                          src={`${backendURL}${author.image}`}
+                          alt={author.username}
+                          className="w-10 h-10 rounded-full"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = "/fallback-image.png";
+                          }}
+                        />
+                      ) : (
+                        <HiOutlineUserCircle className="w-10 h-10 text-gray-400" />
+                      )}
                     </Table.Cell>
-                    <Table.Cell>{author.bio}</Table.Cell>
+                    <Table.Cell>
+                      {author.bio.length > 50
+                        ? `${author.bio.substring(0, 50)}...`
+                        : author.bio}
+                    </Table.Cell>
+
                     <Table.Cell>{author.email}</Table.Cell>
                     <Table.Cell>
                       <span
                         onClick={() => openDeleteModal(author._id)}
-                        className="font-medium text-red-500 hover:underline cursor-pointer"
+                        className="font-medium text-white hover:text-red-500 hover:bg-transparent hover:border hover:border-red-500 cursor-pointer bg-btColour p-1 rounded-md"
                       >
                         Delete
                       </span>
                     </Table.Cell>
                     <Table.Cell>
                       <Link
-                        className="text-teal-500 hover:underline"
+                        className="font-medium text-white hover:text-btColour hover:bg-transparent hover:border hover:border-btColour cursor-pointer bg-btColour p-1 rounded-md"
                         to={`/DashBoard/Admin/CreateAuthor/${author._id}`}
                       >
                         <span>Edit</span>

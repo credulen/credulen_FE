@@ -73,3 +73,21 @@ h2 {
 }
 
 /* Add more element-specific styles as needed */
+/* Custom Scrollbar for WebKit Browsers */
+::-webkit-scrollbar {
+  width: 6px; /* Adjust the width */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.2
+  ); /* Custom color for the scrollbar thumb */
+  border-radius: 10px; /* Rounded edges */
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.1); /* Track background color */
+}

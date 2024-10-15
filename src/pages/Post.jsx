@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Snackbar, Alert, Grid } from "@mui/material";
 import ModeCommentOutlined from "@mui/icons-material/ModeCommentOutlined";
+import EmojiPicker from "emoji-picker-react";
+import data from "@emoji-mart/data";
+import Picker from "@emoji-mart/react";
+
 import { Twitter, Facebook, LinkedIn, WhatsApp } from "@mui/icons-material";
 import {
   Typography,
   Box,
   Chip,
   Divider,
-  Button,
   TextField,
   IconButton,
   Avatar,
@@ -27,6 +30,7 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
+
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import {
   ThumbUp,
@@ -39,6 +43,8 @@ import {
   Reply,
   Margin,
 } from "@mui/icons-material";
+import { TextInput, Button } from "flowbite-react";
+import { Smile, X } from "lucide-react";
 
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.bubble.css";
@@ -50,31 +56,8 @@ import "../index.css";
 
 const backendURL = import.meta.env.VITE_BACKEND_URL;
 
-const DarkBox = styled(Box)(({ theme }) => ({
-  backgroundColor: "gray",
-  color: "#ffffff",
-  borderRadius: "8px",
-  padding: "16px",
-  marginBottom: "16px",
-  border: "1px solid black",
-}));
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  backgroundColor: "#3e3e3e",
-  color: "#ffffff",
-  "&:hover": {
-    backgroundColor: "black",
-  },
-}));
-
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   color: "#ffffff",
-}));
-
-const RelatedPostCard = styled(Card)(({ theme }) => ({
-  backgroundColor: "#2e2e2e",
-  color: "#ffffff",
-  height: "100%",
 }));
 
 export const RelatedPosts = ({ category, currentPostId }) => {
@@ -170,6 +153,43 @@ export const RelatedPosts = ({ category, currentPostId }) => {
   );
 };
 
+const CustomModal = ({ isOpen, onClose, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg relative w-full max-w-md">
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+        >
+          <X size={24} />
+        </button>
+        {children}
+      </div>
+    </div>
+  );
+};
+
+const Button1 = ({ children, onClick, primary, className, ...props }) => {
+  const baseStyle =
+    "px-4 py-2 rounded-md font-semibold text-sm transition-colors duration-200";
+  const primaryStyle = "bg-[#198754] hover:bg-[#15704a] text-white";
+  const secondaryStyle =
+    "bg-white border-2 border-[#047481] text-[#047481] hover:bg-[#e6f3f5]";
+
+  return (
+    <button
+      onClick={onClick}
+      className={`${baseStyle} ${
+        primary ? primaryStyle : secondaryStyle
+      } ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
 export const ExpandableCommentInput = ({
   onSubmit,
   userAvatar,
@@ -179,9 +199,40 @@ export const ExpandableCommentInput = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [comment, setComment] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const navigate = useNavigate();
+  const { userInfo } = useSelector((state) => state.auth);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const emojiPickerRef = useRef(null);
+
+  const handleEmojiSelect = (emoji) => {
+    setComment((prevComment) => prevComment + emoji.native);
+    setShowEmojiPicker(false);
+  };
+  useEffect(() => {
+    setIsLoggedIn(!!userInfo);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [userInfo]);
+
+  const handleClickOutside = (event) => {
+    if (
+      emojiPickerRef.current &&
+      !emojiPickerRef.current.contains(event.target)
+    ) {
+      setShowEmojiPicker(false);
+    }
+  };
 
   const handleExpand = () => {
-    setIsExpanded(true);
+    if (isLoggedIn) {
+      setIsExpanded(true);
+    } else {
+      setShowLoginModal(true);
+    }
   };
 
   const handleCommentChange = (event) => {
@@ -196,109 +247,136 @@ export const ExpandableCommentInput = ({
     }
   };
 
+  const handleLogin = () => {
+    sessionStorage.setItem("returnTo", window.location.pathname);
+    navigate("/login");
+  };
+
+  const handleCloseModal = useCallback(() => {
+    setShowLoginModal(false);
+  }, []);
+
+  useEffect(() => {
+    const handleEscapeKey = (event) => {
+      if (event.key === "Escape" && showLoginModal) {
+        handleCloseModal();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscapeKey);
+    return () => {
+      document.removeEventListener("keydown", handleEscapeKey);
+    };
+  }, [handleCloseModal, showLoginModal]);
+
   return (
     <Box sx={{ mt: 2, width: "100%" }}>
       {commentsCount > 0 && (
         <Box display="flex" alignItems="center" marginBottom={2} marginLeft={1}>
-          <ModeCommentOutlined
-            style={{ marginRight: 4, fontSize: "1.1rem" }} // Adjust the icon size
-          />
           <Typography variant="body2">
             {commentsCount} Comment{commentsCount > 1 ? "s" : ""}
           </Typography>
         </Box>
       )}
 
-      {!isExpanded && (
-        <Box
-          onClick={handleExpand}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            borderRadius: "9px",
-            padding: "8px 16px",
-            cursor: "pointer",
-            border: "1px solid gray",
-            m: 1,
-            p: 2,
-            marginBottom: "20px",
-            "&:hover": {
-              transition: "all 0.3s ease",
-              border: "2px solid gray",
-            },
-          }}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          borderRadius: "9px",
+          m: 1,
+          marginBottom: "20px",
+        }}
+      >
+        <Avatar
+          src={userAvatar}
+          sx={{ width: 32, height: 32, marginRight: "12px" }}
+        />
+        <input
+          id="comment"
+          type="text"
+          placeholder="Share your thoughts"
+          required={true}
+          value={comment}
+          onChange={handleCommentChange}
+          onFocus={handleExpand}
+          className="flex-grow border border-btColour focus:border-btColour focus:outline-none focus:ring-1 focus:ring-btColour bg-gray-50 bg-opacity-50   rounded-lg p-2"
+        />
+
+        <Button
+          onClick={handleSubmit}
+          disabled={!comment.trim()}
+          className="ml-2 border-2 p-0 border-btColour text-btColour hover:font-bold"
         >
-          <Avatar
-            src={userAvatar}
-            sx={{ width: 32, height: 32, marginRight: "12px" }}
+          Post
+        </Button>
+      </Box>
+
+      {isExpanded && (
+        <>
+          <Box
+            display="flex"
+            justifyContent="space-betwee"
+            alignItems="center"
+            mt={0}
+            ml={5.5}
+          >
+            <Box>
+              <StyledIconButton sx={{ fontSize: "18px", padding: "4px" }}>
+                ⬆️
+              </StyledIconButton>
+              <StyledIconButton sx={{ fontSize: "18px", padding: "4px" }}>
+                ⬇️
+              </StyledIconButton>
+            </Box>
+
+            <Button
+              color="primary"
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "rgba(0, 0, 0, 0.04)",
+                },
+              }}
+            >
+              <Smile className="mr-2 h-5 w-5" />
+              {/* Emoji */}
+            </Button>
+          </Box>
+        </>
+      )}
+
+      {showEmojiPicker && (
+        <Box sx={{ position: "absolute", zIndex: 1 }} ref={emojiPickerRef}>
+          <Picker
+            data={data}
+            onEmojiSelect={handleEmojiSelect}
+            theme="light"
+            set="apple"
+            title="Pick your emoji"
+            emoji="point_up"
+            style={{ width: "100%", maxWidth: "320px" }}
           />
-          <Typography
-            sx={{
-              color: "#808080",
-              fontSize: "14px",
-              fontWeight: 500,
-            }}
-          >
-            Share your thoughts
-          </Typography>
-          <Box sx={{ flexGrow: 1 }} />
-          <Typography
-            sx={{
-              color: "#808080",
-              fontSize: "14px",
-              fontWeight: 500,
-              backgroundColor: "",
-              borderColor: "#2a2a2a",
-              borderWidth: "1px",
-              borderRadius: "4px",
-              padding: "4px 8px",
-            }}
-          >
-            Post
-          </Typography>
         </Box>
       )}
 
-      {isExpanded && (
-        <DarkBox>
-          <Box display="flex" alignItems="flex-start" marginBottom={2}>
-            <Avatar src={userAvatar} sx={{ marginRight: 1 }} />
-            <TextField
-              fullWidth
-              multiline
-              rows={3}
-              placeholder="Share your thoughts"
-              value={comment}
-              onChange={handleCommentChange}
-              variant="outlined"
-              sx={{
-                backgroundColor: "white",
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": { borderColor: "white" },
-                  "&:hover fieldset": { borderColor: "white" },
-                  "&.Mui-focused fieldset": { borderColor: "white" },
-                },
-                "& .MuiInputBase-input": { color: "black" },
-              }}
-            />
-          </Box>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Box>
-              <StyledIconButton>⬆️</StyledIconButton>
-              <StyledIconButton>⬇️</StyledIconButton>
-              <StyledIconButton>🔗</StyledIconButton>
-              <StyledIconButton>@</StyledIconButton>
-            </Box>
-            <StyledButton variant="contained" onClick={handleSubmit}>
-              Comment
-            </StyledButton>
-          </Box>
-        </DarkBox>
-      )}
+      <CustomModal isOpen={showLoginModal} onClose={handleCloseModal}>
+        <h2 className="text-2xl font-bold mb-4 text-[#047481]">
+          Login Required
+        </h2>
+        <p className="mb-6 text-gray-600">
+          Please log in to leave a comment. Your thoughts are valuable to us!
+        </p>
+        <div className="flex justify-end space-x-4">
+          <Button1 onClick={handleCloseModal}>Cancel</Button1>
+          <Button1 primary onClick={handleLogin}>
+            Log In
+          </Button1>
+        </div>
+      </CustomModal>
     </Box>
   );
 };
@@ -333,6 +411,9 @@ export default function Post() {
   const [commentToDeleteId, setCommentToDeleteId] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [comment, setComment] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [displayedComments, setDisplayedComments] = useState([]);
+  const commentsPerPage = 5;
 
   const handleMenuOpen = (event, commentId) => {
     setAnchorEl(event.currentTarget);
@@ -347,8 +428,6 @@ export default function Post() {
   const toggleShowAllComments = () => {
     setShowAllComments(!showAllComments);
   };
-
-  const displayedComments = showAllComments ? comments : comments.slice(0, 5);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -466,6 +545,7 @@ export default function Post() {
       setSnackbarMessage("Comment submitted successfully!");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
+      fetchPostComments(postId);
     } catch (error) {
       console.error("Error submitting comment:", error);
       setSnackbarMessage("Failed to submit comment.");
@@ -475,6 +555,7 @@ export default function Post() {
   };
 
   const fetchPostComments = async (postId) => {
+    setLoading(true);
     try {
       const response = await fetch(
         `${backendURL}/api/getPostComments/${postId}`
@@ -506,18 +587,73 @@ export default function Post() {
       );
 
       setComments(commentsWithUsers);
+      setDisplayedComments(commentsWithUsers.slice(0, commentsPerPage));
       console.log(commentsWithUsers, "getPostComments");
     } catch (error) {
       console.error("Error fetching comments:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  console.log(comments);
   useEffect(() => {
     if (postId) {
       fetchPostComments(postId);
     }
   }, [postId]);
+
+  const handleShowMore = () => {
+    const nextPage = currentPage + 1;
+    const startIndex = (nextPage - 1) * commentsPerPage;
+    const endIndex = startIndex + commentsPerPage;
+    setDisplayedComments([
+      ...displayedComments,
+      ...comments.slice(startIndex, endIndex),
+    ]);
+    setCurrentPage(nextPage);
+  };
+
+  // const handleCommentEdit = async (commentId, newContent) => {
+  //   try {
+  //     const response = await fetch(
+  //       `${backendURL}/api/editComment/${commentId}`,
+  //       {
+  //         method: "PUT",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ content: newContent }),
+  //       }
+  //     );
+
+  //     if (!response.ok) {
+  //       throw new Error("Failed to edit comment");
+  //     }
+
+  //     const updatedComment = await response.json();
+
+  //     setComments(
+  //       comments.map((comment) =>
+  //         comment._id === commentId ? updatedComment : comment
+  //       )
+  //     );
+
+  //     setEditingCommentId(null);
+  //     setEditedCommentContent("");
+
+  //     // Trigger success Snackbar
+  //     setSnackbarMessage("Comment edited successfully!");
+  //     setSnackbarSeverity("success");
+  //     setSnackbarOpen(true);
+  //   } catch (error) {
+  //     console.error("Error editing comment:", error);
+
+  //     // Trigger error Snackbar
+  //     setSnackbarMessage("Failed to edit comment.");
+  //     setSnackbarSeverity("error");
+  //     setSnackbarOpen(true);
+  //   }
+  // };
 
   const handleCommentEdit = async (commentId, newContent) => {
     try {
@@ -538,29 +674,35 @@ export default function Post() {
 
       const updatedComment = await response.json();
 
-      setComments(
-        comments.map((comment) =>
-          comment._id === commentId ? updatedComment : comment
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment._id === commentId
+            ? { ...comment, content: updatedComment.content }
+            : comment
+        )
+      );
+
+      setDisplayedComments((prevDisplayedComments) =>
+        prevDisplayedComments.map((comment) =>
+          comment._id === commentId
+            ? { ...comment, content: updatedComment.content }
+            : comment
         )
       );
 
       setEditingCommentId(null);
       setEditedCommentContent("");
 
-      // Trigger success Snackbar
       setSnackbarMessage("Comment edited successfully!");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
     } catch (error) {
       console.error("Error editing comment:", error);
-
-      // Trigger error Snackbar
       setSnackbarMessage("Failed to edit comment.");
       setSnackbarSeverity("error");
       setSnackbarOpen(true);
     }
   };
-
   const handleCommentDelete = async (commentId) => {
     try {
       const response = await fetch(
@@ -581,6 +723,7 @@ export default function Post() {
       setSnackbarMessage("Comment deleted successfully!");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
+      fetchPostComments(postId);
     } catch (error) {
       console.error("Error deleting comment:", error);
 
@@ -594,6 +737,7 @@ export default function Post() {
   const handleEditClick = (comment) => {
     setEditingCommentId(comment._id);
     setEditedCommentContent(comment.content);
+    handleMenuClose();
   };
 
   const handleCancelEdit = () => {
@@ -604,8 +748,8 @@ export default function Post() {
   const handleDeleteClick = (commentId) => {
     setCommentToDeleteId(commentId);
     setDeleteDialogOpen(true);
+    handleMenuClose();
   };
-
   const handleDeleteConfirm = () => {
     if (commentToDeleteId) {
       handleCommentDelete(commentToDeleteId);
@@ -629,8 +773,6 @@ export default function Post() {
   const handleCommentLike = async (commentId) => {
     try {
       const url = `${backendURL}/api/likeComment/${commentId}`;
-      console.log("Attempting to like comment at URL:", url);
-
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -640,27 +782,32 @@ export default function Post() {
       });
 
       if (!response.ok) {
-        console.error("Response status:", response.status);
-        console.error("Response text:", await response.text());
         throw new Error("Failed to like comment");
       }
 
       const updatedComment = await response.json();
 
-      // Ensure the updated comment has user data
-      const updatedCommentWithUserData = {
-        ...updatedComment,
-        userId: comments.find((comment) => comment._id === commentId)
-          ?.userId || {
-          _id: userId,
-          username: name,
-          image: image,
-        },
-      };
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment._id === commentId
+            ? {
+                ...comment,
+                likes: updatedComment.likes,
+                likeCount: updatedComment.likes.length,
+              }
+            : comment
+        )
+      );
 
-      setComments(
-        comments.map((comment) =>
-          comment._id === commentId ? updatedCommentWithUserData : comment
+      setDisplayedComments((prevDisplayedComments) =>
+        prevDisplayedComments.map((comment) =>
+          comment._id === commentId
+            ? {
+                ...comment,
+                likes: updatedComment.likes,
+                likeCount: updatedComment.likes.length,
+              }
+            : comment
         )
       );
 
@@ -833,9 +980,9 @@ export default function Post() {
             userId={userId}
           />
 
-          {comments.length > 0 ? (
+          {displayedComments.length > 0 ? (
             <Box sx={{ width: "100%", bgcolor: "#f5f5f5", p: 2 }}>
-              {comments.map((comment) => (
+              {displayedComments.map((comment) => (
                 <Box
                   key={comment.id}
                   sx={{ mb: 2, bgcolor: "white", borderRadius: 1, p: 2 }}
@@ -843,7 +990,7 @@ export default function Post() {
                   <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                     {/* Avatar */}
                     <Avatar
-                      src={`${backendURL}/uploads/${profile?.image}`}
+                      src={`${backendURL}/uploads/${comment?.userId?.image}`}
                       alt={comment.username}
                       sx={{ width: 22, height: 22, mr: 1, mb: 1 }}
                     />
@@ -908,15 +1055,23 @@ export default function Post() {
                         variant="outlined"
                         sx={{ mb: 1 }}
                       />
-                      <Button
-                        onClick={() =>
-                          handleCommentEdit(comment._id, editedCommentContent)
-                        }
-                        sx={{ mr: 1 }}
-                      >
-                        Save
-                      </Button>
-                      <Button onClick={handleCancelEdit}>Cancel</Button>
+                      <Box sx={{ display: "flex" }}>
+                        <Button
+                          className="text-btColour  hover:font-bold"
+                          onClick={() =>
+                            handleCommentEdit(comment._id, editedCommentContent)
+                          }
+                          sx={{ mr: 1 }}
+                        >
+                          Save
+                        </Button>
+                        <Button
+                          className="text-btColour  hover:font-bold"
+                          onClick={handleCancelEdit}
+                        >
+                          Cancel
+                        </Button>
+                      </Box>
                     </Box>
                   ) : (
                     <Typography
@@ -986,12 +1141,25 @@ export default function Post() {
               No comments yet. Be the first to comment!
             </Typography>
           )}
-
-          {comments.length > 5 && (
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-              <Button onClick={toggleShowAllComments}>
-                {showAllComments ? "Show Less" : "Show More"}
-              </Button>
+          {displayedComments.length < comments.length && (
+            <Box className="flex justify-center mt-2">
+              <button
+                onClick={handleShowMore}
+                disabled={loading}
+                className={`
+  px-2 py-1 text-xs
+  bg-gradient-to-r from-[#047481] to-[#198754] 
+  text-transparent bg-clip-text
+  hover:bg-gradient-to-r hover:from-[#198754] hover:to-[#047481]
+  rounded-md 
+  transition-all duration-300 ease-in-out
+  transform hover:-translate-y-0.5 hover:shadow-lg
+  focus:outline-none focus:ring-2 focus:ring-[#047481] focus:ring-opacity-50
+  disabled:opacity-50 disabled:cursor-not-allowed
+`}
+              >
+                {loading ? "Loading..." : "Show More"}
+              </button>
             </Box>
           )}
           <Menu

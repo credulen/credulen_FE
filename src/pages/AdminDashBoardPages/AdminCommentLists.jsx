@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, TextInput } from "flowbite-react";
 import { useSelector } from "react-redux";
-import { HiOutlineUserCircle, HiOutlineSearch } from "react-icons/hi";
-import { FaCheck, FaTimes } from "react-icons/fa";
+import { HiOutlineSearch } from "react-icons/hi";
 import { TableContainer, Paper, Snackbar } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -13,6 +12,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { IoClose } from "react-icons/io5";
 import { AiTwotoneDelete } from "react-icons/ai";
 import MuiAlert from "@mui/material/Alert";
+import { HiOutlineUserCircle } from "react-icons/hi";
 import moment from "moment";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -101,11 +101,11 @@ const PaginationButtons = ({ currentPage, totalPages, onPageChange }) => {
   );
 };
 
-export default function AdminUsersLists() {
+export default function AdminCommentLists() {
   const backendURL = import.meta.env.VITE_BACKEND_URL;
   const { userInfo } = useSelector((state) => state.auth);
-  const [users, setUsers] = useState([]);
-  const [userIdToDelete, setUserIdToDelete] = useState("");
+  const [comments, setComments] = useState([]);
+  const [commentIdToDelete, setCommentIdToDelete] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [snackbar, setSnackbar] = useState({
@@ -115,9 +115,9 @@ export default function AdminUsersLists() {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalUsers, setTotalUsers] = useState(0);
-  const [debug, setDebug] = useState({ totalUsers: 0, totalPages: 0 });
-  const usersPerPage = 9;
+  const [totalComments, setTotalComments] = useState(0);
+  const [lastMonthComments, setLastMonthComments] = useState(0);
+  const commentsPerPage = 9;
 
   const handleCloseSnackbar = (event, reason) => {
     if (reason === "clickaway") {
@@ -130,23 +130,26 @@ export default function AdminUsersLists() {
     setSnackbar({ open: true, message, severity });
   };
 
-  const fetchUsers = async (page) => {
+  const fetchComments = async (page) => {
     try {
       const res = await fetch(
-        `${backendURL}/api/getUsers?page=${page}&limit=${usersPerPage}`
+        `${backendURL}/api/getComments?startIndex=${
+          (page - 1) * commentsPerPage
+        }&limit=${commentsPerPage}&sort=desc`
       );
       const data = await res.json();
+      console.log(data);
       if (res.ok) {
-        setUsers(data.users);
-        setTotalUsers(data.totalUsers);
-        setTotalPages(data.totalPages);
-        setDebug({ totalUsers: data.totalUsers, totalPages: data.totalPages });
+        setComments(data.comments);
+        setTotalComments(data.totalComments);
+        setLastMonthComments(data.lastMonthComments);
+        setTotalPages(Math.ceil(data.totalComments / commentsPerPage));
       } else {
-        showSnackbar(data.message || "Failed to fetch users", "error");
+        showSnackbar(data.message || "Failed to fetch comments", "error");
       }
     } catch (error) {
       showSnackbar(
-        error.message || "An error occurred while fetching users",
+        error.message || "An error occurred while fetching comments",
         "error"
       );
     }
@@ -154,99 +157,111 @@ export default function AdminUsersLists() {
 
   useEffect(() => {
     if (userInfo) {
-      fetchUsers(currentPage);
+      fetchComments(currentPage);
     }
   }, [userInfo?.user._id, currentPage]);
 
-  const handleDeleteUser = async () => {
+  const handleDeleteComment = async () => {
     try {
-      const res = await fetch(`${backendURL}/api/Delete/${userIdToDelete}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `${backendURL}/api/deleteComment/${commentIdToDelete}`,
+        {
+          method: "DELETE",
+        }
+      );
       const data = await res.json();
       if (res.ok) {
-        setUsers((prev) => prev.filter((user) => user._id !== userIdToDelete));
+        setComments((prev) =>
+          prev.filter((comment) => comment._id !== commentIdToDelete)
+        );
         setDeleteOpen(false);
-        showSnackbar("User deleted successfully", "success");
-        fetchUsers(currentPage);
+        showSnackbar("Comment deleted successfully", "success");
+        fetchComments(currentPage);
       } else {
-        showSnackbar(data.message || "Failed to delete user", "error");
+        showSnackbar(data.message || "Failed to delete comment", "error");
       }
     } catch (error) {
       showSnackbar(
-        error.message || "An error occurred while deleting user",
+        error.message || "An error occurred while deleting comment",
         "error"
       );
     }
   };
 
-  const filteredUsers = users.filter((user) =>
-    user.username.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredComments = comments.filter((comment) =>
+    comment.content.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="mx-auto p-0 mt-5">
-      <div className="mb-4">
+      <div className="mb-4 flex justify-between items-center">
         <TextInput
           id="search"
           type="text"
           icon={HiOutlineSearch}
-          placeholder="Search users..."
+          placeholder="Search comments..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full md:w-64"
         />
+        <div className="text-sm text-gray-500">
+          Last month comments: {lastMonthComments}
+        </div>
       </div>
-      {userInfo && users.length > 0 ? (
+      {userInfo && comments.length > 0 ? (
         <>
           <TableContainer component={Paper} className="shadow-md mb-4">
             <Table hoverable>
               <Table.Head>
-                <Table.HeadCell className="py-3">Date created</Table.HeadCell>
-                <Table.HeadCell>User image</Table.HeadCell>
-                <Table.HeadCell>Username</Table.HeadCell>
-                <Table.HeadCell>Email</Table.HeadCell>
-                <Table.HeadCell>Admin</Table.HeadCell>
-                <Table.HeadCell>Delete</Table.HeadCell>
+                <Table.HeadCell className="py-3">Date</Table.HeadCell>
+                <Table.HeadCell>User</Table.HeadCell>
+                <Table.HeadCell>Post title</Table.HeadCell>
+                <Table.HeadCell>Comment</Table.HeadCell>
+                <Table.HeadCell>Actions</Table.HeadCell>
               </Table.Head>
               <Table.Body className="divide-y">
-                {filteredUsers.map((user) => (
+                {filteredComments.map((comment) => (
                   <Table.Row
-                    key={user._id}
+                    key={comment._id}
                     className="bg-white dark:border-gray-700 dark:bg-gray-800"
                   >
                     <Table.Cell className="py-3">
-                      {moment(user.updatedAt).format("MMMM D")}
+                      {moment(comment.createdAt).format("MMMM D, YYYY")}
                     </Table.Cell>
                     <Table.Cell>
-                      {user.image ? (
-                        <img
-                          src={`${backendURL}/uploads/${user.image}`}
-                          alt={user.username}
-                          className="w-10 h-10 rounded-full"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = "/fallback-image.png";
-                          }}
-                        />
-                      ) : (
-                        <HiOutlineUserCircle className="w-10 h-10 text-gray-400" />
-                      )}
+                      <div className="flex items-center">
+                        {comment.userId?.image ? (
+                          <img
+                            src={`${backendURL}/uploads/${comment.userId.image}`}
+                            alt={comment.userId.username}
+                            className="w-10 h-10 min-w-10 rounded-full mr-2 "
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "/fallback-image.png";
+                            }}
+                          />
+                        ) : (
+                          <HiOutlineUserCircle className="w-10 h-10 text-gray-400" />
+                        )}
+
+                        {comment.userId?.username?.length > 20
+                          ? `${comment.userId.username.substring(0, 20)}...`
+                          : comment.userId?.username}
+                      </div>
                     </Table.Cell>
-                    <Table.Cell>{user.username}</Table.Cell>
-                    <Table.Cell>{user.email}</Table.Cell>
+                    <Table.Cell>{comment.postId.title}</Table.Cell>
                     <Table.Cell>
-                      {user.role === "admin" ? (
-                        <FaCheck className="text-green-500" />
-                      ) : (
-                        <FaTimes className="text-red-500" />
-                      )}
+                      <div className="max-w-sm ">
+                        {comment.content.length > 100
+                          ? `${comment.content.substring(0, 100)}...`
+                          : comment.content}
+                      </div>
                     </Table.Cell>
                     <Table.Cell>
                       <button
                         onClick={() => {
                           setDeleteOpen(true);
-                          setUserIdToDelete(user._id);
+                          setCommentIdToDelete(comment._id);
                         }}
                         className="font-medium text-white hover:text-red-500 hover:bg-transparent hover:border hover:border-red-500 cursor-pointer bg-btColour p-1 rounded-md"
                       >
@@ -268,7 +283,7 @@ export default function AdminUsersLists() {
           )}
         </>
       ) : (
-        <p>You have no users yet!</p>
+        <p>No comments found!</p>
       )}
       <Dialog
         open={deleteOpen}
@@ -277,7 +292,7 @@ export default function AdminUsersLists() {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          Are you sure you want to delete this user?
+          Are you sure you want to delete this comment?
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
@@ -292,7 +307,7 @@ export default function AdminUsersLists() {
             <IoClose size={24} />
           </Button>
           <Button
-            onClick={handleDeleteUser}
+            onClick={handleDeleteComment}
             className="text-red-500 hover:text-red-700"
           >
             <AiTwotoneDelete size={24} />

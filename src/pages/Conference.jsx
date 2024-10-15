@@ -78,7 +78,7 @@ const WebinarCard = ({ event }) => (
       </p>
       <Link
         to={`/event/${event.slug}`}
-        className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg   focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors duration-300 mt-auto self-start hover:text-blue-600 hover:bg-white hover:border-blue-600 hover:border-2 hover:font-semibold"
+        className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-btColour rounded-lg   focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors duration-300 mt-auto self-start hover:text-btColour hover:bg-white hover:border-btColour hover:border-2 hover:font-semibold"
       >
         Read more
         <svg
@@ -152,7 +152,7 @@ const Conferences = () => {
       <hr className="my-8 border-t border-gray-300" />
       <div>
         <div className="flex items-center mb-6">
-          <EventBusyIcon className="text-blue-600 mr-2" />
+          <EventBusyIcon className="text-blue-600  mr-2" />
           <h2 className="text-2xl font-medium">Past Events</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

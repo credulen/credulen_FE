@@ -104,9 +104,6 @@ function Adminheader() {
         {/* End of the screen */}
 
         <div className="flex items-center">
-          {/* <span className="mb-1 cursor-pointer hover:scale-105 hover:text-blue-500 font-medium mr-10">
-            <IoHomeOutline size={16} />
-          </span> */}
           <span className="mb-1 mr-2 font-medium first-letter:uppercase">
             {profile?.username || "Guest"}
           </span>

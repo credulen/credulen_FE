@@ -14,7 +14,7 @@ export default function AdminLayout() {
       {/* Main content */}
       <div className="flex flex-col flex-1 overflow-x-hidden">
         {/* Header */}
-        <Adminheader />
+        {/* <Adminheader /> */}
 
         {/* Main content area */}
         <div className="flex-1 p-4 min-h-0 overflow-y-auto">

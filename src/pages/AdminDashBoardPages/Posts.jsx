@@ -16,7 +16,9 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { IoClose } from "react-icons/io5";
 import { AiTwotoneDelete } from "react-icons/ai";
 import { BiMessageSquareAdd } from "react-icons/bi";
+import { HiOutlineUserCircle, HiOutlineSearch } from "react-icons/hi";
 const backendURL = import.meta.env.VITE_BACKEND_URL;
+import moment from "moment";
 
 export default function Post() {
   const { userInfo } = useSelector((state) => state.auth);
@@ -108,14 +110,16 @@ export default function Post() {
   });
   return (
     <>
-      <Link to="/DashBoard/Admin/CreatePosts">
-        <button className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-[20%] mid:w-[30%]  py-2 text-center transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center mx-3  mb-7">
-          <span className="flex  whitespace-nowrap">
-            <BiMessageSquareAdd className="mr-2" size={20} />
-            Create Post
-          </span>
-        </button>
-      </Link>
+      <div className="my-5 ml-3">
+        <Link to="/DashBoard/Admin/CreatePosts">
+          <button className=" text-btColour border border-btColour p-1 rounded-lg hover:font-semibold">
+            <span className="flex whitespace-nowrap">
+              <BiMessageSquareAdd className="mr-2 mt-1" size={16} />
+              Create Post
+            </span>
+          </button>
+        </Link>
+      </div>
       <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
         {userPosts.length > 0 ? (
           <>
@@ -135,15 +139,23 @@ export default function Post() {
                     className="bg-white dark:border-gray-700 dark:bg-gray-800"
                   >
                     <Table.Cell>
-                      {new Date(post.updatedAt).toLocaleDateString()}
+                      {moment(post.updatedAt).format("MMMM D")}
                     </Table.Cell>
                     <Table.Cell>
                       <Link to={`/post/${post.slug}`}>
-                        <img
-                          src={`${backendURL}${post.image}`}
-                          alt={post.title}
-                          className="w-20 h-20 object-cover bg-gray-500 rounded-full"
-                        />
+                        {post?.image ? (
+                          <img
+                            src={`${backendURL}${post.image}`}
+                            alt={post.username}
+                            className="w-10 h-10 rounded-full"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "/fallback-image.png";
+                            }}
+                          />
+                        ) : (
+                          <HiOutlineUserCircle className="w-10 h-10 text-gray-400" />
+                        )}
                       </Link>
                     </Table.Cell>
                     <Table.Cell>
@@ -162,14 +174,14 @@ export default function Post() {
                           DeleteOpen();
                           setPostIdToDelete(post._id);
                         }}
-                        className="font-medium text-red-500 hover:underline cursor-pointer"
+                        className="font-medium text-white hover:text-red-500 hover:bg-transparent hover:border hover:border-red-500 cursor-pointer bg-btColour p-1 rounded-md"
                       >
                         Delete
                       </span>
                     </Table.Cell>
                     <Table.Cell>
                       <Link
-                        className="text-teal-500 hover:underline"
+                        className="font-medium text-white hover:text-btColour hover:bg-transparent hover:border hover:border-btColour cursor-pointer bg-btColour p-1 rounded-md"
                         to={`/DashBoard/Admin/CreatePosts/${post._id}`}
                       >
                         <span>Edit</span>

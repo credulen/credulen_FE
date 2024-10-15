@@ -94,7 +94,7 @@ const SolutionCard = ({ event }) => (
       </p>
       <Link
         to={`/SolutionForm/${event.slug}`}
-        className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors duration-300 mt-auto self-start hover:text-blue-600 hover:bg-white hover:border-blue-600 hover:border-2 hover:font-semibold"
+        className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-teal-700 bt rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors duration-300 mt-auto self-start hover:text-bg-teal-700 hover:bg-transparent hover:text-teal-700 hover:border-teal-700 hover:border-bg-teal-700 hover:border-2 hover:font-semibold"
       >
         Register Interest
         <svg
