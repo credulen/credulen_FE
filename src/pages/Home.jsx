@@ -567,7 +567,7 @@ const IntelligentHomepage = () => {
                 className="bg-red-600 text-white px-6 py-3 rounded-lg font-bold  
                 transition-colors flex items-center justify-center hover:border-2 hover:border-red-600 hover:bg-white hover:text-red-600 duration-300"
               >
-                Contact US
+                Contact US.
               </button>
             </Link>
           </motion.div>
