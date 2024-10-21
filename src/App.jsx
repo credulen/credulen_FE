@@ -1,6 +1,5 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import ResetPassword from "./pages/ResetPassword";
 import Home from "./pages/Home";
 import Conferences from "./pages/Conference";
 import Webinar from "./pages/Webinars";
@@ -9,6 +8,7 @@ import Contact from "./pages/Contactus";
 import RegisterAdmin from "../src/pages/RegisterAdmin";
 import Signup from "../src/pages/RegisterUser";
 import ForgotPassword from "../src/pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -22,7 +22,8 @@ import DashBoardActivities from "./pages/UsersDashBoardPages/DashBoardActivities
 import DashBoardNotifications from "./pages/UsersDashBoardPages/DashBoardNotifications";
 import Post from "./pages/Post";
 import SolutionForm from "./pages/SolutionForm";
-// Administartion
+// Admin
+
 import AdminLayout from "./components/Dashboard_Admin/AdminLayout";
 import AdminDashboard from "./pages/AdminDashBoardPages/AdminDashboard";
 import AdminProfile from "./pages/AdminDashBoardPages/AdminProfile";
