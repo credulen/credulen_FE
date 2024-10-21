@@ -4,7 +4,8 @@ import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import Spinner from "../components/tools/Spinner";
-import { login, verifyOtp } from "../features/auth/authSlice";
+import { logoutUser } from "../features/auth/authSlice";
+import { verifyAdminOTP } from "../features/auth/authActions";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 
@@ -33,7 +34,7 @@ const Login = () => {
   }, [user, isOtpRequired, navigate]);
 
   const submitForm = (data) => {
-    dispatch(login(data))
+    dispatch(loginUser(data))
       .unwrap()
       .then((result) => {
         if (result.requireOTP) {
@@ -53,7 +54,7 @@ const Login = () => {
   };
 
   const handleOtpSubmit = (otp) => {
-    dispatch(verifyOtp({ userId: tempUserId, otp }))
+    dispatch(verifyAdminOTP({ userId: tempUserId, otp }))
       .unwrap()
       .then(() => {
         setSnackbarMessage("OTP verified successfully!");
