@@ -17,8 +17,11 @@ import { IoClose } from "react-icons/io5";
 import { AiTwotoneDelete } from "react-icons/ai";
 import { BiMessageSquareAdd } from "react-icons/bi";
 import { HiOutlineUserCircle, HiOutlineSearch } from "react-icons/hi";
-const backendURL = import.meta.env.VITE_BACKEND_URL;
 import moment from "moment";
+const backendURL =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_BACKEND_URL
+    : "http://localhost:3001";
 
 export default function Post() {
   const { userInfo } = useSelector((state) => state.auth);

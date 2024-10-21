@@ -66,7 +66,10 @@ import { HiOutlineSearch } from "react-icons/hi";
 import NoResult from "../assets/noResult.png";
 import Pagination from "../components/Pagination";
 
-const backendURL = import.meta.env.VITE_BACKEND_URL;
+const backendURL =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_BACKEND_URL
+    : "http://localhost:3001";
 
 const FilterSection = ({
   categories,

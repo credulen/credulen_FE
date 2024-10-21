@@ -1,6 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-const backendURL = import.meta.env.VITE_BACKEND_URL;
+const backendURL =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_BACKEND_URL
+    : "http://localhost:3001";
 
 // Define the async action to fetch all profiles
 export const fetchAllProfiles = createAsyncThunk(

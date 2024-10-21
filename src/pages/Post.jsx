@@ -54,7 +54,10 @@ import moment from "moment";
 import { styled } from "@mui/system";
 import "../index.css";
 
-const backendURL = import.meta.env.VITE_BACKEND_URL;
+const backendURL =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_BACKEND_URL
+    : "http://localhost:3001";
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   color: "#ffffff",

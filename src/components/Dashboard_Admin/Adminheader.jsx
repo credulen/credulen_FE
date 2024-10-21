@@ -10,7 +10,10 @@ import { fetchProfileById } from "../../features/Users/userAction";
 import { IoHomeOutline } from "react-icons/io5";
 
 function Adminheader() {
-  const backendURL = import.meta.env.VITE_BACKEND_URL;
+  const backendURL =
+    import.meta.env.MODE === "production"
+      ? import.meta.env.VITE_BACKEND_URL
+      : "http://localhost:3001";
   const [isNavOpen, setIsNavOpen] = useState(false);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();

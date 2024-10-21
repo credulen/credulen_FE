@@ -15,7 +15,10 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { logoutUser } from "../../features/auth/authSlice";
 import { fetchProfileById } from "../../features/Users/userAction";
 
-const backendURL = import.meta.env.VITE_BACKEND_URL;
+const backendURL =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_BACKEND_URL
+    : "http://localhost:3001";
 
 const AdminSidebar = () => {
   const dispatch = useDispatch();

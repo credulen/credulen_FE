@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import Spinner from "../components/tools/Spinner";
 import { logoutUser } from "../features/auth/authSlice";
-import { verifyAdminOTP } from "../features/auth/authActions";
+import { verifyAdminOTP, loginUser } from "../features/auth/authActions";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 

@@ -13,7 +13,10 @@ import { AiTwotoneDelete } from "react-icons/ai";
 import { BiMessageSquareAdd } from "react-icons/bi";
 import { HiOutlineUserCircle, HiOutlineSearch } from "react-icons/hi";
 
-const backendURL = import.meta.env.VITE_BACKEND_URL;
+const backendURL =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_BACKEND_URL
+    : "http://localhost:3001";
 
 export default function Authors() {
   const { userInfo } = useSelector((state) => state.auth);

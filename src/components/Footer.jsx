@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { Bell, CheckCircle, AlertCircle, X, Loader } from "lucide-react";
 import { Alert, AlertDescription } from "../components/tools/Alert";
-const backendURL = import.meta.env.VITE_BACKEND_URL;
+const backendURL =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_BACKEND_URL
+    : "http://localhost:3001";
 
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;

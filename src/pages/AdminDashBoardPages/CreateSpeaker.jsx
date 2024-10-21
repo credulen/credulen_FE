@@ -13,7 +13,10 @@ import {
 } from "@mui/material";
 import { IoArrowBack } from "react-icons/io5";
 
-const backendURL = import.meta.env.VITE_BACKEND_URL;
+const backendURL =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_BACKEND_URL
+    : "http://localhost:3001";
 
 const CreateSpeaker = () => {
   const { speakerId } = useParams();

@@ -386,7 +386,10 @@ import { useNavigate, Link } from "react-router-dom";
 import NewsletterSignup from "../components/tools/NewsletterSignup";
 import { motion, AnimatePresence } from "framer-motion";
 import moment from "moment";
-const backendURL = import.meta.env.VITE_BACKEND_URL;
+const backendURL =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_BACKEND_URL
+    : "http://localhost:3001";
 import {
   Clock,
   BookOpen,

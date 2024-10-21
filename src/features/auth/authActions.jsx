@@ -8,7 +8,10 @@ import { SET_EMAIL } from "../types";
 // Define your email sending API endpoint
 const SEND_EMAIL_ENDPOINT = "http://localhost:8080/api/registerMail";
 
-const backendURL = import.meta.env.VITE_BACKEND_URL;
+const backendURL =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_BACKEND_URL
+    : "http://localhost:3001";
 export const setEmail = (email) => ({
   type: SET_EMAIL,
   payload: email,
