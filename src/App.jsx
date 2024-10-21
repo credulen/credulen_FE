@@ -8,7 +8,7 @@ import Contact from "./pages/Contactus";
 import RegisterAdmin from "../src/pages/RegisterAdmin";
 import Signup from "../src/pages/RegisterUser";
 import ForgotPassword from "../src/pages/ForgotPassword";
-import ResetPassword from "../src/pages/ResetPassword";
+import ResetPassword from "./pages/ResetPassword.jsx";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
