@@ -8,7 +8,7 @@ import Contact from "./pages/Contactus";
 import RegisterAdmin from "../src/pages/RegisterAdmin";
 import Signup from "../src/pages/RegisterUser";
 import ForgotPassword from "../src/pages/ForgotPassword";
-import ResetPassword from "../src/pages/ResetPassword";
+// import ResetPassword from "../src/pages/ResetPassword";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -63,7 +63,7 @@ const AppContent = () => {
         <Route path="/RegisterAdmin" element={<RegisterAdmin />} />
         <Route path="/login" element={<Login />} />
         <Route path="/ForgotPassword" element={<ForgotPassword />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        {/* <Route path="/reset-password/:token" element={<ResetPassword />} /> */}
         <Route path="/dashboard" element={<Dashboard />} />
         {/* Protected users routes */}
         <Route element={<ProtectedRoute />}>
