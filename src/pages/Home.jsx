@@ -385,6 +385,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import NewsletterSignup from "../components/tools/NewsletterSignup";
 import { motion, AnimatePresence } from "framer-motion";
+import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 const backendURL =
   import.meta.env.MODE === "production"
@@ -570,7 +571,7 @@ const IntelligentHomepage = () => {
                 className="bg-red-600 text-white px-6 py-3 rounded-lg font-bold  
                 transition-colors flex items-center justify-center hover:border-2 hover:border-red-600 hover:bg-white hover:text-red-600 duration-300"
               >
-                Contact US...
+                Contact US
               </button>
             </Link>
           </motion.div>

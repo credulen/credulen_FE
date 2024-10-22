@@ -10,7 +10,7 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 
 const Login = () => {
-  const { loading, user, error, isOtpRequired, tempUserId } = useSelector(
+  const { loading, userInfo, error, isOtpRequired, tempUserId } = useSelector(
     (state) => state.auth
   );
   const dispatch = useDispatch();
@@ -20,6 +20,24 @@ const Login = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
+  useEffect(() => {
+    if (userInfo) {
+      console.log("User Information:");
+      console.log("ID:", userInfo._id);
+      console.log("Email:", userInfo.email);
+      console.log("Username:", userInfo.username);
+      console.log("Role:", userInfo.role);
+      console.log("Token:", userInfo.token);
+
+      // Log the stored data in localStorage
+      console.log(
+        "LocalStorage userInfo:",
+        JSON.parse(localStorage.getItem("userInfo"))
+      );
+      console.log("LocalStorage userToken:", localStorage.getItem("userToken"));
+    }
+  }, [userInfo]);
+
   const handleCloseSnackbar = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -28,41 +46,55 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if (user && !isOtpRequired) {
-      navigate("/DashBoard/Admin_Dashboard");
+    if (userInfo && !isOtpRequired) {
+      // Check role and navigate accordingly
+      if (userInfo.role === "admin") {
+        navigate("/DashBoard/Admin_Dashboard");
+      } else {
+        navigate("/dashboard"); // or wherever regular users should go
+      }
     }
-  }, [user, isOtpRequired, navigate]);
+  }, [userInfo, isOtpRequired, navigate]);
 
-  const submitForm = (data) => {
-    dispatch(loginUser(data))
-      .unwrap()
-      .then((result) => {
-        if (result.requireOTP) {
-          setSnackbarMessage("OTP sent to your email. Please verify.");
-          setSnackbarSeverity("info");
-        } else {
-          setSnackbarMessage("Login successful!");
-          setSnackbarSeverity("success");
-        }
-        setOpenSnackbar(true);
-      })
-      .catch((error) => {
-        setSnackbarMessage(error || "Login failed");
-        setSnackbarSeverity("error");
-        setOpenSnackbar(true);
-      });
+  const submitForm = async (data) => {
+    try {
+      const result = await dispatch(loginUser(data)).unwrap();
+      if (result.requireOTP) {
+        setSnackbarMessage("OTP sent to your email. Please verify.");
+        setSnackbarSeverity("info");
+      } else {
+        setSnackbarMessage("Login successful!");
+        setSnackbarSeverity("success");
+        console.log("Login successful. User data:", result);
+      }
+      setOpenSnackbar(true);
+    } catch (err) {
+      setSnackbarMessage(err || "Login failed");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+      console.error("Login error:", err);
+    }
   };
 
   const handleOtpSubmit = (otp) => {
+    if (!tempUserId) {
+      setSnackbarMessage("User ID not found. Please try logging in again.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+      return;
+    }
+
     dispatch(verifyAdminOTP({ userId: tempUserId, otp }))
       .unwrap()
-      .then(() => {
+      .then((response) => {
+        console.log("OTP verification successful:", response);
         setSnackbarMessage("OTP verified successfully!");
         setSnackbarSeverity("success");
         setOpenSnackbar(true);
       })
       .catch((error) => {
-        setSnackbarMessage("OTP verification failed");
+        console.error("OTP verification failed:", error);
+        setSnackbarMessage(error || "OTP verification failed");
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       });

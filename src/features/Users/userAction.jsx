@@ -38,11 +38,17 @@ export const updateProfile = createAsyncThunk(
   "profiles/updateProfile",
   async ({ userId, formData }, { rejectWithValue }) => {
     try {
+      // Validate password if provided
+      const password = formData.get("password");
+      if (password && password.length < 6) {
+        throw new Error("Password must be at least 6 characters long");
+      }
+
       const response = await axios.put(
         `${backendURL}/api/Users/${userId}`,
         formData,
         {
-          headers: { "Content-Type": "multipart/form-data" }, // Ensure correct Content-Type
+          headers: { "Content-Type": "multipart/form-data" },
           withCredentials: true,
         }
       );

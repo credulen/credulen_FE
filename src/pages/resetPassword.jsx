@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // import useNavigate
 import { Snackbar } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import Spinner from "../components/tools/Spinner";
+
 const backendURL =
   import.meta.env.MODE === "production"
     ? import.meta.env.VITE_BACKEND_URL
@@ -15,6 +16,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 const ResetPassword = () => {
   const { token } = useParams(); // Get the reset token from the URL
+  const navigate = useNavigate(); // initialize useNavigate hook
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -41,15 +43,17 @@ const ResetPassword = () => {
       setMessage(response.data.message);
       setSnackbarSeverity("success");
       setPassword("");
+      setOpenSnackbar(true);
+
+      // Navigate to /login after 2 seconds
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
     } catch (error) {
       setMessage(error.response?.data?.message || "An error occurred");
       setSnackbarSeverity("error");
     } finally {
       setLoading(false);
-      setOpenSnackbar(true);
-      setTimeout(() => {
-        navigate("/login");
-      }, 3000);
     }
   };
 

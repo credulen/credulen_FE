@@ -312,175 +312,142 @@ const Navbar = () => {
 
 export default Navbar;
 
-export function DropdownItems(handleLinkClick) {
-  const userDropdownRef = useRef(null);
-  const menuRef = useRef(null);
-  const [userOpen, setUserOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
-
+export function DropdownItems() {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const dispatch = useDispatch();
-  const { userInfo } = useSelector((state) => state.auth);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    setIsLoggedIn(!!userInfo);
-  }, [userInfo]);
-
-  const { profile, loading, success, error } = useSelector(
-    (state) => state.profiles
+  const { loading, userInfo, error, isOtpRequired, tempUserId } = useSelector(
+    (state) => state.auth
   );
-  const userId = userInfo?.user?._id;
+  const { profile } = useSelector((state) => state.profiles);
+
+  const userId = userInfo?._id;
   const dashboardPath =
-    userInfo?.user?.role === "admin"
+    userInfo?.role === "admin"
       ? "/DashBoard/Admin_Dashboard"
       : "/DashBoard/profile";
 
-  // Fetch profile on component mount
   useEffect(() => {
     if (userId) {
       dispatch(fetchProfileById(userId));
     }
   }, [dispatch, userId]);
 
-  const toggleUserFile = () => setUserOpen(!userOpen);
-
-  const handleClickOutside = (event) => {
-    if (
-      menuRef.current &&
-      !menuRef.current.contains(event.target) &&
-      !userDropdownRef.current.contains(event.target)
-    ) {
-      setIsMenuOpen(false);
-      setUserOpen(false);
-    }
-  };
-
   useEffect(() => {
-    // Check if user is logged in (e.g., by checking for a token in localStorage)
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLogout = () => {
     try {
       dispatch(logoutUser());
-      setSnackbarMessage("Logged out successfully!");
-      setSnackbarSeverity("success");
-      setOpenSnackbar(true);
-      window.location.reload();
       navigate("/");
+      window.location.reload();
     } catch (error) {
-      setSnackbarMessage("Logout failed!");
-      setSnackbarSeverity("error");
-      setOpenSnackbar(true);
       console.error("Logout error:", error);
     }
   };
 
-  return (
-    <div ref={menuRef}>
-      {userInfo ? (
-        <div className="relative" ref={userDropdownRef}>
-          <button
-            onClick={toggleUserFile}
-            className="focus:ring- focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center"
-            type="button"
-          >
-            <span className="mb-2">
-              {profile?.image ? (
-                <img
-                  src={`${backendURL}/uploads/${profile?.image}`}
-                  alt={`${userInfo.username}`}
-                  className="w-7 h-7 rounded-full object-cover mr-4"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/fallback-image.png";
-                  }}
-                />
-              ) : (
-                <FaUserCircle className="w-7 h-7 text-gray-400 mr-4 cursor-pointer" />
-              )}
-            </span>
-            <svg
-              className={`w-2.5 h-2.5 ms-3 ${
-                userOpen ? "transform rotate-180" : ""
-              }`}
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 10 6"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m1 1 4 4 4-4"
-              />
-            </svg>
-          </button>
+  if (!userInfo) {
+    return (
+      <div className="flex items-center gap-3">
+        <Link
+          to="/signup"
+          type="button"
+          className="text-white bg-gradient-to-r from-cyan-500 to-btColour hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-xs px-4 py-2 text-center me-2 mb-2"
+        >
+          Sign Up
+        </Link>
 
-          {userOpen && (
-            <div
-              id="dropdownInformation"
-              className="absolute z-10 right-1  mid:left-[6rem] mid:top-[-2rem] text-black divide-y divide-black rounded-lg shadow w-44 mt-1 bg-NavClr"
-            >
-              <div className="px-4 py-3 text-sm text-black">
-                <div className="font-medium truncate">
-                  {userInfo && userInfo?.user?.email
-                    ? userInfo?.user.email
-                    : "User email not available"}
-                </div>
-              </div>
-              <ul className="py-2 text-sm text-gray-700">
-                <li>
-                  <NavLink
-                    to={dashboardPath}
-                    className="block px-4 py-2 text-black rounded hover:text-btColour md:dark:hover:bg-transparent font-semibold"
-                    onClick={handleLinkClick}
-                  >
-                    DashBoard
-                  </NavLink>
-                </li>
-                <li>
-                  <button
-                    className="block px-4 py-2 text-black rounded hover:text-btColour md:dark:hover:bg-transparent font-semibold"
-                    onClick={handleLogout}
-                  >
-                    <div className="flex items-center space-x-2 justify-center">
-                      <span>Logout</span>
-                      <HiOutlineLogout className="text-black w-4 h-4" />
-                    </div>
-                  </button>
-                </li>
-              </ul>
-            </div>
+        <Link
+          to="/login"
+          className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-xs font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-btColour group-hover:from-cyan-500 group-hover:to-btColour hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800"
+        >
+          <span className="relative px-4 py-2 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+            Login
+          </span>
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 focus:outline-none"
+      >
+        <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-gray-200">
+          {profile?.image ? (
+            <img
+              src={`${backendURL}/uploads/${profile.image}`}
+              alt={userInfo.username}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.src = "/fallback-image.png";
+              }}
+            />
+          ) : (
+            <FaUserCircle className="w-full h-full text-gray-400" />
           )}
         </div>
-      ) : (
-        <>
-          <Link
-            to="/signup"
-            type="button"
-            className="text-white bg-gradient-to-r from-cyan-500 to-btColour hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-          >
-            Sign Up
-          </Link>
 
-          <Link
-            to="/login"
-            className="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-btColour group-hover:from-cyan-500 group-hover:to-btColour hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800"
+        <svg
+          className={`w-4 h-4 transition-transform duration-200 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-1 z-50 transform opacity-100 scale-100 transition-all duration-200">
+          <div className="px-4 py-3 border-b border-gray-100">
+            <p className="text-sm font-medium text-gray-900 truncate">
+              {userInfo?.email || "User email not available"}
+            </p>
+          </div>
+
+          <NavLink
+            to={dashboardPath}
+            className={({ isActive }) =>
+              `block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50  hover:text-btColour transition-colors duration-150 ${
+                isActive ? "bg-gray-50 text-cyan-600" : ""
+              }`
+            }
+            onClick={() => setIsOpen(false)}
           >
-            <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
-              Login
-            </span>
-          </Link>
-        </>
+            Dashboard
+          </NavLink>
+
+          <button
+            onClick={() => {
+              setIsOpen(false);
+              handleLogout();
+            }}
+            className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-btColour transition-colors duration-150 flex justify-center items-center gap-2"
+          >
+            <span>Logout</span>
+            <HiOutlineLogout className="w-4 h-4" />
+          </button>
+        </div>
       )}
     </div>
   );

@@ -165,13 +165,11 @@ import {
   loginUser,
   registerUser,
   registerAdmin,
-  generateOTP,
-  verifyOTP,
-  resetPassword,
   verifyAdminOTP,
 } from "./authActions";
 
 const storedUserInfo = localStorage.getItem("userInfo");
+
 const initialState = {
   email: "",
   loading: false,
@@ -179,6 +177,7 @@ const initialState = {
   error: null,
   success: false,
   isOtpRequired: false,
+  tempUserId: null,
   tempAdminData: null,
 };
 
@@ -193,12 +192,13 @@ const authSlice = createSlice({
       state.userInfo = null;
       state.isOtpRequired = false;
       state.tempAdminData = null;
+      state.tempUserId = null;
       localStorage.removeItem("userToken");
       localStorage.removeItem("userInfo");
     },
     setCredentials: (state, { payload }) => {
       state.userInfo = payload;
-      localStorage.setItem("userToken", payload.userToken);
+      localStorage.setItem("userToken", payload.token);
       localStorage.setItem("userInfo", JSON.stringify(payload));
     },
     resetSuccess: (state) => {
@@ -207,6 +207,7 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Login cases
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -215,18 +216,30 @@ const authSlice = createSlice({
         state.loading = false;
         if (action.payload.requireOTP) {
           state.isOtpRequired = true;
+          state.tempUserId = action.payload.user._id;
           state.tempAdminData = action.payload.user;
         } else {
-          state.userInfo = action.payload;
+          // Regular user login
+          state.userInfo = {
+            ...action.payload.user,
+            token: action.payload.token,
+          };
           state.success = true;
-          localStorage.setItem("userToken", action.payload.userToken);
-          localStorage.setItem("userInfo", JSON.stringify(action.payload));
+          localStorage.setItem("userToken", action.payload.token);
+          localStorage.setItem(
+            "userInfo",
+            JSON.stringify({
+              ...action.payload.user,
+              token: action.payload.token,
+            })
+          );
         }
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
+      // OTP verification cases
       .addCase(verifyAdminOTP.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -234,17 +247,41 @@ const authSlice = createSlice({
       .addCase(verifyAdminOTP.fulfilled, (state, action) => {
         state.loading = false;
         state.isOtpRequired = false;
-        state.userInfo = action.payload;
+
+        // Create a complete user object with token
+        const userWithToken = {
+          ...action.payload.user,
+          token: action.payload.token,
+        };
+
+        // Update state
+        state.userInfo = userWithToken;
         state.success = true;
         state.tempAdminData = null;
+        state.tempUserId = null;
+
+        // Update localStorage
         localStorage.setItem("userToken", action.payload.token);
-        localStorage.setItem("userInfo", JSON.stringify(action.payload.user));
+        localStorage.setItem("userInfo", JSON.stringify(userWithToken));
       })
       .addCase(verifyAdminOTP.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      // Registration cases remain the same
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.userInfo = action.payload;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
-    // ... (other cases remain the same)
   },
 });
 

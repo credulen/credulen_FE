@@ -5,22 +5,24 @@ import {
   updateProfile,
   deleteAccount,
 } from "../../features/Users/userAction";
-import Box from "@mui/material/Box";
-import Modal from "@mui/material/Modal";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
+import {
+  Box,
+  Modal,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import { BsPersonBoundingBox } from "react-icons/bs";
 import { MdOutlineAddAPhoto } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
 import { AiTwotoneDelete } from "react-icons/ai";
 import Spinner from "../../components/tools/Spinner";
 import { resetSuccess } from "../../features/Users/UserSlice";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 function AdminProfile() {
   const fileInputRef = useRef(null);
@@ -31,18 +33,27 @@ function AdminProfile() {
     email: "",
     password: "",
   });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [Deleteopen, setDeleteOpen] = React.useState(false);
+  const [Deleteopen, setDeleteOpen] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
   const { profile, loading, success, error } = useSelector(
     (state) => state.profiles
   );
-  const userId = userInfo?.user._id;
+  const userId = userInfo?._id;
   const backendURL =
     import.meta.env.MODE === "production"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:3001";
   const dispatch = useDispatch();
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   const DeleteOpen = () => {
     setDeleteOpen(true);
@@ -51,7 +62,6 @@ function AdminProfile() {
     setDeleteOpen(false);
   };
 
-  // Fetch profile on component mount
   useEffect(() => {
     if (userId) {
       dispatch(fetchProfileById(userId));
@@ -88,43 +98,70 @@ function AdminProfile() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const updateData = new FormData();
     updateData.append("username", formData.username);
     updateData.append("email", formData.email);
-    updateData.append("password", formData.password);
+
+    // Password validation and handling
+    if (formData.password.trim()) {
+      if (formData.password.length < 6) {
+        setSnackbar({
+          open: true,
+          message: "Password must be at least 6 characters long",
+          severity: "error",
+        });
+        return;
+      }
+      updateData.append("password", formData.password);
+    }
+
     if (selectedFile) {
       updateData.append("image", selectedFile);
     }
-    if (userId) {
-      dispatch(updateProfile({ userId, formData: updateData }));
-      toast.success("Profile updated successfully!");
-      dispatch(resetSuccess());
-    } else {
-      console.error("User ID is undefined");
-    }
 
-    // Log FormData entries
-    for (let [key, value] of updateData.entries()) {
-      console.log(`${key}:`, value);
+    if (userId) {
+      try {
+        await dispatch(
+          updateProfile({ userId, formData: updateData })
+        ).unwrap();
+        setSnackbar({
+          open: true,
+          message: "Profile updated successfully!",
+          severity: "success",
+        });
+        setFormData((prev) => ({ ...prev, password: "" }));
+        dispatch(resetSuccess());
+      } catch (error) {
+        setSnackbar({
+          open: true,
+          message: error.message || "Failed to update profile",
+          severity: "error",
+        });
+      }
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (userId) {
-      dispatch(deleteAccount(userId))
-        .then(() => {
-          toast.success("Account deleted successfully!");
-        })
-        .catch(() => {
-          toast.error("Failed to delete account.");
+      try {
+        await dispatch(deleteAccount(userId)).unwrap();
+        setSnackbar({
+          open: true,
+          message: "Account deleted successfully!",
+          severity: "success",
         });
-    } else {
-      console.error("User ID is undefined");
+        setDeleteOpen(false);
+      } catch (error) {
+        setSnackbar({
+          open: true,
+          message: "Failed to delete account",
+          severity: "error",
+        });
+      }
     }
-    setIsModalOpen(false); // Close the modal
   };
 
   return (
@@ -191,7 +228,8 @@ function AdminProfile() {
         </div>
       </div>
 
-      {/* Form */}
+      {/* Form section remains the same */}
+
       <div className="md:px-[5rem] p-16 mx-auto md:w-[35rem] mid:mx-[1rem] rounded-xl">
         <form onSubmit={handleSubmit}>
           <div className="mb-5">
@@ -256,17 +294,16 @@ function AdminProfile() {
           </div>
         </form>
       </div>
-      {/* DELETING MODAL STARTS HERE */}
+
+      {/* Delete Modal */}
       <Button>
         <React.Fragment>
           <button
             onClick={DeleteOpen}
-            href="#"
-            className="px-2  first-letter:uppercase  pt-[10rem] text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white transition ease-in-out duration-200 transform hover:scale-110 hover:text-red-600 underline"
+            className="px-2 first-letter:uppercase pt-[10rem] text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white transition ease-in-out duration-200 transform hover:scale-110 hover:text-red-600 underline"
           >
             Delete Account
           </button>
-          {/* </Button> */}
           <Dialog
             open={Deleteopen}
             onClose={DeleteClose}
@@ -285,20 +322,35 @@ function AdminProfile() {
               <Button onClick={DeleteClose}>
                 <IoClose
                   size={24}
-                  className="text-red-500  border-red-500 rounded-sm transition ease-in-out duration-200 transform hover:scale-125 hover:text-red-600"
+                  className="text-red-500 border-red-500 rounded-sm transition ease-in-out duration-200 transform hover:scale-125 hover:text-red-600"
                 />
               </Button>
               <Button onClick={handleDelete}>
                 <AiTwotoneDelete
                   size={24}
-                  className="text-red-500  border-red-500 rounded-sm transition ease-in-out duration-200 transform hover:scale-125 hover:text-red-600"
+                  className="text-red-500 border-red-500 rounded-sm transition ease-in-out duration-200 transform hover:scale-125 hover:text-red-600"
                 />
               </Button>
             </DialogActions>
           </Dialog>
         </React.Fragment>
       </Button>
-      {/* DELETING MODAL Ends HERE */}
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

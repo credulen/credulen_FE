@@ -29,7 +29,7 @@ const AdminSidebar = () => {
   const user = useSelector((state) => state.auth.user);
   const sidebarRef = useRef(null);
   const { userInfo } = useSelector((state) => state.auth);
-  const userId = userInfo?.user._id;
+  const userId = userInfo?._id;
   const { profile, loading, success, error } = useSelector(
     (state) => state.profiles
   );
@@ -137,7 +137,7 @@ const AdminSidebar = () => {
       </div>
       <div
         ref={sidebarRef}
-        className={`fixed inset-y-0 left-0 z-30 w-64 bg-purple-700 text-white transition-all duration-300 ease-in-out transform 
+        className={`fixed inset-y-0 left-0 z-30 w-64  bg-blue-700 text-white transition-all duration-300 ease-in-out transform 
           ${isOpen ? "translate-x-0" : "-translate-x-full"} 
           ${isSmallScreen ? "top-16" : "top-0"}`}
       >
@@ -177,8 +177,8 @@ const AdminSidebar = () => {
                 onClick={() => isSmallScreen && setIsOpen(false)}
                 className={`flex items-center px-5 py-3 text-sm ${
                   location.pathname === link.path
-                    ? "bg-purple-800"
-                    : "hover:bg-purple-600"
+                    ? "bg-blue-500"
+                    : "hover:bg-blue-600"
                 }`}
               >
                 <link.icon className="w-5 h-5 mr-3" />
