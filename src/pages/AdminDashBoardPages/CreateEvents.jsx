@@ -31,7 +31,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 export default function CreateEvents() {
-  const { eventId } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
@@ -47,6 +47,7 @@ export default function CreateEvents() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [eventId, setEventId] = useState(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -70,12 +71,12 @@ export default function CreateEvents() {
     fetchSpeakers();
 
     const fetchEvent = async () => {
-      if (eventId) {
+      if (slug) {
         try {
           setLoading(true);
-          const res = await fetch(`${backendURL}/api/getEventById/${eventId}`);
+          const res = await fetch(`${backendURL}/api/getEventBySlug/${slug}`);
           const event = await res.json();
-          console.log("Fetched event:", event);
+          setEventId(event._id);
           if (event) {
             setFormData({
               title: event.title || "",
@@ -99,7 +100,7 @@ export default function CreateEvents() {
     };
 
     fetchEvent();
-  }, [eventId]);
+  }, [slug]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -239,7 +240,7 @@ export default function CreateEvents() {
       </button>
       <Box className="p-3 max-w-3xl mx-auto min-h-screen">
         <h1 className="text-center text-3xl my-7 font-semibold">
-          {eventId ? "Edit Event" : "Create an Event"}
+          {slug ? "Edit Event" : "Create an Event"}
         </h1>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <TextField
@@ -362,7 +363,7 @@ export default function CreateEvents() {
           >
             {loading ? (
               <CircularProgress size={24} />
-            ) : eventId ? (
+            ) : slug ? (
               "Update Event"
             ) : (
               "Create Event"

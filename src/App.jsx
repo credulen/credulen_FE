@@ -112,7 +112,7 @@ const AppContent = () => {
               element={<AdminEventLists />}
             />
             <Route
-              path="/DashBoard/Admin/CreateEvents/:eventId?"
+              path="/DashBoard/Admin/CreateEvents/:slug?"
               element={<CreateEvents />}
             />
             <Route

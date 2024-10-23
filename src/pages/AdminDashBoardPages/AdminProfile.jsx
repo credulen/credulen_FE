@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   fetchProfileById,
@@ -16,7 +22,9 @@ import {
   DialogTitle,
   Snackbar,
   Alert,
+  CircularProgress,
 } from "@mui/material";
+
 import { BsPersonBoundingBox } from "react-icons/bs";
 import { MdOutlineAddAPhoto } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
@@ -40,41 +48,88 @@ function AdminProfile() {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [Deleteopen, setDeleteOpen] = useState(false);
+
+  const dispatch = useDispatch();
+
+  // Memoized selectors
   const { userInfo } = useSelector((state) => state.auth);
   const { profile, loading, success, error } = useSelector(
     (state) => state.profiles
   );
   const userId = userInfo?._id;
-  const backendURL =
-    import.meta.env.MODE === "production"
-      ? import.meta.env.VITE_BACKEND_URL
-      : "http://localhost:3001";
-  const dispatch = useDispatch();
 
-  const handleSnackbarClose = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
+  // Memoize backend URL calculation
+  const backendURL = useMemo(
+    () =>
+      import.meta.env.MODE === "production"
+        ? import.meta.env.VITE_BACKEND_URL
+        : "http://localhost:3001",
+    []
+  );
 
-  const DeleteOpen = () => {
+  // Memoized handlers
+  const handleSnackbarClose = useCallback(() => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  }, []);
+
+  const DeleteOpen = useCallback(() => {
     setDeleteOpen(true);
-  };
-  const DeleteClose = () => {
-    setDeleteOpen(false);
-  };
+  }, []);
 
-  useEffect(() => {
-    if (userId) {
-      dispatch(fetchProfileById(userId));
+  const DeleteClose = useCallback(() => {
+    setDeleteOpen(false);
+  }, []);
+
+  const handleFileChange = useCallback((e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setImagePreview(URL.createObjectURL(file));
     }
+  }, []);
+
+  const handleInputChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  }, []);
+
+  // Load profile data
+  useEffect(() => {
+    let isSubscribed = true;
+
+    const loadProfile = async () => {
+      if (userId && isSubscribed) {
+        try {
+          await dispatch(fetchProfileById(userId));
+        } catch (error) {
+          setSnackbar({
+            open: true,
+            message: "Failed to load profile",
+            severity: "error",
+          });
+        }
+      }
+    };
+
+    loadProfile();
+
+    return () => {
+      isSubscribed = false;
+    };
   }, [dispatch, userId]);
 
+  // Update form data when profile changes
   useEffect(() => {
     if (profile) {
-      setFormData({
+      setFormData((prev) => ({
+        ...prev,
         username: profile.username || "",
         email: profile.email || "",
         password: "", // Do not prefill password
-      });
+      }));
 
       if (profile.image) {
         setImagePreview(`${backendURL}/uploads/${profile.image}`);
@@ -82,47 +137,33 @@ function AdminProfile() {
     }
   }, [profile, backendURL]);
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      setImagePreview(URL.createObjectURL(file));
-    }
-  };
+  // Memoize submit handler
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+      if (!userId) return;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+      const updateData = new FormData();
+      updateData.append("username", formData.username);
+      updateData.append("email", formData.email);
 
-    const updateData = new FormData();
-    updateData.append("username", formData.username);
-    updateData.append("email", formData.email);
-
-    // Password validation and handling
-    if (formData.password.trim()) {
-      if (formData.password.length < 6) {
-        setSnackbar({
-          open: true,
-          message: "Password must be at least 6 characters long",
-          severity: "error",
-        });
-        return;
+      if (formData.password.trim()) {
+        if (formData.password.length < 6) {
+          setSnackbar({
+            open: true,
+            message: "Password must be at least 6 characters long",
+            severity: "error",
+          });
+          return;
+        }
+        updateData.append("password", formData.password);
       }
-      updateData.append("password", formData.password);
-    }
 
-    if (selectedFile) {
-      updateData.append("image", selectedFile);
-    }
+      if (selectedFile) {
+        updateData.append("image", selectedFile);
+      }
 
-    if (userId) {
       try {
         await dispatch(
           updateProfile({ userId, formData: updateData })
@@ -141,38 +182,76 @@ function AdminProfile() {
           severity: "error",
         });
       }
-    }
-  };
+    },
+    [dispatch, userId, formData, selectedFile]
+  );
 
-  const handleDelete = async () => {
-    if (userId) {
-      try {
-        await dispatch(deleteAccount(userId)).unwrap();
-        setSnackbar({
-          open: true,
-          message: "Account deleted successfully!",
-          severity: "success",
-        });
-        setDeleteOpen(false);
-      } catch (error) {
-        setSnackbar({
-          open: true,
-          message: "Failed to delete account",
-          severity: "error",
-        });
-      }
+  // Memoize delete handler
+  const handleDelete = useCallback(async () => {
+    if (!userId) return;
+
+    try {
+      await dispatch(deleteAccount(userId)).unwrap();
+      setSnackbar({
+        open: true,
+        message: "Account deleted successfully!",
+        severity: "success",
+      });
+      setDeleteOpen(false);
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Failed to delete account",
+        severity: "error",
+      });
     }
-  };
+  }, [dispatch, userId]);
+
+  // Memoize loading state component
+  const LoadingSpinner = useMemo(
+    () => (
+      <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+        <CircularProgress size={40} className="text-btColour" />
+      </div>
+    ),
+    []
+  );
+
+  // Memoize form inputs configuration
+  const formInputs = useMemo(
+    () => [
+      {
+        id: "username",
+        label: "Username",
+        type: "text",
+        required: true,
+      },
+      {
+        id: "email",
+        label: "Email",
+        type: "email",
+        required: true,
+      },
+      {
+        id: "password",
+        label: "Password",
+        type: "password",
+        required: false,
+        placeholder: "********",
+      },
+    ],
+    []
+  );
+
+  if (loading) {
+    return LoadingSpinner;
+  }
 
   return (
-    <div>
-      {/* Image */}
+    <div className="mid:mt-20">
       <div>
         <div className="col-span-full mx-auto text-center items-center align-middle">
-          <label
-            htmlFor="cover-photo"
-            className="block text-xl font-bold leading-6 text-gray-900"
-          >
+          <label className="block text-xl font-bold leading-6 text-gray-900">
             My profile
           </label>
           <div className="mt-1 flex justify-center rounded-lg px-6 pt-10">
@@ -181,17 +260,14 @@ function AdminProfile() {
                 <>
                   <img
                     src={imagePreview}
-                    alt="Image preview"
+                    alt="Profile preview"
                     className="h-[15rem] w-[15rem] rounded-full object-cover border-4 border-white"
                   />
                   <label
                     htmlFor="file-upload"
                     className="absolute bottom-0 right-4 cursor-pointer h-12 w-12 bg-white rounded-full flex justify-center items-center border-2 border-white"
                   >
-                    <MdOutlineAddAPhoto
-                      aria-hidden="true"
-                      className="h-8 w-8 text-gray-500"
-                    />
+                    <MdOutlineAddAPhoto className="h-8 w-8 text-gray-500" />
                     <input
                       id="file-upload"
                       name="image"
@@ -207,20 +283,15 @@ function AdminProfile() {
                   htmlFor="file-upload"
                   className="cursor-pointer h-40 w-40 flex flex-col justify-center items-center border-2 border-dashed border-gray-300 rounded-full"
                 >
-                  <BsPersonBoundingBox
-                    aria-hidden="true"
-                    className="h-12 w-12 text-gray-300"
+                  <BsPersonBoundingBox className="h-12 w-12 text-gray-300" />
+                  <input
+                    id="file-upload"
+                    name="image"
+                    type="file"
+                    className="sr-only"
+                    onChange={handleFileChange}
+                    ref={fileInputRef}
                   />
-                  <div className="mt-4 flex text-sm leading-6 text-gray-600">
-                    <input
-                      id="file-upload"
-                      name="image"
-                      type="file"
-                      className="sr-only"
-                      onChange={handleFileChange}
-                      ref={fileInputRef}
-                    />
-                  </div>
                 </label>
               )}
             </div>
@@ -228,66 +299,34 @@ function AdminProfile() {
         </div>
       </div>
 
-      {/* Form section remains the same */}
-
       <div className="md:px-[5rem] p-16 mx-auto md:w-[35rem] mid:mx-[1rem] rounded-xl">
         <form onSubmit={handleSubmit}>
-          <div className="mb-5">
-            <label
-              htmlFor="username"
-              className="block mb-2 text-sm font-medium text-gray-900"
-            >
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleInputChange}
-              className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5"
-              required
-            />
-          </div>
-          <div className="mb-5">
-            <label
-              htmlFor="email"
-              className="block mb-2 text-sm font-medium text-gray-900"
-            >
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5"
-              required
-            />
-          </div>
-          <div className="mb-5">
-            <label
-              htmlFor="password"
-              className="block mb-2 text-sm font-medium text-gray-900"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5"
-              placeholder="********"
-            />
-          </div>
+          {formInputs.map(({ id, label, type, required, placeholder }) => (
+            <div key={id} className="mb-5">
+              <label
+                htmlFor={id}
+                className="block mb-2 text-sm font-medium text-gray-900"
+              >
+                {label}
+              </label>
+              <input
+                type={type}
+                id={id}
+                name={id}
+                value={formData[id]}
+                onChange={handleInputChange}
+                className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg block w-full p-2.5"
+                required={required}
+                placeholder={placeholder}
+              />
+            </div>
+          ))}
 
-          <div className=" flex justify-end">
+          <div className="flex justify-end">
             <button
               type="submit"
-              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-[30%]   py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700"
+              disabled={loading}
+              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-[30%] py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700"
             >
               {loading ? <Spinner /> : "Update"}
             </button>
@@ -295,7 +334,6 @@ function AdminProfile() {
         </form>
       </div>
 
-      {/* Delete Modal */}
       <Button>
         <React.Fragment>
           <button
@@ -336,7 +374,6 @@ function AdminProfile() {
         </React.Fragment>
       </Button>
 
-      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}

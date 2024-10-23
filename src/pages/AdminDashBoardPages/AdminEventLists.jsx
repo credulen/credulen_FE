@@ -1,285 +1,380 @@
-import React, { useEffect, useState } from "react";
-import { Table, Button, Dropdown, Modal } from "flowbite-react";
-import { toast } from "react-toastify";
-import moment from "moment";
-import { HiOutlineTrash } from "react-icons/hi";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { Table, Button } from "flowbite-react";
+import { BiMessageSquareAdd } from "react-icons/bi";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import { IoClose } from "react-icons/io5";
+import { AiTwotoneDelete } from "react-icons/ai";
+import { CircularProgress } from "@mui/material";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import { format } from "date-fns";
 
 const backendURL =
   import.meta.env.MODE === "production"
     ? import.meta.env.VITE_BACKEND_URL
     : "http://localhost:3001";
 
-const PaginationButtons = ({ currentPage, totalPages, onPageChange }) => {
-  const pageNumbers = [];
-  const maxVisibleButtons = 5;
+const ITEMS_PER_PAGE = 10;
 
-  let startPage = Math.max(1, currentPage - Math.floor(maxVisibleButtons / 2));
-  let endPage = Math.min(totalPages, startPage + maxVisibleButtons - 1);
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
-  if (endPage - startPage + 1 < maxVisibleButtons) {
-    startPage = Math.max(1, endPage - maxVisibleButtons + 1);
-  }
+// Memoized pagination component
+const PaginationButtons = React.memo(
+  ({ currentPage, totalPages, onPageChange }) => {
+    const pageNumbers = useMemo(() => {
+      const numbers = [];
+      const maxVisibleButtons = 5;
+      let startPage = Math.max(
+        1,
+        currentPage - Math.floor(maxVisibleButtons / 2)
+      );
+      let endPage = Math.min(totalPages, startPage + maxVisibleButtons - 1);
 
-  for (let i = startPage; i <= endPage; i++) {
-    pageNumbers.push(i);
-  }
+      if (endPage - startPage + 1 < maxVisibleButtons) {
+        startPage = Math.max(1, endPage - maxVisibleButtons + 1);
+      }
 
-  return (
-    <div className="flex justify-center items-center mt-4 space-x-2">
-      <button
-        onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
-        disabled={currentPage === 1}
-        className={`px-3 py-2 rounded-lg ${
-          currentPage === 1
-            ? " text-gray-500 cursor-not-allowed"
-            : "text-blue-500 hover:text-white hover:bg-blue-600"
-        }`}
-      >
-        &lt;
-      </button>
+      for (let i = startPage; i <= endPage; i++) {
+        numbers.push(i);
+      }
+      return numbers;
+    }, [currentPage, totalPages]);
 
-      {startPage > 1 && (
-        <>
-          <button
-            onClick={() => onPageChange(1)}
-            className="px-3 py-2 rounded-lg text-blue-50 hover:bg-gray-100"
-          >
-            1
-          </button>
-          {startPage > 2 && <span className="px-3 py-2">...</span>}
-        </>
-      )}
-
-      {pageNumbers.map((number) => (
+    return (
+      <div className="flex justify-center items-center mt-4 space-x-2">
         <button
-          key={number}
-          onClick={() => onPageChange(number)}
-          className={`px-2 py-0 rounded-lg ${
-            currentPage === number
-              ? "bg-btColour text-white"
-              : " text-btColour hover:text-white hover:bg-btColour"
+          onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
+          disabled={currentPage === 1}
+          className={`px-3 py-2 rounded-lg ${
+            currentPage === 1
+              ? "text-gray-500 cursor-not-allowed"
+              : "text-blue-500 hover:text-white hover:bg-blue-600"
           }`}
         >
-          {number}
+          &lt;
         </button>
-      ))}
 
-      {endPage < totalPages && (
-        <>
-          {endPage < totalPages - 1 && <span className="px-3 py-2">...</span>}
+        {pageNumbers.map((number) => (
           <button
-            onClick={() => onPageChange(totalPages)}
-            className="px-3 py-2 rounded-lg  text-btColour hover:text-white hover:bg-btColour"
+            key={number}
+            onClick={() => onPageChange(number)}
+            className={`px-2 py-0 rounded-lg ${
+              currentPage === number
+                ? "bg-btColour text-white"
+                : "text-btColour hover:text-white hover:bg-btColour"
+            }`}
           >
-            {totalPages}
+            {number}
           </button>
-        </>
-      )}
+        ))}
 
-      <button
-        onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
-        disabled={currentPage === totalPages}
-        className={`px-3 py-2 rounded-lg ${
-          currentPage === totalPages
-            ? "bg-gray-200 text- cursor-not-allowed"
-            : "text-btColour hover:text-white hover:bg-btColour"
-        }`}
+        <button
+          onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          className={`px-3 py-2 rounded-lg ${
+            currentPage === totalPages
+              ? "bg-gray-200 cursor-not-allowed"
+              : "text-btColour hover:text-white hover:bg-btColour"
+          }`}
+        >
+          &gt;
+        </button>
+      </div>
+    );
+  }
+);
+
+// Memoized table row component
+const EventRow = React.memo(({ event, onDelete, backendURL }) => (
+  <Table.Row className="bg-white dark:bg-gray-800">
+    <Table.Cell>{format(new Date(event.date), "MMM d, yyyy")}</Table.Cell>
+    <Table.Cell>
+      <div className="w-12 h-12 overflow-hidden rounded-full">
+        <img
+          src={`${backendURL}${event.image}`}
+          alt={event.title}
+          className="w-full h-full object-cover"
+          loading="lazy"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = "/fallback-image.png";
+          }}
+        />
+      </div>
+    </Table.Cell>
+    <Table.Cell>
+      <Link
+        to={`/event/${event.slug}`}
+        className="font-medium text-gray-900 dark:text-white hover:text-btColour"
       >
-        &gt;
+        {event.title.length > 50
+          ? `${event.title.substring(0, 50)}...`
+          : event.title}
+      </Link>
+    </Table.Cell>
+    <Table.Cell>{event.venue}</Table.Cell>
+    <Table.Cell>{event.eventType}</Table.Cell>
+    <Table.Cell>
+      {event.speakers.map((speaker, index) => (
+        <span key={index}>
+          {speaker.name}
+          {index < event.speakers.length - 1 && ", "}
+        </span>
+      ))}
+    </Table.Cell>
+    <Table.Cell>
+      <button
+        onClick={() => onDelete(event._id)}
+        className="font-medium text-red-500 bg-transparent border border-red-500 cursor-pointer hover:bg-btColour hover:text-white p-1 rounded-md "
+      >
+        Delete
       </button>
-    </div>
-  );
-};
+    </Table.Cell>
+    <Table.Cell>
+      <Link
+        to={`/DashBoard/Admin/CreateEvents/${event.slug}`}
+        className="font-medium text-white hover:text-btColour hover:bg-transparent hover:border hover:border-btColour bg-btColour p-1 rounded-md transition-all duration-300 px-2"
+      >
+        Edit
+      </Link>
+    </Table.Cell>
+  </Table.Row>
+));
 
-export default function RegisteredSolutionsList() {
-  const [solutions, setSolutions] = useState([]);
-  const [selectedSolution, setSelectedSolution] = useState("");
-  const [totalSolutions, setTotalSolutions] = useState(0);
-  const [lastMonthSolutions, setLastMonthSolutions] = useState(0);
-  const [availableSolutions, setAvailableSolutions] = useState([]);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+export default function AdminEventLists() {
+  const { userInfo } = useSelector((state) => state.auth);
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 10;
+  const [totalPages, setTotalPages] = useState(0);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [eventIdToDelete, setEventIdToDelete] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [categories, setCategories] = useState([]);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
+  const fetchEvents = useCallback(async (page, category) => {
+    setLoading(true);
+    try {
+      let url = `${backendURL}/api/getEvents?page=${page}&limit=${ITEMS_PER_PAGE}`;
+
+      // Only append category if it's not 'all'
+      if (category && category !== "all") {
+        url += `&eventType=${category}`; // Changed from category to eventType to match your data structure
+      }
+
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (res.ok) {
+        setEvents(data.events);
+        setTotalPages(Math.ceil(data.total / ITEMS_PER_PAGE));
+      } else {
+        setSnackbar({
+          open: true,
+          message: "Failed to fetch events",
+          severity: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      setSnackbar({
+        open: true,
+        message: "Error loading events",
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Fetch events when page or category changes
   useEffect(() => {
-    fetchSolutions();
-  }, [currentPage, selectedSolution]);
+    fetchEvents(currentPage, selectedCategory);
+  }, [currentPage, selectedCategory, fetchEvents]);
 
-  const fetchSolutions = async () => {
+  const handleCategoryChange = (e) => {
+    const newCategory = e.target.value;
+    setSelectedCategory(newCategory);
+    setCurrentPage(1); // Reset to first page when changing category
+    fetchEvents(1, newCategory); // Immediately fetch events with new category
+  };
+
+  const handleDeleteEvent = useCallback(async () => {
     try {
       const res = await fetch(
-        `${backendURL}/api/getSolutionForms?page=${currentPage}&limit=${itemsPerPage}${
-          selectedSolution ? `&selectedSolution=${selectedSolution}` : ""
-        }`
+        `${backendURL}/api/deleteEvent/${eventIdToDelete}`,
+        {
+          method: "DELETE",
+        }
       );
       const data = await res.json();
-      if (res.ok) {
-        setSolutions(data.solutions);
-        setTotalSolutions(data.totalSolutions);
-        setLastMonthSolutions(data.lastMonthSolutions);
-        setTotalPages(Math.ceil(data.totalSolutions / itemsPerPage));
-
-        const uniqueSolutions = [
-          ...new Set(data.solutions.map((s) => s.selectedSolution)),
-        ];
-        setAvailableSolutions(uniqueSolutions);
-      }
-    } catch (error) {
-      console.error("Error fetching solutions:", error);
-      toast.error("Failed to fetch registered solutions");
-    }
-  };
-
-  const handleFilter = (solution) => {
-    setSelectedSolution(solution);
-    setCurrentPage(1);
-  };
-
-  const handleDeleteBySolution = async () => {
-    if (!selectedSolution) {
-      toast.error("Please select a solution to delete");
-      return;
-    }
-
-    try {
-      const res = await fetch(`${backendURL}/api/deleteSolutionsByType`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ selectedSolution }),
-      });
 
       if (res.ok) {
-        toast.success(`Deleted all entries for ${selectedSolution}`);
-        setSelectedSolution("");
-        setCurrentPage(1);
-        fetchSolutions();
+        setEvents((prev) =>
+          prev.filter((event) => event._id !== eventIdToDelete)
+        );
+        setSnackbar({
+          open: true,
+          message: "Event deleted successfully",
+          severity: "success",
+        });
+        setIsDeleteModalOpen(false);
+
+        if (events.length === 1 && currentPage > 1) {
+          setCurrentPage((prev) => prev - 1);
+        } else if (events.length === 1) {
+          fetchEvents(1);
+        }
       } else {
-        toast.error("Failed to delete solutions");
+        setSnackbar({
+          open: true,
+          message: data.message || "Failed to delete event",
+          severity: "error",
+        });
       }
     } catch (error) {
-      console.error("Error deleting solutions:", error);
-      toast.error("Failed to delete solutions");
-    } finally {
-      setShowDeleteModal(false);
+      console.error("Error deleting event:", error);
+      setSnackbar({
+        open: true,
+        message: "Error deleting event",
+        severity: "error",
+      });
     }
-  };
+  }, [eventIdToDelete, currentPage, events.length, fetchEvents]);
 
   return (
-    <div className="flex flex-col w-full h-full">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4 p-3">
-        <div className="flex items-center gap-4 mb-4 md:mb-0">
-          <h1 className="text-2xl font-semibold">Registered Solutions</h1>
-          <div className="flex gap-2 text-sm">
-            <span className="text-slate-700 font-semibold">
-              Total: {totalSolutions}
-            </span>
-            <span className="text-slate-700 font-semibold">
-              Last month: {lastMonthSolutions}
-            </span>
-          </div>
+    <div className="p-2 mid:mt-20">
+      {loading ? (
+        <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+          <CircularProgress size={40} className="text-btColour" />
         </div>
-        <div className="flex gap-2">
-          <Dropdown
-            style={{ color: "black" }}
-            label={selectedSolution || "Filter by Solution"}
+      ) : (
+        <>
+          <div className="flex justify-between items-center mb-6">
+            <Link to="/DashBoard/Admin/CreateEvents">
+              <button className="text-btColour border border-btColour p-2 rounded-lg hover:bg-btColour hover:text-white transition-all duration-300">
+                <span className="flex items-center gap-2">
+                  <BiMessageSquareAdd size={20} />
+                  Create Event
+                </span>
+              </button>
+            </Link>
+
+            <select
+              value={selectedCategory}
+              onChange={handleCategoryChange}
+              className="border border-gray-300 rounded-lg p-2"
+            >
+              <option value="all">All EVents</option>
+              <option value="webinar">Webinar</option>
+              <option value="conference">Conference</option>
+            </select>
+          </div>
+
+          <div className="overflow-x-auto shadow-md rounded-lg">
+            {loading ? (
+              <div className="flex justify-center items-center p-8">
+                <CircularProgress size={40} className="text-btColour" />
+              </div>
+            ) : events.length > 0 ? (
+              <Table hoverable>
+                <Table.Head>
+                  <Table.HeadCell>Date</Table.HeadCell>
+                  <Table.HeadCell>Event Image</Table.HeadCell>
+                  <Table.HeadCell>Title</Table.HeadCell>
+                  <Table.HeadCell>Venue</Table.HeadCell>
+                  <Table.HeadCell>Event Type</Table.HeadCell>
+                  <Table.HeadCell>Speakers</Table.HeadCell>
+                  <Table.HeadCell>Delete</Table.HeadCell>
+                  <Table.HeadCell>Edit</Table.HeadCell>
+                </Table.Head>
+                <Table.Body className="divide-y">
+                  {events.map((event) => (
+                    <EventRow
+                      key={event._id}
+                      event={event}
+                      onDelete={() => {
+                        setEventIdToDelete(event._id);
+                        setIsDeleteModalOpen(true);
+                      }}
+                      backendURL={backendURL}
+                    />
+                  ))}
+                </Table.Body>
+              </Table>
+            ) : (
+              <p className="text-center py-4">No events found</p>
+            )}
+
+            {totalPages > 1 && (
+              <PaginationButtons
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            )}
+          </div>
+
+          <Dialog
+            open={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
           >
-            <Dropdown.Item
-              onClick={() => handleFilter("")}
-              style={{ color: "black" }}
+            <DialogTitle id="alert-dialog-title">
+              Are you sure you want to delete this event?
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                This action cannot be undone. All data associated with this
+                event will be permanently removed.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setIsDeleteModalOpen(false)}>
+                <IoClose
+                  size={24}
+                  className="text-red-500 hover:scale-110 transition-transform"
+                />
+              </Button>
+              <Button onClick={handleDeleteEvent}>
+                <AiTwotoneDelete
+                  size={24}
+                  className="text-red-500 hover:scale-110 transition-transform"
+                />
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          <Snackbar
+            open={snackbar.open}
+            autoHideDuration={6000}
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          >
+            <Alert
+              onClose={() => setSnackbar({ ...snackbar, open: false })}
+              severity={snackbar.severity}
+              sx={{ width: "100%" }}
             >
-              All Solutions
-            </Dropdown.Item>
-            {availableSolutions.map((solution) => (
-              <Dropdown.Item
-                key={solution}
-                onClick={() => handleFilter(solution)}
-                style={{ color: "black" }}
-              >
-                {solution}
-              </Dropdown.Item>
-            ))}
-          </Dropdown>
-
-          <span className="mt-2">
-            <button
-              className="flex gap-2 font-medium hover:text-red-500 hover:bg-transparent cursor-pointer text-btColour p-1 rounded-md text-xs"
-              onClick={() => setShowDeleteModal(true)}
-            >
-              <HiOutlineTrash className="h-4 w-4" />
-              Delete All
-            </button>
-          </span>
-        </div>
-      </div>
-
-      <div className="flex-grow overflow-x-auto">
-        <div className="h-full overflow-y-auto">
-          {solutions.length > 0 ? (
-            <Table hoverable className="shadow-md">
-              <Table.Head>
-                <Table.HeadCell>Full Name</Table.HeadCell>
-                <Table.HeadCell>Phone Number</Table.HeadCell>
-                <Table.HeadCell>Email</Table.HeadCell>
-                <Table.HeadCell>Employment Status</Table.HeadCell>
-                <Table.HeadCell>Job Title</Table.HeadCell>
-                <Table.HeadCell>Selected Solution</Table.HeadCell>
-                <Table.HeadCell>Submitted At</Table.HeadCell>
-              </Table.Head>
-              <Table.Body className="divide-y">
-                {solutions.map((solution) => (
-                  <Table.Row
-                    key={solution._id}
-                    className="bg-white dark:border-gray-700 dark:bg-gray-800"
-                  >
-                    <Table.Cell>{solution.fullName}</Table.Cell>
-                    <Table.Cell>{solution.phoneNumber}</Table.Cell>
-                    <Table.Cell>{solution.email}</Table.Cell>
-                    <Table.Cell>{solution.employmentStatus}</Table.Cell>
-                    <Table.Cell>{solution.jobTitle}</Table.Cell>
-                    <Table.Cell>{solution.selectedSolution}</Table.Cell>
-                    <Table.Cell>
-                      {moment(solution.submittedAt).format("MMMM D, HH:mm")}
-                    </Table.Cell>
-                  </Table.Row>
-                ))}
-              </Table.Body>
-            </Table>
-          ) : (
-            <p className="text-center py-4">No registered solutions found!</p>
-          )}
-        </div>
-      </div>
-
-      <PaginationButtons
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
-
-      <Modal show={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
-        <Modal.Header>Confirm Deletion</Modal.Header>
-        <Modal.Body>
-          <div className="space-y-6">
-            <p className="text-base leading-relaxed text-gray-500  dark:text-gray-400">
-              Are you sure you want to delete all entries for{" "}
-              <span className="font-bold">
-                {selectedSolution || "the selected solution"}?
-              </span>
-            </p>
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button color="failure" onClick={handleDeleteBySolution}>
-            Yes, Delete All
-          </Button>
-          <Button color="gray" onClick={() => setShowDeleteModal(false)}>
-            Cancel
-          </Button>
-        </Modal.Footer>
-      </Modal>
+              {snackbar.message}
+            </Alert>
+          </Snackbar>
+        </>
+      )}
     </div>
   );
 }
