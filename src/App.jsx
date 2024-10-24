@@ -28,8 +28,8 @@ import AdminLayout from "./components/Dashboard_Admin/AdminLayout";
 import AdminDashboard from "./pages/AdminDashBoardPages/AdminDashboard";
 import AdminProfile from "./pages/AdminDashBoardPages/AdminProfile";
 import AdminUsersLists from "./pages/AdminDashBoardPages/AdminUsersLists";
-import Authors from "./pages/AdminDashBoardPages/DashBoardActivities";
-import Posts from "./pages/AdminDashBoardPages/Posts";
+import AutthorList from "./pages/AdminDashBoardPages/AutthorList";
+import AdminBlogposts from "./pages/AdminDashBoardPages/AdminBlogposts";
 import CreatePosts from "./pages/AdminDashBoardPages/CreatePosts";
 import CreateAuthor from "./pages/AdminDashBoardPages/CreateAuthor";
 import AdminEventLists from "./pages/AdminDashBoardPages/AdminEventLists";
@@ -41,6 +41,7 @@ import AdminSolutionList from "./pages/AdminDashBoardPages/AdminSolutionList";
 import CreateSolutions from "./pages/AdminDashBoardPages/CreateSolutions";
 import RegisteredSolutionsList from "./pages/AdminDashBoardPages/RegisteredSolutionsList";
 import AdminCommentLists from "./pages/AdminDashBoardPages/AdminCommentLists";
+import RegisteredEventLists from "./pages/AdminDashBoardPages/RegisteredEventLists";
 
 const AppContent = () => {
   const location = useLocation();
@@ -97,8 +98,8 @@ const AppContent = () => {
               path="/DashBoard/Admin/Comments"
               element={<AdminCommentLists />}
             />
-            <Route path="/DashBoard/Admin/Authors" element={<Authors />} />
-            <Route path="/DashBoard/Admin/Posts" element={<Posts />} />
+            <Route path="/DashBoard/Admin/Authors" element={<AutthorList />} />
+            <Route path="/DashBoard/Admin/Posts" element={<AdminBlogposts />} />
             <Route
               path="/DashBoard/Admin/CreatePosts/:postId?"
               element={<CreatePosts />}
@@ -126,6 +127,10 @@ const AppContent = () => {
             <Route
               path="/DashBoard/Admin/RegisteredSolutionsList"
               element={<RegisteredSolutionsList />}
+            />
+            <Route
+              path="/DashBoard/Admin/RegisteredEventList"
+              element={<RegisteredEventLists />}
             />
           </Route>
         </Route>

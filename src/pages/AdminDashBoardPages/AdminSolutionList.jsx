@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, memo } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Table, Button } from "flowbite-react";
@@ -10,8 +10,8 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { IoClose } from "react-icons/io5";
 import { AiTwotoneDelete } from "react-icons/ai";
+import { CircularProgress } from "@mui/material";
 import moment from "moment";
-import "../../index.css";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 
@@ -20,9 +20,68 @@ const backendURL =
     ? import.meta.env.VITE_BACKEND_URL
     : "http://localhost:3001";
 
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+// Memoized components
+const Alert = memo(
+  React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  })
+);
+
+const LoadingSpinner = memo(() => (
+  <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+    <CircularProgress size={40} className="text-btColour" />
+  </div>
+));
+
+// Memoized table row component
+const SolutionTableRow = memo(({ solution, onDeleteClick }) => (
+  <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+    <Table.Cell>{moment(solution.updatedAt).format("MMMM D")}</Table.Cell>
+    <Table.Cell>
+      <Link to={`/solution/${solution.slug}`}>
+        <div className="w-10 h-10 overflow-hidden rounded-full flex items-center justify-center bg-gray-500">
+          <img
+            src={`${backendURL}${solution.image}`}
+            alt={solution.title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "/fallback-image.png";
+            }}
+          />
+        </div>
+      </Link>
+    </Table.Cell>
+    <Table.Cell>
+      <Link
+        className="font-medium text-gray-900 dark:text-white"
+        to={`/solution/${solution.slug}`}
+      >
+        {solution.title.length > 50
+          ? `${solution.title.substring(0, 50)}...`
+          : solution.title}
+      </Link>
+    </Table.Cell>
+    <Table.Cell>{solution.category}</Table.Cell>
+    <Table.Cell>
+      <span
+        onClick={() => onDeleteClick(solution._id)}
+        className="font-medium text-red-500 bg-transparent border border-red-500 cursor-pointer hover:bg-btColour hover:text-white p-1 rounded-md "
+      >
+        Delete
+      </span>
+    </Table.Cell>
+    <Table.Cell>
+      <Link
+        className="font-medium text-white hover:text-btColour hover:bg-transparent hover:border hover:border-btColour bg-btColour p-1 rounded-md transition-all duration-300 px-2"
+        to={`/DashBoard/Admin/CreateSolutions/${solution.slug}`}
+      >
+        <span>Edit</span>
+      </Link>
+    </Table.Cell>
+  </Table.Row>
+));
 
 export default function AdminSolutionList() {
   const { userInfo } = useSelector((state) => state.auth);
@@ -30,64 +89,70 @@ export default function AdminSolutionList() {
   const [showMore, setShowMore] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [solutionIdToDelete, setSolutionIdToDelete] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
 
-  const openDeleteModal = (solutionId) => {
-    setSolutionIdToDelete(solutionId);
-    setIsDeleteModalOpen(true);
-  };
-
-  const closeDeleteModal = () => {
-    setIsDeleteModalOpen(false);
-    setSolutionIdToDelete("");
-  };
-
-  useEffect(() => {
-    fetchSolutions();
-  }, [userInfo]);
-
-  const fetchSolutions = async (startIndex = 0) => {
+  const fetchSolutions = useCallback(async (startIndex = 0) => {
     try {
+      startIndex === 0 ? setInitialLoading(true) : setLoading(true);
       const res = await fetch(
         `${backendURL}/api/getAllSolutions?startIndex=${startIndex}&limit=9`
       );
       const data = await res.json();
+
       if (res.ok) {
-        if (startIndex === 0) {
-          setSolutions(data.solutions);
-        } else {
-          setSolutions((prev) => [...prev, ...data.solutions]);
-        }
+        setSolutions((prev) =>
+          startIndex === 0 ? data.solutions : [...prev, ...data.solutions]
+        );
         setShowMore(data.solutions.length === 9);
+      } else {
+        throw new Error(data.message || "Failed to fetch solutions");
       }
     } catch (error) {
       console.error("Error fetching solutions:", error);
       setSnackbar({
         open: true,
-        message: "Failed to fetch solutions",
+        message: error.message,
         severity: "error",
       });
+    } finally {
+      startIndex === 0 ? setInitialLoading(false) : setLoading(false);
     }
-  };
+  }, []);
 
-  const handleShowMore = () => {
-    const startIndex = solutions.length;
-    fetchSolutions(startIndex);
-  };
+  useEffect(() => {
+    fetchSolutions();
+  }, [fetchSolutions, userInfo]);
 
-  const handleDeleteSolution = async () => {
+  const handleShowMore = useCallback(() => {
+    if (!loading) {
+      fetchSolutions(solutions.length);
+    }
+  }, [fetchSolutions, loading, solutions.length]);
+
+  const openDeleteModal = useCallback((solutionId) => {
+    setSolutionIdToDelete(solutionId);
+    setIsDeleteModalOpen(true);
+  }, []);
+
+  const closeDeleteModal = useCallback(() => {
+    setIsDeleteModalOpen(false);
+    setSolutionIdToDelete("");
+  }, []);
+
+  const handleDeleteSolution = useCallback(async () => {
     try {
       const res = await fetch(
         `${backendURL}/api/deleteSolution/${solutionIdToDelete}`,
-        {
-          method: "DELETE",
-        }
+        { method: "DELETE" }
       );
       const data = await res.json();
+
       if (res.ok) {
         setSolutions((prev) =>
           prev.filter((solution) => solution._id !== solutionIdToDelete)
@@ -99,32 +164,28 @@ export default function AdminSolutionList() {
         });
         closeDeleteModal();
       } else {
-        setSnackbar({
-          open: true,
-          message: data.message || "Failed to delete solution",
-          severity: "error",
-        });
+        throw new Error(data.message || "Failed to delete solution");
       }
     } catch (error) {
       console.error("Error deleting solution:", error);
       setSnackbar({
         open: true,
-        message: "An error occurred while deleting the solution",
+        message: error.message,
         severity: "error",
       });
     }
-  };
+  }, [solutionIdToDelete, closeDeleteModal]);
 
-  const handleCloseSnackbar = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setSnackbar({ ...snackbar, open: false });
-  };
+  const handleCloseSnackbar = useCallback((event, reason) => {
+    if (reason === "clickaway") return;
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  }, []);
+
+  if (initialLoading) return <LoadingSpinner />;
 
   return (
     <>
-      <div className="my-5 ml-3">
+      <div className="my-5 ml-3 mid:mt-20">
         <Link to="/DashBoard/Admin/CreateSolutions">
           <button className="text-btColour border border-btColour p-1 rounded-lg hover:font-semibold">
             <span className="flex whitespace-nowrap">
@@ -134,6 +195,7 @@ export default function AdminSolutionList() {
           </button>
         </Link>
       </div>
+
       <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
         {solutions.length > 0 ? (
           <>
@@ -148,65 +210,22 @@ export default function AdminSolutionList() {
               </Table.Head>
               <Table.Body className="divide-y">
                 {solutions.map((solution) => (
-                  <Table.Row
+                  <SolutionTableRow
                     key={solution._id}
-                    className="bg-white dark:border-gray-700 dark:bg-gray-800"
-                  >
-                    <Table.Cell>
-                      {moment(solution.updatedAt).format("MMMM D")}
-                    </Table.Cell>
-                    <Table.Cell>
-                      <Link to={`/solution/${solution.slug}`}>
-                        <div className="w-10 h-10 overflow-hidden rounded-full flex items-center justify-center bg-gray-500">
-                          <img
-                            src={`${backendURL}${solution.image}`}
-                            alt={solution.title}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = "/fallback-image.png";
-                            }}
-                          />
-                        </div>
-                      </Link>
-                    </Table.Cell>
-                    <Table.Cell>
-                      <Link
-                        className="font-medium text-gray-900 dark:text-white"
-                        to={`/solution/${solution.slug}`}
-                      >
-                        {solution.title.length > 50
-                          ? `${solution.title.substring(0, 50)}...`
-                          : solution.title}
-                      </Link>
-                    </Table.Cell>
-                    <Table.Cell>{solution.category}</Table.Cell>
-                    <Table.Cell>
-                      <span
-                        onClick={() => openDeleteModal(solution._id)}
-                        className="font-medium text-white hover:text-red-500 hover:bg-transparent hover:border hover:border-red-500 cursor-pointer bg-btColour p-1 rounded-md"
-                      >
-                        Delete
-                      </span>
-                    </Table.Cell>
-                    <Table.Cell>
-                      <Link
-                        className="font-medium text-white hover:text-btColour hover:bg-transparent hover:border hover:border-btColour cursor-pointer bg-btColour p-1 rounded-md"
-                        to={`/DashBoard/Admin/CreateSolutions/${solution.slug}`}
-                      >
-                        <span>Edit</span>
-                      </Link>
-                    </Table.Cell>
-                  </Table.Row>
+                    solution={solution}
+                    onDeleteClick={openDeleteModal}
+                  />
                 ))}
               </Table.Body>
             </Table>
+
             {showMore && (
               <button
                 onClick={handleShowMore}
-                className="w-full text-teal-500 self-center text-sm py-7"
+                disabled={loading}
+                className="w-full text-teal-500 self-center text-sm py-7 disabled:opacity-50"
               >
-                Show more
+                {loading ? "Loading..." : "Show more"}
               </button>
             )}
           </>

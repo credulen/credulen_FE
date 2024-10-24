@@ -99,6 +99,11 @@ const AdminSidebar = () => {
       icon: IoMdNotificationsOutline,
       label: "Registered Solutions",
     },
+    {
+      path: "/DashBoard/Admin/RegisteredEventList",
+      icon: IoMdNotificationsOutline,
+      label: "Registered Events",
+    },
   ];
 
   return (

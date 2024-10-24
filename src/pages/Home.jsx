@@ -516,14 +516,14 @@ const IntelligentHomepage = () => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.7 }}
             >
-              Intelligence
-            </motion.span>{" "}
+              Intelligence,
+            </motion.span>
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.9 }}
             >
-              And
+              {/* And */}
             </motion.span>
             <br />
             <motion.span

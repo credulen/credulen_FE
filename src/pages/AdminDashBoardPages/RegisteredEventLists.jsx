@@ -24,47 +24,41 @@ const Alert = memo(
   })
 );
 
-// Memoized loading spinner component
 const LoadingSpinner = memo(() => (
   <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
     <CircularProgress size={40} className="text-btColour" />
   </div>
 ));
 
-// Memoized solution table row component
-const SolutionTableRow = memo(({ solution }) => (
+const EventTableRow = memo(({ registration }) => (
   <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-    <Table.Cell>{solution.fullName}</Table.Cell>
-    <Table.Cell>{solution.phoneNumber}</Table.Cell>
-    <Table.Cell>{solution.email}</Table.Cell>
-    <Table.Cell>{solution.employmentStatus}</Table.Cell>
-    <Table.Cell>{solution.jobTitle}</Table.Cell>
-    <Table.Cell>{solution.selectedSolution}</Table.Cell>
+    <Table.Cell>{registration.fullName}</Table.Cell>
+    <Table.Cell>{registration.email}</Table.Cell>
+    <Table.Cell>{registration.company}</Table.Cell>
+    <Table.Cell>{registration.reason}</Table.Cell>
+    <Table.Cell>{registration.eventTitle}</Table.Cell>
+    <Table.Cell>{registration.eventCategory}</Table.Cell>
     <Table.Cell>
-      {moment(solution.submittedAt).format("MMMM D, HH:mm")}
+      {moment(registration.createdAt).format("MMMM D, HH:mm")}
     </Table.Cell>
   </Table.Row>
 ));
 
-// Memoized stats component
-const StatsDisplay = memo(({ totalSolutions, lastMonthSolutions }) => (
+const StatsDisplay = memo(({ totalRegistrations }) => (
   <div className="flex gap-2 text-sm">
     <span className="text-slate-700 font-semibold">
-      Total: {totalSolutions}
-    </span>
-    <span className="text-slate-700 font-semibold">
-      Last month: {lastMonthSolutions}
+      Total Registrations: {totalRegistrations}
     </span>
   </div>
 ));
 
-export default function RegisteredSolutionsList() {
-  const [solutions, setSolutions] = useState([]);
+export default function RegisteredEventLists() {
+  const [registrations, setRegistrations] = useState([]);
   const [showMore, setShowMore] = useState(true);
-  const [selectedSolution, setSelectedSolution] = useState("");
-  const [totalSolutions, setTotalSolutions] = useState(0);
-  const [lastMonthSolutions, setLastMonthSolutions] = useState(0);
-  const [availableSolutions, setAvailableSolutions] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState("");
+  const [totalRegistrations, setTotalRegistrations] = useState(0);
+  const [availableEvents, setAvailableEvents] = useState([]);
+  const [allEvents, setAllEvents] = useState([]); // New state to store all events
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -74,106 +68,142 @@ export default function RegisteredSolutionsList() {
     severity: "success",
   });
 
-  const fetchSolutions = useCallback(
+  // Separate function to fetch all available events
+  const fetchAllEvents = useCallback(async () => {
+    try {
+      const res = await fetch(`${backendURL}/api/getAllRegisteredEvents`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch events");
+      }
+      const ListData = data.registrations;
+      const uniqueEvents = [
+        ...new Set(ListData.map((event) => event.eventTitle)),
+      ];
+      setAllEvents(uniqueEvents);
+      console.log(uniqueEvents);
+    } catch (error) {
+      console.error("Error fetching all events:", error);
+      setSnackbar({
+        open: true,
+        message: "Failed to fetch events list",
+        severity: "error",
+      });
+    }
+  }, []);
+
+  const fetchRegistrations = useCallback(
     async (startIndex = 0) => {
       try {
         startIndex === 0 ? setInitialLoading(true) : setLoading(true);
 
-        const res = await fetch(
-          `${backendURL}/api/getSolutionForms?startIndex=${startIndex}&limit=5${
-            selectedSolution ? `&selectedSolution=${selectedSolution}` : ""
-          }`
-        );
+        const url = new URL(`${backendURL}/api/getAllRegisteredEvents`);
+        url.searchParams.append("startIndex", startIndex);
+        url.searchParams.append("limit", 10);
+        if (selectedEvent) {
+          url.searchParams.append("eventTitle", selectedEvent);
+        }
 
+        const res = await fetch(url);
         const data = await res.json();
 
         if (!res.ok) {
-          throw new Error(data.message || "Failed to fetch solutions");
+          throw new Error(data.message || "Failed to fetch registrations");
         }
 
         if (startIndex === 0) {
-          setSolutions(data.solutions);
+          setRegistrations(data.registrations);
         } else {
-          setSolutions((prev) => [...prev, ...data.solutions]);
+          setRegistrations((prev) => [...prev, ...data.registrations]);
         }
 
-        setShowMore(data.solutions.length === 5);
-        setTotalSolutions(data.totalSolutions);
-        setLastMonthSolutions(data.lastMonthSolutions);
+        setShowMore(data.hasMore);
+        setTotalRegistrations(data.totalRegistrations);
 
-        const uniqueSolutions = [
-          ...new Set(data.solutions.map((s) => s.selectedSolution)),
-        ];
-        setAvailableSolutions(uniqueSolutions);
+        // Update available events from the current data
+        if (startIndex === 0) {
+          const currentEvents = [
+            ...new Set(data.registrations.map((r) => r.eventTitle)),
+          ];
+          setAvailableEvents(currentEvents);
+        }
       } catch (error) {
-        console.error("Error fetching solutions:", error);
+        console.error("Error fetching registrations:", error);
         setSnackbar({
           open: true,
-          message: "Failed to fetch registered solutions",
+          message: "Failed to fetch event registrations",
           severity: "error",
         });
       } finally {
         startIndex === 0 ? setInitialLoading(false) : setLoading(false);
       }
     },
-    [selectedSolution]
+    [selectedEvent]
   );
 
+  const handleFilter = useCallback((event) => {
+    setSelectedEvent(event);
+    setRegistrations([]); // Clear current registrations when filter changes
+  }, []);
+
+  // Fetch all events on component mount
   useEffect(() => {
-    fetchSolutions(0);
-  }, [fetchSolutions, selectedSolution]);
+    fetchAllEvents();
+  }, [fetchAllEvents]);
+
+  useEffect(() => {
+    fetchRegistrations(0);
+  }, [fetchRegistrations, selectedEvent]);
 
   const handleShowMore = useCallback(() => {
     if (!loading) {
-      fetchSolutions(solutions.length);
+      fetchRegistrations(registrations.length);
     }
-  }, [fetchSolutions, loading, solutions.length]);
+  }, [fetchRegistrations, loading, registrations.length]);
 
-  const handleFilter = useCallback((solution) => {
-    setSelectedSolution(solution);
-  }, []);
-
-  const handleDeleteBySolution = useCallback(async () => {
-    if (!selectedSolution) {
+  const handleDeleteByEvent = useCallback(async () => {
+    if (!selectedEvent) {
       setSnackbar({
         open: true,
-        message: "Please select a solution to delete",
+        message: "Please select an event to delete",
         severity: "error",
       });
       return;
     }
 
     try {
-      const res = await fetch(`${backendURL}/api/deleteSolutionsByType`, {
+      const res = await fetch(`${backendURL}/api/handleDeleteByEvent`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ selectedSolution }),
+        body: JSON.stringify({ eventTitle: selectedEvent }),
       });
 
       if (!res.ok) {
-        throw new Error("Failed to delete solutions");
+        throw new Error("Failed to delete registrations");
       }
 
       setSnackbar({
         open: true,
-        message: `Deleted all entries for ${selectedSolution}`,
+        message: `Deleted all registrations for ${selectedEvent}`,
         severity: "success",
       });
 
-      setSelectedSolution("");
+      setSelectedEvent("");
       setShowDeleteModal(false);
-      fetchSolutions(0);
+      fetchRegistrations(0);
+      fetchAllEvents(); // Refresh the events list after deletion
     } catch (error) {
-      console.error("Error deleting solutions:", error);
+      console.error("Error deleting registrations:", error);
       setSnackbar({
         open: true,
-        message: "Failed to delete solutions",
+        message: "Failed to delete registrations",
         severity: "error",
       });
     }
-  }, [selectedSolution, fetchSolutions]);
+  }, [selectedEvent, fetchRegistrations, fetchAllEvents]);
 
   const handleCloseSnackbar = useCallback((event, reason) => {
     if (reason === "clickaway") return;
@@ -188,30 +218,27 @@ export default function RegisteredSolutionsList() {
     <div className="flex flex-col w-full h-full mid:mt-20">
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 p-3">
         <div className="flex items-center gap-4 mb-4 md:mb-0">
-          <h1 className="text-2xl font-semibold">Registered Solutions</h1>
-          <StatsDisplay
-            totalSolutions={totalSolutions}
-            lastMonthSolutions={lastMonthSolutions}
-          />
+          <h1 className="text-2xl font-semibold">Event Registrations</h1>
+          <StatsDisplay totalRegistrations={totalRegistrations} />
         </div>
         <div className="flex gap-2">
           <Dropdown
             style={{ color: "black" }}
-            label={selectedSolution || "Filter by Solution"}
+            label={selectedEvent || "Filter by Event"}
           >
             <Dropdown.Item
               onClick={() => handleFilter("")}
               style={{ color: "black" }}
             >
-              All Solutions
+              All Events
             </Dropdown.Item>
-            {availableSolutions.map((solution) => (
+            {allEvents.map((event) => (
               <Dropdown.Item
-                key={solution}
-                onClick={() => handleFilter(solution)}
+                key={event}
+                onClick={() => handleFilter(event)}
                 style={{ color: "black" }}
               >
-                {solution}
+                {event}
               </Dropdown.Item>
             ))}
           </Dropdown>
@@ -230,25 +257,28 @@ export default function RegisteredSolutionsList() {
 
       <div className="flex-grow overflow-x-auto">
         <div className="h-full overflow-y-auto">
-          {solutions.length > 0 ? (
+          {registrations.length > 0 ? (
             <Table hoverable className="shadow-md">
               <Table.Head>
                 <Table.HeadCell>Full Name</Table.HeadCell>
-                <Table.HeadCell>Phone Number</Table.HeadCell>
                 <Table.HeadCell>Email</Table.HeadCell>
-                <Table.HeadCell>Employment Status</Table.HeadCell>
-                <Table.HeadCell>Job Title</Table.HeadCell>
-                <Table.HeadCell>Selected Solution</Table.HeadCell>
-                <Table.HeadCell>Submitted At</Table.HeadCell>
+                <Table.HeadCell>Company</Table.HeadCell>
+                <Table.HeadCell>Reason</Table.HeadCell>
+                <Table.HeadCell>Event Title</Table.HeadCell>
+                <Table.HeadCell>Event Category</Table.HeadCell>
+                <Table.HeadCell>Registered Date/Time</Table.HeadCell>
               </Table.Head>
               <Table.Body className="divide-y">
-                {solutions.map((solution) => (
-                  <SolutionTableRow key={solution._id} solution={solution} />
+                {registrations.map((registration) => (
+                  <EventTableRow
+                    key={registration._id}
+                    registration={registration}
+                  />
                 ))}
               </Table.Body>
             </Table>
           ) : (
-            <p className="text-center py-4">No registered solutions found!</p>
+            <p className="text-center py-4">No event registrations found!</p>
           )}
         </div>
       </div>
@@ -273,9 +303,9 @@ export default function RegisteredSolutionsList() {
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-              Are you sure you want to delete all entries for{" "}
+              Are you sure you want to delete all registrations for{" "}
               <span className="font-bold">
-                {selectedSolution || "the selected solution"}?
+                {selectedEvent || "the selected event"}?
               </span>
             </p>
           </DialogContentText>
@@ -288,7 +318,7 @@ export default function RegisteredSolutionsList() {
             <IoClose size={24} />
           </Button>
           <Button
-            onClick={handleDeleteBySolution}
+            onClick={handleDeleteByEvent}
             className="text-red-500 hover:text-red-700"
           >
             <AiTwotoneDelete size={24} />

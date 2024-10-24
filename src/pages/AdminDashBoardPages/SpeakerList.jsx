@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Table, Button } from "flowbite-react";
 import { toast } from "react-toastify";
@@ -11,6 +11,7 @@ import { IoClose } from "react-icons/io5";
 import { AiTwotoneDelete } from "react-icons/ai";
 import { BiMessageSquareAdd } from "react-icons/bi";
 import { HiOutlineUserCircle } from "react-icons/hi";
+import { CircularProgress } from "@mui/material";
 import axios from "axios";
 
 const backendURL =
@@ -24,6 +25,7 @@ const SpeakerList = () => {
   const [showMore, setShowMore] = useState(true);
   const [speakerIdToDelete, setSpeakerIdToDelete] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const openDeleteModal = (speakerId) => {
     setSpeakerIdToDelete(speakerId);
@@ -39,7 +41,8 @@ const SpeakerList = () => {
     fetchSpeakers();
   }, []);
 
-  const fetchSpeakers = async (startIndex = 0) => {
+  const fetchSpeakers = useCallback(async (startIndex = 0) => {
+    setLoading(true);
     try {
       const res = await axios.get(
         `${backendURL}/api/getAllSpeakers?startIndex=${startIndex}&limit=9`
@@ -53,8 +56,10 @@ const SpeakerList = () => {
     } catch (error) {
       console.error("Error fetching speakers:", error);
       toast.error("Failed to fetch speakers");
+    } finally {
+      setLoading(false);
     }
-  };
+  });
 
   const handleShowMore = () => {
     const startIndex = speakers.length;
@@ -77,9 +82,22 @@ const SpeakerList = () => {
     }
   };
 
+  const LoadingSpinner = useMemo(
+    () => (
+      <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+        <CircularProgress size={40} className="text-btColour" />
+      </div>
+    ),
+    []
+  );
+
+  if (loading) {
+    return LoadingSpinner;
+  }
+
   return (
     <>
-      <div className="my-5 ml-3">
+      <div className="my-5 ml-3 mid:mt-20">
         <Link to="/DashBoard/Admin/CreateSpeaker">
           <button className="text-btColour border border-btColour p-1 rounded-lg hover:font-semibold">
             <span className="flex whitespace-nowrap">
@@ -136,14 +154,14 @@ const SpeakerList = () => {
                     <Table.Cell>
                       <span
                         onClick={() => openDeleteModal(speaker._id)}
-                        className="font-medium text-white hover:text-red-500 hover:bg-transparent hover:border hover:border-red-500 cursor-pointer bg-btColour p-1 rounded-md"
+                        className="font-medium text-red-500 bg-transparent border border-red-500 cursor-pointer hover:bg-btColour hover:text-white p-1 rounded-md "
                       >
                         Delete
                       </span>
                     </Table.Cell>
                     <Table.Cell>
                       <Link
-                        className="font-medium text-white hover:text-btColour hover:bg-transparent hover:border hover:border-btColour cursor-pointer bg-btColour p-1 rounded-md"
+                        className="font-medium text-white hover:text-btColour hover:bg-transparent hover:border hover:border-btColour bg-btColour p-1 rounded-md transition-all duration-300 px-2"
                         to={`/DashBoard/Admin/CreateSpeaker/${speaker._id}`}
                       >
                         <span>Edit</span>
