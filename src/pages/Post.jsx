@@ -494,7 +494,7 @@ export default function Post() {
       setPost(data);
       setPostId(data._id);
       setLikesCount(data.likes.length || 0);
-      setIsLiked(data.likes.includes(userInfo.userId));
+      setIsLiked(data.likes.includes(userInfo?.userId));
 
       // Cache the post data
       localStorage.setItem(`post_${slug}`, JSON.stringify(data));
@@ -503,7 +503,7 @@ export default function Post() {
     } finally {
       setLoading(false);
     }
-  }, [slug, userInfo.userId]);
+  }, [slug, userInfo?.userId]);
 
   // Cache management with localStorage
   useEffect(() => {
@@ -513,11 +513,11 @@ export default function Post() {
       setPost(parsedPost);
       setPostId(parsedPost._id);
       setLikesCount(parsedPost.likes.length || 0);
-      setIsLiked(parsedPost.likes.includes(userInfo.userId));
+      setIsLiked(parsedPost.likes.includes(userInfo?.userId));
     }
 
     fetchPost();
-  }, [slug, userInfo.userId]);
+  }, [slug, userInfo?.userId]);
 
   const handleShare = React.memo((platform) => {
     if (!post) {
@@ -549,33 +549,6 @@ export default function Post() {
     window.open(shareUrl, "_blank");
   });
 
-  // const handleLike = async () => {
-  //   try {
-  //     const response = await fetch(`${backendURL}/api/likePost/${postId}`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ userId: currentUser.userInfo?._id }),
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error("Failed to like post");
-  //     }
-
-  //     const data = await response.json();
-  //     setLikesCount(data.likesCount);
-  //     setIsLiked(data.isLiked);
-  //     setSnackbarMessage(data.message);
-  //     setSnackbarSeverity("success");
-  //     setSnackbarOpen(true);
-  //   } catch (error) {
-  //     console.error("Error liking post:", error);
-  //     setSnackbarMessage("Failed to like post.");
-  //     setSnackbarSeverity("error");
-  //     setSnackbarOpen(true);
-  //   }
-  // };
   const handleLike = useCallback(async () => {
     if (!postId || !currentUser?.userInfo?._id) return;
 
@@ -584,7 +557,7 @@ export default function Post() {
       const response = await fetch(`${backendURL}/api/likePost/${postId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: currentUser.userInfo._id }),
+        body: JSON.stringify({ userId: currentUser?.userInfo?._id }),
       });
 
       if (!response.ok) throw new Error("Failed to like post");
