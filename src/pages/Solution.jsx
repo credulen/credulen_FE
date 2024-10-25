@@ -61,8 +61,9 @@
 
 // // export default Solutions;
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { CircularProgress } from "@mui/material";
 
 const backendURL =
   import.meta.env.MODE === "production"
@@ -161,8 +162,17 @@ const Solutions = () => {
     }
   };
 
+  const LoadingSpinner = useMemo(
+    () => (
+      <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+        <CircularProgress size={40} className="text-btColour" />
+      </div>
+    ),
+    []
+  );
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return LoadingSpinner;
   }
 
   if (error) {
