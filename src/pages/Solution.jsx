@@ -61,7 +61,7 @@
 
 // // export default Solutions;
 
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { CircularProgress } from "@mui/material";
 
@@ -70,15 +70,10 @@ const backendURL =
     ? import.meta.env.VITE_BACKEND_URL
     : "http://localhost:3001";
 
-const stripHtmlTags = (content) => {
-  return content.replace(/<\/?[^>]+(>|$)/g, "");
-};
+const stripHtmlTags = (content) => content.replace(/<\/?[^>]+(>|$)/g, "");
 
 function truncateText(text, maxLength) {
-  if (text.length > maxLength) {
-    return text.slice(0, maxLength) + "...";
-  }
-  return text;
+  return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 }
 
 const SolutionCard = ({ event }) => (
@@ -98,15 +93,15 @@ const SolutionCard = ({ event }) => (
       </p>
       <Link
         to={`/SolutionForm/${event.slug}`}
-        className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-teal-700 bt rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors duration-300 mt-auto self-start hover:text-bg-teal-700 hover:bg-transparent hover:text-teal-700 hover:border-teal-700 hover:border-bg-teal-700 hover:border-2 hover:font-semibold"
+        className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-teal-700 rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors duration-300 mt-auto self-start hover:bg-transparent hover:text-teal-700 hover:border-teal-700 hover:border-2 hover:font-semibold"
       >
         Register Interest
         <svg
           className="w-3.5 h-3.5 ms-2"
-          aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 14 10"
+          aria-hidden="true"
         >
           <path
             stroke="currentColor"
@@ -142,7 +137,6 @@ const Solutions = () => {
       }
       const data = await response.json();
 
-      // Filter solutions by category
       const trainingSchool = data.solutions.filter(
         (solution) => solution.category === "TrainingSchool"
       );
@@ -155,7 +149,6 @@ const Solutions = () => {
         ConsultingService: consultingService,
       });
     } catch (error) {
-      console.error("Error fetching solutions:", error);
       setError(error.message);
     } finally {
       setIsLoading(false);
@@ -193,14 +186,19 @@ const Solutions = () => {
       <div className="pb-12">
         <h2 className="text-xl font-medium">Training School</h2>
         <p className="mb-10">
-          Data Science & Engineering for Professionals: "Our comprehensive
-          training programs provide professionals with the skills needed to
-          excel in data science and engineering. Learn from industry experts and
-          gain practical experience through hands-on projects. " Using
-          Generative AI to Supercharge Productivity: "Discover how to leverage
-          Generative AI to enhance your productivity as an individual or
-          organization. Our training covers the latest AI tools and techniques
-          to help you stay ahead of the curve.
+          <span className="font-medium mr-1">
+            Data Science & Engineering for Professionals:
+          </span>
+          Our comprehensive training programs provide professionals with the
+          skills needed to excel in data science and engineering. Learn from
+          industry experts and gain practical experience through hands-on
+          projects. <br />
+          <span className="font-medium mr-1">
+            Using Generative AI to Supercharge Productivity:
+          </span>
+          Discover how to leverage Generative AI to enhance your productivity as
+          an individual or organization. Our training covers the latest AI tools
+          and techniques to help you stay ahead of the curve.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {solutions.TrainingSchool.length > 0 ? (
@@ -216,11 +214,13 @@ const Solutions = () => {
       <div className="mt-24">
         <h2 className="text-xl font-medium">Consulting Services</h2>
         <p className="mb-10">
-          Data, Blockchain & AI Integration and Strategy: "We offer expert
-          consulting to help organizations integrate data, blockchain, and AI
-          technologies seamlessly. Our strategic guidance ensures that your
-          technology investments drive maximum value creation and business
-          growth.
+          <span className="font-medium mr-1">
+            Data, Blockchain & AI Integration and Strategy:
+          </span>
+          We offer expert consulting to help organizations integrate data,
+          blockchain, and AI technologies seamlessly. Our strategic guidance
+          ensures that your technology investments drive maximum value creation
+          and business growth.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {solutions.ConsultingService.length > 0 ? (

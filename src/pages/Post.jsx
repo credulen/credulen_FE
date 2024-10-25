@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Snackbar, Alert, Grid } from "@mui/material";
@@ -30,7 +36,8 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-
+import { ChevronRight, Calendar, Eye, ArrowRight } from "lucide-react";
+import { CircularProgress } from "@mui/material";
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import {
   ThumbUp,
@@ -97,9 +104,9 @@ export const RelatedPosts = ({ category, currentPostId }) => {
 
   return (
     <Box className="mt-8 w-full">
-      <Typography variant="h5" className="mb-4">
+      <h3 variant="h5" className="mb-4 font-semibold text-xl text-btColour">
         Related Posts
-      </Typography>
+      </h3>
       <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4 minilg:grid-cols-1">
         {relatedPosts.map((post) => (
           <Card
@@ -110,7 +117,7 @@ export const RelatedPosts = ({ category, currentPostId }) => {
           >
             <CardContent className="flex-grow p-4">
               <Typography
-                className="font-semibold mb-2 hover:text-blue-600 transition-colors duration-300"
+                className="font-semibold mb-2 hover:text-btColour hover:scale-105 transition-all duration-300 ease-in"
                 variant="h6"
               >
                 {post.title}
@@ -119,8 +126,9 @@ export const RelatedPosts = ({ category, currentPostId }) => {
                 <Avatar
                   src={`${backendURL}${post.authorId.image}`}
                   alt={post.authorId.name}
-                  className="w-5 h-5 mr-2"
+                  sx={{ width: 24, height: 24, mr: 1 }} // 3rem size adjustment
                 />
+
                 <Typography variant="body2" className="text-gray-600">
                   {post.authorId.name}
                 </Typography>
@@ -398,10 +406,22 @@ export default function Post() {
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const { profile } = useSelector((state) => state.profiles);
   const currentUser = useSelector((state) => state.auth);
-  const userId = currentUser?.userInfo?.user?._id;
-  const email = currentUser?.userInfo?.user?.email;
-  const name = profile?.username;
-  const image = profile?.image;
+  const userId = useMemo(
+    () => currentUser?.userInfo?._id,
+    [currentUser?.userInfo?._id]
+  );
+
+  const email = useMemo(
+    () => currentUser?.userInfo?.email,
+    [currentUser?.userInfo?.email]
+  );
+
+  const name = useMemo(() => profile?.username, [profile?.username]);
+
+  const image = useMemo(() => profile?.image, [profile?.image]);
+
+  const { userInfo } = useSelector((state) => state.auth);
+
   const [likesCount, setLikesCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
 
@@ -432,29 +452,74 @@ export default function Post() {
     setShowAllComments(!showAllComments);
   };
 
+  const LoadingSpinner = React.memo(() => (
+    <div className="fixed inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm z-50">
+      <div className="flex flex-col items-center">
+        <CircularProgress size={40} className="text-btColour" />
+        <Typography variant="body2" sx={{ mt: 2, color: "text.secondary" }}>
+          Loading content...
+        </Typography>
+      </div>
+    </div>
+  ));
+
+  // useEffect(() => {
+  //   const fetchPost = async () => {
+  //     try {
+  //       const response = await fetch(`${backendURL}/api/getPostBySlug/${slug}`);
+  //       if (!response.ok) {
+  //         throw new Error("Failed to fetch post");
+  //       }
+  //       const data = await response.json();
+  //       setPost(data);
+  //       setPostId(data._id);
+  //       setLikesCount(data.likes.length || 0);
+  //       setIsLiked(data.likes.includes(userId));
+  //     } catch (err) {
+  //       setError(err.message);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchPost();
+  // }, [slug]);
+  const fetchPost = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${backendURL}/api/getPostBySlug/${slug}`);
+      if (!response.ok) throw new Error("Failed to fetch post");
+
+      const data = await response.json();
+      setPost(data);
+      setPostId(data._id);
+      setLikesCount(data.likes.length || 0);
+      setIsLiked(data.likes.includes(userInfo.userId));
+
+      // Cache the post data
+      localStorage.setItem(`post_${slug}`, JSON.stringify(data));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [slug, userInfo.userId]);
+
+  // Cache management with localStorage
   useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const response = await fetch(`${backendURL}/api/getPostBySlug/${slug}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch post");
-        }
-        const data = await response.json();
-        setPost(data);
-        setPostId(data._id);
-        setLikesCount(data.likes.length || 0);
-        setIsLiked(data.likes.includes(userId));
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+    const cachedPost = localStorage.getItem(`post_${slug}`);
+    if (cachedPost) {
+      const parsedPost = JSON.parse(cachedPost);
+      setPost(parsedPost);
+      setPostId(parsedPost._id);
+      setLikesCount(parsedPost.likes.length || 0);
+      setIsLiked(parsedPost.likes.includes(userInfo.userId));
+    }
 
     fetchPost();
-  }, [slug]);
+  }, [slug, userInfo.userId]);
 
-  const handleShare = (platform) => {
+  const handleShare = React.memo((platform) => {
     if (!post) {
       console.error("Post data is not available");
       return;
@@ -482,21 +547,47 @@ export default function Post() {
     }
 
     window.open(shareUrl, "_blank");
-  };
+  });
 
-  const handleLike = async () => {
+  // const handleLike = async () => {
+  //   try {
+  //     const response = await fetch(`${backendURL}/api/likePost/${postId}`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ userId: currentUser.userInfo?._id }),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error("Failed to like post");
+  //     }
+
+  //     const data = await response.json();
+  //     setLikesCount(data.likesCount);
+  //     setIsLiked(data.isLiked);
+  //     setSnackbarMessage(data.message);
+  //     setSnackbarSeverity("success");
+  //     setSnackbarOpen(true);
+  //   } catch (error) {
+  //     console.error("Error liking post:", error);
+  //     setSnackbarMessage("Failed to like post.");
+  //     setSnackbarSeverity("error");
+  //     setSnackbarOpen(true);
+  //   }
+  // };
+  const handleLike = useCallback(async () => {
+    if (!postId || !currentUser?.userInfo?._id) return;
+
     try {
+      setLoading(true);
       const response = await fetch(`${backendURL}/api/likePost/${postId}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId: currentUser.userInfo.user._id }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: currentUser.userInfo._id }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to like post");
-      }
+      if (!response.ok) throw new Error("Failed to like post");
 
       const data = await response.json();
       setLikesCount(data.likesCount);
@@ -508,9 +599,10 @@ export default function Post() {
       console.error("Error liking post:", error);
       setSnackbarMessage("Failed to like post.");
       setSnackbarSeverity("error");
-      setSnackbarOpen(true);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [postId, currentUser?.userInfo?._id]);
 
   const handleCommentSubmit = async (newComment) => {
     try {
@@ -534,6 +626,7 @@ export default function Post() {
 
       const newCommentObj = await response.json();
 
+      // Create the complete comment object with user data
       const commentWithUserData = {
         ...newCommentObj,
         userId: {
@@ -541,14 +634,23 @@ export default function Post() {
           username: name,
           image: image,
         },
+        likes: [], // Initialize empty likes array
+        likeCount: 0,
       };
 
-      setComments([...comments, commentWithUserData]);
+      // Update both comments and displayedComments states
+      setComments((prevComments) => [...prevComments, commentWithUserData]);
+      setDisplayedComments((prevDisplayed) => {
+        // Only add to displayed comments if we haven't reached the page limit
+        if (prevDisplayed.length < currentPage * commentsPerPage) {
+          return [...prevDisplayed, commentWithUserData];
+        }
+        return prevDisplayed;
+      });
 
       setSnackbarMessage("Comment submitted successfully!");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
-      fetchPostComments(postId);
     } catch (error) {
       console.error("Error submitting comment:", error);
       setSnackbarMessage("Failed to submit comment.");
@@ -616,48 +718,6 @@ export default function Post() {
     setCurrentPage(nextPage);
   };
 
-  // const handleCommentEdit = async (commentId, newContent) => {
-  //   try {
-  //     const response = await fetch(
-  //       `${backendURL}/api/editComment/${commentId}`,
-  //       {
-  //         method: "PUT",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ content: newContent }),
-  //       }
-  //     );
-
-  //     if (!response.ok) {
-  //       throw new Error("Failed to edit comment");
-  //     }
-
-  //     const updatedComment = await response.json();
-
-  //     setComments(
-  //       comments.map((comment) =>
-  //         comment._id === commentId ? updatedComment : comment
-  //       )
-  //     );
-
-  //     setEditingCommentId(null);
-  //     setEditedCommentContent("");
-
-  //     // Trigger success Snackbar
-  //     setSnackbarMessage("Comment edited successfully!");
-  //     setSnackbarSeverity("success");
-  //     setSnackbarOpen(true);
-  //   } catch (error) {
-  //     console.error("Error editing comment:", error);
-
-  //     // Trigger error Snackbar
-  //     setSnackbarMessage("Failed to edit comment.");
-  //     setSnackbarSeverity("error");
-  //     setSnackbarOpen(true);
-  //   }
-  // };
-
   const handleCommentEdit = async (commentId, newContent) => {
     try {
       const response = await fetch(
@@ -706,6 +766,7 @@ export default function Post() {
       setSnackbarOpen(true);
     }
   };
+
   const handleCommentDelete = async (commentId) => {
     try {
       const response = await fetch(
@@ -720,17 +781,24 @@ export default function Post() {
         throw new Error("Failed to delete comment");
       }
 
-      setComments(comments.filter((comment) => comment._id !== commentId));
+      // Update both comments and displayedComments states
+      setComments((prevComments) =>
+        prevComments.filter((comment) => comment._id !== commentId)
+      );
+      setDisplayedComments((prevDisplayed) =>
+        prevDisplayed.filter((comment) => comment._id !== commentId)
+      );
 
-      // Trigger success Snackbar
+      // Update currentPage if necessary
+      if (displayedComments.length === 1 && currentPage > 1) {
+        setCurrentPage((prev) => prev - 1);
+      }
+
       setSnackbarMessage("Comment deleted successfully!");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
-      fetchPostComments(postId);
     } catch (error) {
       console.error("Error deleting comment:", error);
-
-      // Trigger error Snackbar
       setSnackbarMessage("Failed to delete comment.");
       setSnackbarSeverity("error");
       setSnackbarOpen(true);
@@ -781,7 +849,7 @@ export default function Post() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId: currentUser.userInfo.user._id }),
+        body: JSON.stringify({ userId: currentUser.userInfo?._id }),
       });
 
       if (!response.ok) {
@@ -829,35 +897,94 @@ export default function Post() {
     }
   };
 
-  if (loading) return <Typography>Loading...</Typography>;
+  // if (loading) return <Typography>Loading...</Typography>;
+  // if (error) return <Typography color="error">{error}</Typography>;
+  // if (!post) return <Typography>Post not found</Typography>;
+  // console.log(post, "post details");
+  // Loading states
+  if (loading) return <LoadingSpinner />;
   if (error) return <Typography color="error">{error}</Typography>;
   if (!post) return <Typography>Post not found</Typography>;
-  console.log(post, "post details");
 
   return (
     <Grid container spacing={3} sx={{ px: { xs: 2, md: 4 }, py: 11.5 }}>
+      {/* Hero Section (keeping the same as before) */}
+      <div className="relative h-[90vh] w-full">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${backendURL}${post.image})`,
+          }}
+        >
+          <div className="absolute inset-0 bg-black/50" />
+        </div>
+
+        <div className="relative h-full flex flex-col justify-end pb-16 px-4 md:px-8 lg:px-16">
+          <div className="mb-4">
+            <a
+              href="/society"
+              className="inline-block bg-red-600 text-white text-sm px-4 py-1 rounded-sm hover:bg-red-700 transition-colors"
+              style={{
+                opacity: 0.8,
+              }}
+            >
+              {post.category}
+            </a>
+          </div>
+
+          <h1
+            className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 max-w-4xl"
+            style={{
+              opacity: 0.1,
+            }}
+          >
+            {post.title}
+          </h1>
+
+          <div className="flex flex-wrap items-center gap-4 text-sm md:text-base text-gray-300">
+            <div
+              style={{
+                opacity: 0.1,
+              }}
+              className="flex items-center"
+            >
+              <a
+                href="#"
+                className="text-white hover:text-gray-300 flex items-center"
+              >
+                <Avatar
+                  src={`${backendURL}${post?.authorId?.image}`}
+                  alt={"post image"}
+                  sx={{ width: 30, height: 30 }}
+                >
+                  {/* `${backendURL}${post.authorId.image}` */}
+                  {!post?.authorId?.image && <ImageIcon />}
+                </Avatar>
+                <span className="ml-2">{post.authorId.name}</span>
+              </a>
+            </div>
+
+            <div
+              style={{
+                opacity: 0.1,
+              }}
+              className="flex items-center"
+            >
+              <Calendar className="w-4 h-4 mr-2" />
+              <span>{moment(post.createdAt).format("MMMM D, YYYY")}</span>
+            </div>
+            <div
+              style={{
+                opacity: 0.1,
+              }}
+              className="flex items-center"
+            ></div>
+          </div>
+        </div>
+      </div>
+
       <Grid item xs={12} md={8}>
         <Box sx={{ maxWidth: "100%", margin: "auto" }}>
-          {post.image && (
-            <Box
-              component="img"
-              src={`${backendURL}${post.image}`}
-              alt="Post image"
-              sx={{
-                width: "100%",
-                height: {
-                  xs: "60vw",
-                  sm: "50vw",
-                  md: "35vw",
-                  lg: "35vw",
-                },
-                borderRadius: "4px",
-                marginBottom: "1rem",
-                objectFit: "cover",
-              }}
-            />
-          )}
-
           <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
             <Avatar
               src={
@@ -886,9 +1013,14 @@ export default function Post() {
             </Typography>
           </Box>
 
-          <Typography variant="h4" gutterBottom>
+          <h1
+            className="text-3xl md:text-4xl lg:text-4xl font-semibold text-[#1e293b] mb-6 max-w-4xl"
+            style={{
+              opacity: 0.9,
+            }}
+          >
             {post.title}
-          </Typography>
+          </h1>
 
           <Box
             sx={{
@@ -1029,10 +1161,9 @@ export default function Post() {
                       </Box>
 
                       {/* MoreVert icon button aligned to the right */}
-                      {currentUser?.userInfo?.user &&
-                        (currentUser.userInfo.user._id ===
-                          comment.userId?._id ||
-                          currentUser.userInfo.user.isAdmin) && (
+                      {currentUser?.userInfo &&
+                        (currentUser.userInfo._id === comment.userId?._id ||
+                          currentUser.userInfo?.isAdmin) && (
                           <IconButton
                             size="small"
                             onClick={(event) =>
