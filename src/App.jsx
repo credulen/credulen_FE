@@ -9,6 +9,7 @@ import Contact from "./pages/Contactus";
 import RegisterAdmin from "../src/pages/RegisterAdmin";
 import Signup from "../src/pages/RegisterUser";
 import ForgotPassword from "../src/pages/ForgotPassword";
+import PageNotFound from "../src/components/tools/PageNotFound";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -52,6 +53,8 @@ const AppContent = () => {
       {!isDashboardRoute && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="*" element={<PageNotFound />} />
+
         <Route path="/Post/:slug" element={<Post />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/event/:slug" element={<SingleEventPost />} />

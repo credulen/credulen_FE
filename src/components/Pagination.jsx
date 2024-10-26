@@ -95,7 +95,6 @@
 // };
 
 // export default Pagination;
-
 import React from "react";
 import { Box, Button } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
@@ -112,7 +111,11 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
       <Button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        sx={{ minWidth: "40px", p: 0 }}
+        sx={{
+          minWidth: "40px",
+          p: 0,
+          color: currentPage === 1 ? "grey" : "inherit",
+        }}
       >
         <ArrowBackIosNewIcon fontSize="small" />
       </Button>
@@ -123,12 +126,11 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
           sx={{
             mx: 0.5,
             minWidth: "40px",
-            backgroundColor:
-              currentPage === number ? "primary.main" : "transparent",
+            backgroundColor: currentPage === number ? "#2b4b5e" : "transparent",
             color: currentPage === number ? "white" : "inherit",
             "&:hover": {
               backgroundColor:
-                currentPage === number ? "primary.dark" : "rgba(0, 0, 0, 0.04)",
+                currentPage === number ? "#2b4b5e" : "rgba(0, 0, 0, 0.04)",
             },
           }}
         >
@@ -138,7 +140,11 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
       <Button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        sx={{ minWidth: "40px", p: 0 }}
+        sx={{
+          minWidth: "40px",
+          p: 0,
+          color: currentPage === totalPages ? "grey" : "inherit",
+        }}
       >
         <ArrowForwardIosIcon fontSize="small" />
       </Button>

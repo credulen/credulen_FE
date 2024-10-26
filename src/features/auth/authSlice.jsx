@@ -204,6 +204,9 @@ const authSlice = createSlice({
     resetSuccess: (state) => {
       state.success = false;
     },
+    resetError: (state) => {
+      state.error = null; // Reset the error to null
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -276,15 +279,28 @@ const authSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.userInfo = action.payload;
       })
       .addCase(registerUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(registerAdmin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerAdmin.fulfilled, (state) => {
+        state.loading = false;
+        state.success = true;
+        // Remove setting userInfo on registration
+      })
+      .addCase(registerAdmin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
   },
 });
 
-export const { logoutUser, setCredentials, resetSuccess } = authSlice.actions;
+export const { logoutUser, setCredentials, resetSuccess, resetError } =
+  authSlice.actions;
 
 export default authSlice.reducer;

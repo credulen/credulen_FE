@@ -249,6 +249,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { logoutUser } from "../features/auth/authSlice";
 import { verifyAdminOTP, loginUser } from "../features/auth/authActions";
+import { resetSuccess, resetError } from "../features/auth/authSlice";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
@@ -276,11 +277,15 @@ const Login = () => {
 
   useEffect(() => {
     if (userInfo && !isOtpRequired) {
-      if (userInfo.role === "admin") {
-        navigate("/DashBoard/Admin_Dashboard");
-      } else {
-        navigate("/dashboard");
-      }
+      const timer = setTimeout(() => {
+        if (userInfo.role === "admin") {
+          navigate("/DashBoard/Admin_Dashboard");
+        } else {
+          navigate("/");
+        }
+      }, 2000);
+
+      return () => clearTimeout(timer);
     }
   }, [userInfo, isOtpRequired, navigate]);
 
@@ -293,12 +298,14 @@ const Login = () => {
       } else {
         setSnackbarMessage("Login successful!");
         setSnackbarSeverity("success");
+        dispatch(resetSuccess());
       }
       setOpenSnackbar(true);
     } catch (err) {
       setSnackbarMessage(err || "Login failed");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
+      dispatch(resetError());
     }
   };
   const handleOtpSubmit = (otp) => {
@@ -306,6 +313,7 @@ const Login = () => {
       setSnackbarMessage("User ID not found. Please try logging in again.");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
+      dispatch(resetError());
       return;
     }
 
@@ -316,6 +324,7 @@ const Login = () => {
         setSnackbarMessage("OTP verified successfully!");
         setSnackbarSeverity("success");
         setOpenSnackbar(true);
+        dispatch(resetSuccess());
       })
       .catch((error) => {
         console.error("OTP verification failed:", error);

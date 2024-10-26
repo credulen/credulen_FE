@@ -248,9 +248,25 @@ export default function CreatePosts() {
             fullWidth
           >
             <MenuItem value="uncategorized">Select a category</MenuItem>
-            <MenuItem value="javascript">JavaScript</MenuItem>
-            <MenuItem value="reactjs">React.js</MenuItem>
-            <MenuItem value="nextjs">Next.js</MenuItem>
+            <MenuItem value="Web3-&-Blockchain-Education">
+              Web3 & Blockchain Education
+            </MenuItem>
+
+            <MenuItem value="Web3 & Blockchain Trends">
+              Web3 & Blockchain Trends
+            </MenuItem>
+
+            <MenuItem value="Web3 & Blockchain Trends">
+              Web3 & Blockchain Trends
+            </MenuItem>
+
+            <MenuItem value="Big Data & A.I Trends">
+              Big Data & A.I Trends
+            </MenuItem>
+            <MenuItem value="Big Data & A.I Education">
+              Big Data & A.I Education
+            </MenuItem>
+            <MenuItem value="Data in Web3/DeFi">Data in Web3/DeFi</MenuItem>
           </TextField>
           <FormControl fullWidth>
             <InputLabel id="author-select-label">Author</InputLabel>

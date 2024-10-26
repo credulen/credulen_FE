@@ -61,7 +61,7 @@
 
 // // export default Solutions;
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { CircularProgress } from "@mui/material";
 
@@ -124,11 +124,7 @@ const Solutions = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchSolutions();
-  }, []);
-
-  const fetchSolutions = async () => {
+  const fetchSolutions = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await fetch(`${backendURL}/api/getAllSolutions`);
@@ -153,7 +149,11 @@ const Solutions = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [backendURL]);
+
+  useEffect(() => {
+    fetchSolutions();
+  }, [fetchSolutions]);
 
   const LoadingSpinner = useMemo(
     () => (

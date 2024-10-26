@@ -381,7 +381,7 @@
 //   );
 // };
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import NewsletterSignup from "../components/tools/NewsletterSignup";
 import { motion, AnimatePresence } from "framer-motion";
@@ -418,22 +418,7 @@ const IntelligentHomepage = () => {
   const [pastEvents, setPastEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) =>
-        prevIndex === heroImages.length - 1 ? 0 : prevIndex + 1
-      );
-    }, 10000); // Change image every 10 seconds
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    fetchPosts();
-    fetchWebinars();
-  }, []);
-
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await fetch(`${backendURL}/api/getPosts`);
@@ -449,9 +434,9 @@ const IntelligentHomepage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const fetchWebinars = async () => {
+  const fetchWebinars = useCallback(async () => {
     try {
       const response = await fetch(`${backendURL}/api/getEvents`);
       const data = await response.json();
@@ -468,14 +453,36 @@ const IntelligentHomepage = () => {
         (event) => new Date(event.date) <= currentDate
       );
 
-      setUpcomingEvents(upcoming);
-      setPastEvents(past);
+      setUpcomingEvents(upcoming.slice(0, 5));
+      setPastEvents(past.slice(0, 5));
     } catch (error) {
       console.error("Error fetching webinars:", error);
       setUpcomingEvents([]);
       setPastEvents([]);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchPosts();
+    fetchWebinars();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) =>
+        prevIndex === heroImages.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 10000); // Change image every 10 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const memoizedPosts = useMemo(() => posts, [posts]);
+  const memoizedUpcomingEvents = useMemo(
+    () => upcomingEvents,
+    [upcomingEvents]
+  );
+  const memoizedPastEvents = useMemo(() => pastEvents, [pastEvents]);
 
   return (
     <>
