@@ -255,7 +255,7 @@ export default function AdminUsersLists() {
   const filteredUsers = useMemo(
     () =>
       users.filter((user) =>
-        user.username.toLowerCase().includes(searchTerm.toLowerCase())
+        user?.username?.toLowerCase().includes(searchTerm.toLowerCase())
       ),
     [users, searchTerm]
   );
