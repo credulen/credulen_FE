@@ -210,7 +210,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Login cases
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -218,9 +217,11 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         if (action.payload.requireOTP) {
+          // For admin users requiring OTP
           state.isOtpRequired = true;
           state.tempUserId = action.payload.user._id;
           state.tempAdminData = action.payload.user;
+          // Don't set userInfo or store in localStorage yet
         } else {
           // Regular user login
           state.userInfo = {
@@ -242,6 +243,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
       // OTP verification cases
       .addCase(verifyAdminOTP.pending, (state) => {
         state.loading = true;
@@ -251,19 +253,17 @@ const authSlice = createSlice({
         state.loading = false;
         state.isOtpRequired = false;
 
-        // Create a complete user object with token
         const userWithToken = {
           ...action.payload.user,
           token: action.payload.token,
         };
 
-        // Update state
+        // Only set userInfo and localStorage after successful OTP verification
         state.userInfo = userWithToken;
         state.success = true;
         state.tempAdminData = null;
         state.tempUserId = null;
 
-        // Update localStorage
         localStorage.setItem("userToken", action.payload.token);
         localStorage.setItem("userInfo", JSON.stringify(userWithToken));
       })

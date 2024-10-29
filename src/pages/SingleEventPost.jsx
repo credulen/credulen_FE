@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   Box,
@@ -15,6 +15,7 @@ import {
   Skeleton,
   MenuItem,
   Menu,
+  CircularProgress,
 } from "@mui/material";
 import {
   EventNote,
@@ -42,13 +43,13 @@ const RelatedEventsCarousel = ({ events }) => {
   const scrollRef = useRef(null);
   const navigate = useNavigate();
 
-  const scroll = (scrollOffset) => {
+  const scroll = useCallback((scrollOffset) => {
     if (scrollRef.current) {
       scrollRef.current.scrollLeft += scrollOffset;
     }
-  };
+  }, []);
 
-  const formatDate = (dateString) => {
+  const formatDate = useCallback((dateString) => {
     const date = new Date(dateString);
     return date
       .toLocaleDateString("en-US", {
@@ -63,12 +64,15 @@ const RelatedEventsCarousel = ({ events }) => {
         ];
         return `${day}${suffix}`;
       });
-  };
+  }, []);
 
-  const handleCardClick = (slug) => {
-    navigate(`/event/${slug}`);
-    window.scrollTo(0, 0);
-  };
+  const handleCardClick = useCallback(
+    (slug) => {
+      navigate(`/event/${slug}`);
+      window.scrollTo(0, 0);
+    },
+    [navigate]
+  );
 
   return (
     <Box sx={{ mt: 4 }}>
@@ -111,10 +115,7 @@ const RelatedEventsCarousel = ({ events }) => {
             >
               <CardMedia
                 component="img"
-                sx={{
-                  height: 160,
-                  objectFit: "cover",
-                }}
+                sx={{ height: 160, objectFit: "cover" }}
                 image={`${backendURL}${event.image}`}
                 alt={event.title}
               />
@@ -135,7 +136,11 @@ const RelatedEventsCarousel = ({ events }) => {
                     sx={{ display: "flex", alignItems: "center", mb: 1 }}
                   >
                     <EventNote
-                      sx={{ fontSize: "small", color: "text.secondary", mr: 1 }}
+                      sx={{
+                        fontSize: "small",
+                        color: "text.secondary",
+                        mr: 1,
+                      }}
                     />
                     <Typography variant="body2" color="text.secondary">
                       {formatDate(event.date)}
@@ -147,7 +152,11 @@ const RelatedEventsCarousel = ({ events }) => {
                     sx={{ display: "flex", alignItems: "center" }}
                   >
                     <LocationOn
-                      sx={{ fontSize: "small", color: "text.secondary", mr: 1 }}
+                      sx={{
+                        fontSize: "small",
+                        color: "text.secondary",
+                        mr: 1,
+                      }}
                     />
                     <Typography variant="body2" color="text.secondary" noWrap>
                       {event.venue}
@@ -325,7 +334,7 @@ const ShareFeature = ({ post }) => {
     </Box>
   );
 };
-
+// Define components before using them
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
@@ -337,7 +346,7 @@ const Modal = ({ isOpen, onClose, children }) => {
           className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
           aria-label="Close"
         >
-          <X size={20} />
+          <X className="w-5 h-5" />
         </button>
         {children}
       </div>
@@ -345,125 +354,137 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
+const LoadingSpinner = () => (
+  <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+    <CircularProgress size={40} className="text-btColour" />
+  </div>
+);
+
 const SingleEventPost = () => {
   const { slug } = useParams();
-  const [eventData, setEventData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [relatedEvents, setRelatedEvents] = useState([]);
-  const [error, setError] = useState(null);
-
   const [email, setEmail] = useState("");
-  const [alertInfo, setAlertInfo] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  const [relatedEvents, setRelatedEvents] = useState([]);
+  const navigate = useNavigate();
+  const [eventData, setEventData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [registrationAlertInfo, setRegistrationAlertInfo] = useState(null);
+  const [subLoading, setSubLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [alertInfo, setAlertInfo] = useState(null);
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     company: "",
     reason: "",
   });
-  const handleInputChange = (e) => {
+
+  console.log(relatedEvents);
+
+  const backendURL =
+    import.meta.env.MODE === "production"
+      ? import.meta.env.VITE_BACKEND_URL
+      : "http://localhost:3001";
+
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setSubLoading(true);
+
+      try {
+        const response = await fetch(`${backendURL}/api/newsletter-signup`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setAlertInfo({
+            message: "Subscription successful!",
+            variant: "success",
+            icon: CheckCircle,
+          });
+          setEmail("");
+        } else {
+          setAlertInfo({
+            message: data.message || "An error occurred. Please try again.",
+            variant: data.message.includes("already subscribed")
+              ? "warning"
+              : "destructive",
+            icon: AlertCircle,
+          });
+          setEmail("");
+        }
+      } catch (error) {
+        setAlertInfo({
+          message: "An error occurred. Please try again.",
+          variant: "destructive",
+          icon: AlertCircle,
+        });
+      } finally {
+        setSubLoading(false);
+      }
+    },
+    [email]
+  );
+
+  const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }, []);
 
-  const handleRegisterSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      const response = await fetch(`${backendURL}/api/register-event`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          eventTitle: eventData.title,
-          slug: eventData.slug,
-          eventCategory: eventData.category || eventData.eventType,
-        }),
-      });
-      const data = await response.json();
+  const handleRegisterSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setSubLoading(true);
 
-      if (response.ok) {
-        setAlertInfo({
-          message: "Registration successful!!",
-          variant: "success",
-          icon: CheckCircle,
+      try {
+        const response = await fetch(`${backendURL}/api/register-event`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...formData,
+            eventTitle: eventData?.title,
+            slug: eventData?.slug,
+            eventCategory: eventData?.category || eventData?.eventType,
+          }),
         });
-        setFormData({ fullName: "", email: "", company: "", reason: "" });
-      } else {
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setAlertInfo({
+            message: "Registration successful!",
+            variant: "success",
+            icon: CheckCircle,
+          });
+          setFormData({ fullName: "", email: "", company: "", reason: "" });
+        } else {
+          setAlertInfo({
+            message: data.message || "Registration failed. Please try again.",
+            variant: "destructive",
+            icon: AlertCircle,
+          });
+        }
+      } catch (error) {
         setAlertInfo({
-          message: data.message || "An error occurred. Please try again.",
-          variant: data.message.includes("already registered for this event")
-            ? "warning"
-            : "destructive",
+          message: "An error occurred. Please try again.",
+          variant: "destructive",
           icon: AlertCircle,
         });
+      } finally {
+        setSubLoading(false);
+        setShowModal(true);
       }
-    } catch (error) {
-      setAlertInfo({
-        message: "An error occurred. Please try again.",
-        variant: "destructive",
-        icon: AlertCircle,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [formData, eventData, backendURL]
+  );
 
-  useEffect(() => {
-    if (alertInfo) {
-      setShowModal(true);
-      const timer = setTimeout(() => {
-        setShowModal(false);
-        setAlertInfo(null);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [alertInfo]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const fetchEventDetails = useCallback(async (slug) => {
     setIsLoading(true);
-    try {
-      const response = await fetch(`${backendURL}/api/newsletter-signup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setAlertInfo({
-          message: "Subscription successful!",
-          variant: "success",
-          icon: CheckCircle,
-        });
-        setEmail("");
-      } else {
-        setAlertInfo({
-          message: data.message || "An error occurred. Please try again.",
-          variant: data.message.includes("already subscribed")
-            ? "warning"
-            : "destructive",
-          icon: AlertCircle,
-        });
-        setEmail("");
-      }
-    } catch (error) {
-      setAlertInfo({
-        message: "An error occurred. Please try again.",
-        variant: "destructive",
-        icon: AlertCircle,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchEventDetails = async (slug) => {
     try {
       const response = await fetch(`${backendURL}/api/getEventBySlug/${slug}`);
       if (!response.ok) {
@@ -490,9 +511,9 @@ const SingleEventPost = () => {
       setError("Failed to load event details. Please try again later.");
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchRelatedEvents = async (currentEventId, category) => {
+  const fetchRelatedEvents = useCallback(async (currentEventId, category) => {
     try {
       console.log("Fetching related events with:", {
         currentEventId,
@@ -513,7 +534,7 @@ const SingleEventPost = () => {
       console.error("Error fetching related events:", error);
       console.warn("Failed to load related events. This is non-critical.");
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (slug) {
@@ -521,371 +542,363 @@ const SingleEventPost = () => {
     }
   }, [slug]);
 
-  if (loading) {
-    return (
-      <Container maxWidth="lg">
-        <Skeleton variant="rectangular" height={400} sx={{ mb: 3 }} />
-        <Skeleton variant="text" height={60} sx={{ mb: 2 }} />
-        <Skeleton variant="text" height={30} sx={{ mb: 1 }} />
-        <Skeleton variant="text" height={30} sx={{ mb: 1 }} />
-        <Skeleton variant="text" height={30} sx={{ mb: 1 }} />
-      </Container>
-    );
-  }
-
-  if (error) {
-    return (
-      <Container maxWidth="lg">
-        <Typography variant="h5" color="error" align="center">
-          {error}
-        </Typography>
-      </Container>
-    );
-  }
-
-  if (!eventData) {
-    return (
-      <Container maxWidth="lg">
-        <Typography variant="h5" color="error" align="center">
-          No event data available. Please try again later.
-        </Typography>
-      </Container>
-    );
-  }
+  if (loading) return <LoadingSpinner />;
+  if (error) return <div className="text-red-500 text-center p-4">{error}</div>;
+  if (!eventData) return <div className="text-center p-4">No event found</div>;
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ my: 5 }}>
-        <Box
-          sx={{
-            mb: 4,
-            borderRadius: "16px",
-            overflow: "hidden",
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          <img
-            src={`${backendURL}${eventData.image}`}
-            alt="Event Banner"
-            style={{
-              width: "100%",
-              height: "auto",
-              maxHeight: "500px",
-              objectFit: "cover",
+    <>
+      {" "}
+      <Container maxWidth="lg">
+        <Box sx={{ mb: 5, mt: 8 }}>
+          <Box
+            sx={{
+              mb: 4,
+              borderRadius: "16px",
+              overflow: "hidden",
+              boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
             }}
-          />
-        </Box>
-
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={8}>
-            <Box sx={{ mb: 4, color: "#201F1F" }}>
-              <Typography sx={{ mb: 2, color: "#333333" }} variant="overline">
-                {new Date(eventData.date).toLocaleDateString("en-US", {
-                  weekday: "long",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </Typography>
-              <Typography
-                variant="h3"
-                component="h1"
-                sx={{
-                  mb: 2,
-                  fontWeight: 700,
-                  fontSize: {
-                    xs: "h4.fontSize",
-                    sm: "h3.fontSize",
-                  },
-                }}
-              >
-                {eventData.title}
-              </Typography>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-                <IconButton aria-label="add to favorites" color="primary">
-                  <FavoriteBorder />
-                </IconButton>
-                <ShareFeature post={eventData} />
-              </Box>
-            </Box>
-
-            <Paper
-              elevation={0}
-              sx={{
-                p: 0,
-                mb: 4,
-                borderRadius: "12px",
-                backgroundColor: "#",
+          >
+            <img
+              src={`${backendURL}${eventData.image}`}
+              alt="Event Banner"
+              style={{
+                width: "100%",
+                height: "auto",
+                maxHeight: "500px",
+                objectFit: "cover",
               }}
-            >
-              <Typography
-                variant="h6"
-                sx={{ mb: 2, fontWeight: 600, color: "#047481" }}
-              >
-                Date and time
-              </Typography>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <EventNote sx={{ mr: 1, color: "#047481" }} />
-                <Typography variant="body1">
+            />
+          </Box>
+
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={8}>
+              <Box sx={{ mb: 4, color: "#201F1F" }}>
+                <Typography sx={{ mb: 2, color: "#333333" }} variant="overline">
                   {new Date(eventData.date).toLocaleDateString("en-US", {
                     weekday: "long",
                     month: "long",
                     day: "numeric",
-                  })}{" "}
-                  at {new Date(eventData.date).toLocaleTimeString()} (+1GMT)
+                  })}
                 </Typography>
+                <Typography
+                  variant="h3"
+                  component="h1"
+                  sx={{
+                    mb: 2,
+                    fontWeight: 700,
+                    fontSize: {
+                      xs: "h4.fontSize",
+                      sm: "h3.fontSize",
+                    },
+                  }}
+                >
+                  {eventData.title}
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+                  <IconButton aria-label="add to favorites" color="primary">
+                    <FavoriteBorder />
+                  </IconButton>
+                  <ShareFeature post={eventData} />
+                </Box>
               </Box>
-              <Typography
-                variant="h6"
-                sx={{ mb: 2, fontWeight: 600, color: "#047481", mt: 3 }}
-              >
-                Location
-              </Typography>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <LocationOn sx={{ mr: 1, color: "#047481" }} />
-                <Typography variant="body1">{eventData.venue}</Typography>
-              </Box>
-            </Paper>
 
-            <Typography
-              variant="h5"
-              sx={{ mb: 3, fontWeight: 600, color: "#047481" }}
-            >
-              Speakers
-            </Typography>
-            <Box sx={{ mb: 4 }}>
-              <SpeakersCarousel speakers={eventData.speakers || []} />
-            </Box>
-
-            <Paper
-              elevation={0}
-              sx={{
-                p: 0,
-                mb: 4,
-                borderRadius: "12px",
-                backgroundColor: "",
-              }}
-            >
-              <Typography
-                variant="h5"
-                sx={{ mb: 3, mt: 12, fontWeight: 600, color: "#047481" }}
-              >
-                About this event
-              </Typography>
-              <Typography
-                variant="body1"
-                paragraph
-                dangerouslySetInnerHTML={{ __html: eventData.content }}
-              />
-            </Paper>
-
-            <Paper
-              elevation={0}
-              sx={{
-                p: 3,
-                mb: 4,
-                borderRadius: "12px",
-                backgroundColor: "#f5f5f5",
-              }}
-            >
-              <Typography
-                variant="h5"
+              <Paper
+                elevation={0}
                 sx={{
-                  mb: 3,
-                  fontWeight: 600,
-                  color: "#047481",
+                  p: 0,
+                  mb: 4,
+                  borderRadius: "12px",
+                  backgroundColor: "#",
                 }}
               >
-                Register for this event
-              </Typography>
-
-              {/* Flowbite Form */}
-              <form className="space-y-4" onSubmit={handleRegisterSubmit}>
-                <div>
-                  <label
-                    htmlFor="full_name"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    id="fullName"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleInputChange}
-                    className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-700 focus:border-teal-700  dark:bg-gray-700 dark:border-gray-600 placeholder-gray-400 dark:text-white "
-                    placeholder="Enter your full name"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-700 focus:border-teal-700  dark:bg-gray-700 dark:border-gray-600 placeholder-gray-400 dark:text-white "
-                    placeholder="Enter your email"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="company"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Company
-                  </label>
-                  <input
-                    type="text"
-                    id="company"
-                    name="company"
-                    value={formData.company}
-                    onChange={handleInputChange}
-                    className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-700 focus:border-teal-700  dark:bg-gray-700 dark:border-gray-600 placeholder-gray-400 dark:text-white "
-                    placeholder="Your company name"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="reason"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Why do you want to attend?
-                  </label>
-                  <textarea
-                    id="reason"
-                    name="reason"
-                    value={formData.reason}
-                    onChange={handleInputChange}
-                    rows="4"
-                    className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-700 focus:border-teal-700  dark:bg-gray-700 dark:border-gray-600 placeholder-gray-400 dark:text-white "
-                    placeholder="Write your reason here..."
-                  ></textarea>
-                </div>
-
-                <button
-                  type="submit"
-                  className="bg-[#198754] text-white px-4 py-2 rounded hover:font-medium  transition-colors flex items-center justify-center hover:border-2 hover:border-[#198754] hover:bg-white hover:text-[#198754]  duration-300"
-                  disabled={isLoading}
+                <Typography
+                  variant="h6"
+                  sx={{ mb: 2, fontWeight: 600, color: "#047481" }}
                 >
-                  {isLoading ? (
-                    <>
-                      <Loader className="animate-spin mr-2" size={20} />
-                      Registering...
-                    </>
-                  ) : (
-                    "Register Now"
-                  )}
-                </button>
-              </form>
-              {/* End of Flowbite Form */}
+                  Date and time
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <EventNote sx={{ mr: 1, color: "#047481" }} />
+                  <Typography variant="body1">
+                    {new Date(eventData.date).toLocaleDateString("en-US", {
+                      weekday: "long",
+                      month: "long",
+                      day: "numeric",
+                    })}{" "}
+                    at {new Date(eventData.date).toLocaleTimeString()} (+1GMT)
+                  </Typography>
+                </Box>
+                <Typography
+                  variant="h6"
+                  sx={{ mb: 2, fontWeight: 600, color: "#047481", mt: 3 }}
+                >
+                  Location
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <LocationOn sx={{ mr: 1, color: "#047481" }} />
+                  <Typography variant="body1">{eventData.venue}</Typography>
+                </Box>
+              </Paper>
 
-              <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-                {alertInfo && (
-                  <Alert variant={alertInfo.variant} className="m-0">
-                    <div className="flex items-center gap-2">
-                      {alertInfo.icon && (
-                        <alertInfo.icon className="h-5 w-5 flex-shrink-0" />
-                      )}
-                      <AlertDescription>{alertInfo.message}</AlertDescription>
+              <Typography
+                variant="h5"
+                sx={{ mb: 3, fontWeight: 600, color: "#047481" }}
+              >
+                Speakers
+              </Typography>
+              <Box sx={{ mb: 4 }}>
+                <SpeakersCarousel speakers={eventData.speakers || []} />
+              </Box>
+
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 0,
+                  mb: 4,
+                  borderRadius: "12px",
+                  backgroundColor: "",
+                }}
+              >
+                <Typography
+                  variant="h5"
+                  sx={{ mb: 3, mt: 12, fontWeight: 600, color: "#047481" }}
+                >
+                  About this event
+                </Typography>
+                <Typography
+                  variant="body1"
+                  paragraph
+                  dangerouslySetInnerHTML={{ __html: eventData.content }}
+                />
+              </Paper>
+
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 3,
+                  mb: 4,
+                  borderRadius: "12px",
+                  backgroundColor: "#f5f5f5",
+                }}
+              >
+                <Typography
+                  variant="h5"
+                  sx={{
+                    mb: 3,
+                    fontWeight: 600,
+                    color: "#047481",
+                  }}
+                >
+                  Register for this event
+                </Typography>
+
+                {/* Flowbite Form */}
+                <form className="space-y-4" onSubmit={handleRegisterSubmit}>
+                  <div>
+                    <label
+                      htmlFor="full_name"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      id="fullName"
+                      name="fullName"
+                      value={formData.fullName}
+                      onChange={handleInputChange}
+                      className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-700 focus:border-teal-700  dark:bg-gray-700 dark:border-gray-600 placeholder-gray-400 dark:text-white "
+                      placeholder="Enter your full name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="email"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-700 focus:border-teal-700  dark:bg-gray-700 dark:border-gray-600 placeholder-gray-400 dark:text-white "
+                      placeholder="Enter your email"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="company"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Company
+                    </label>
+                    <input
+                      type="text"
+                      id="company"
+                      name="company"
+                      value={formData.company}
+                      onChange={handleInputChange}
+                      className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-700 focus:border-teal-700  dark:bg-gray-700 dark:border-gray-600 placeholder-gray-400 dark:text-white "
+                      placeholder="Your company name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="reason"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Why do you want to attend?
+                    </label>
+                    <textarea
+                      id="reason"
+                      name="reason"
+                      value={formData.reason}
+                      onChange={handleInputChange}
+                      rows="4"
+                      className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-700 focus:border-teal-700  dark:bg-gray-700 dark:border-gray-600 placeholder-gray-400 dark:text-white "
+                      placeholder="Write your reason here..."
+                    ></textarea>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="bg-[#198754] text-white px-4 py-2 rounded hover:font-medium  transition-colors flex items-center justify-center hover:border-2 hover:border-[#198754] hover:bg-white hover:text-[#198754]  duration-300"
+                    disabled={subLoading}
+                  >
+                    {subLoading ? (
+                      <>
+                        <Loader className="animate-spin mr-2" size={20} />
+                        Registering...
+                      </>
+                    ) : (
+                      "Register Now"
+                    )}
+                  </button>
+                </form>
+                {/* End of Flowbite Form */}
+
+                <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+                  {alertInfo && (
+                    <Alert variant={alertInfo.variant} className="m-0">
+                      <div className="flex items-center gap-2">
+                        {alertInfo.icon && (
+                          <alertInfo.icon className="h-5 w-5 flex-shrink-0" />
+                        )}
+                        <AlertDescription>{alertInfo.message}</AlertDescription>
+                      </div>
+                    </Alert>
+                  )}
+                </Modal>
+              </Paper>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                gap={3}
+                sx={{
+                  p: 3,
+                  borderRadius: "12px",
+                  backgroundColor: "#f5f5f5",
+                }}
+              >
+                <Button
+                  href="https://t.me/credulensubscribers"
+                  target="_blank"
+                  variant="contained"
+                  startIcon={<TelegramIcon />}
+                  sx={{
+                    backgroundColor: "#198754",
+                    width: "100%",
+                    transition: "all 0.3s ease-in-out",
+                    "&:hover": {
+                      backgroundColor: "transparent",
+                      borderColor: "#198754",
+                      color: "#198754",
+                      border: "1px solid #198754",
+                    },
+                  }}
+                >
+                  Join Our Telegram Community
+                </Button>
+
+                <form onSubmit={handleSubmit} className="w-full">
+                  <div className="mb-3">
+                    <label
+                      htmlFor="email-subscribe"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Subscribe to our newsletter
+                    </label>
+                    <input
+                      type="email"
+                      id="email-subscribe"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      placeholder="Enter your email address"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="text-white bg-teal-600 hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
+                    disabled={subLoading}
+                  >
+                    {subLoading ? (
+                      <>
+                        <Loader
+                          className="animate-spin mr-2 inline"
+                          size={20}
+                        />
+                        Subscribing...
+                      </>
+                    ) : (
+                      "Subscribe"
+                    )}
+                  </button>
+                  {alertInfo && (
+                    <div
+                      className={`mt-4 p-4 rounded-lg ${
+                        alertInfo.variant === "success"
+                          ? "bg-green-100 text-green-800"
+                          : alertInfo.variant === "warning"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      <alertInfo.icon className="inline mr-2" size={20} />
+                      {alertInfo.message}
                     </div>
-                  </Alert>
-                )}
-              </Modal>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              justifyContent="center"
-              gap={3}
-              sx={{
-                p: 3,
-                borderRadius: "12px",
-                backgroundColor: "#f5f5f5",
-              }}
-            >
-              <Button
-                href="https://t.me/credulensubscribers"
-                target="_blank"
-                variant="contained"
-                startIcon={<TelegramIcon />}
-                sx={{
-                  backgroundColor: "#198754",
-                  width: "100%",
-                  transition: "all 0.3s ease-in-out",
-                  "&:hover": {
-                    backgroundColor: "transparent",
-                    borderColor: "#198754",
-                    color: "#198754",
-                    border: "1px solid #198754",
-                  },
-                }}
-              >
-                Join Our Telegram Community
-              </Button>
-
-              <form onSubmit={handleSubmit} className="w-full">
-                <div className="mb-3">
-                  <label
-                    htmlFor="email-subscribe"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Subscribe to our newsletter
-                  </label>
-                  <input
-                    type="email"
-                    id="email-subscribe"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Enter your email address"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="text-white bg-teal-600 hover:bg-teal-700 focus:ring-4 focus:outline-none focus:ring-teal-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader className="animate-spin mr-2 inline" size={20} />
-                      Subscribing...
-                    </>
-                  ) : (
-                    "Subscribe"
                   )}
-                </button>
-              </form>
-            </Box>
+                </form>
+              </Box>
+            </Grid>
           </Grid>
-        </Grid>
 
-        <Box sx={{ mt: 6 }}>
-          <hr style={{ margin: "16px 0", border: "1px solid #e0e0e0" }} />
-          {relatedEvents.length > 0 ? (
-            <RelatedEventsCarousel events={relatedEvents} />
-          ) : (
-            <Typography variant="body1" sx={{ mt: 4, textAlign: "center" }}>
-              No related events found.
-            </Typography>
-          )}
+          <Box sx={{ mt: 6 }}>
+            <hr style={{ margin: "16px 0", border: "1px solid #e0e0e0" }} />
+            {relatedEvents.length > 0 ? (
+              <RelatedEventsCarousel events={relatedEvents} />
+            ) : (
+              <Typography variant="body1" sx={{ mt: 4, textAlign: "center" }}>
+                No related events found.
+              </Typography>
+            )}
+          </Box>
         </Box>
-      </Box>
-    </Container>
+      </Container>
+    </>
   );
 };
 

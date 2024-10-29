@@ -26,19 +26,17 @@ export const loginUser = createAsyncThunk(
         { email, password },
         {
           headers: { "Content-Type": "application/json" },
-          withCredentials: true, // Ensure cookies are sent with the request
+          withCredentials: true,
         }
       );
 
+      // For admin users requiring OTP, don't store anything in localStorage yet
+      if (response.data.requireOTP) {
+        return response.data;
+      }
+
+      // For regular users, proceed with storing token and user info
       const { token, user } = response.data;
-      console.log(response.data, "returned login data");
-
-      // Store the token in localStorage
-      localStorage.setItem("userToken", token);
-
-      // Store user info in localStorage if needed
-      localStorage.setItem("userInfo", JSON.stringify(user));
-
       return response.data;
     } catch (error) {
       return rejectWithValue(

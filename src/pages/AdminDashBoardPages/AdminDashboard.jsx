@@ -1,379 +1,408 @@
-// import { useEffect, useState } from "react";
-// import { useSelector } from "react-redux";
-// import { Link } from "react-router-dom";
-// import { FaUserCircle } from "react-icons/fa";
-// import { TextInput, Label, Button, Card } from "flowbite-react";
-// import { HiOutlineSearch, HiOutlineUserCircle } from "react-icons/hi";
-// import { motion } from "framer-motion";
-// import { FaBriefcase } from "react-icons/fa";
-// import {
-//   HiAnnotation,
-//   HiArrowNarrowUp,
-//   HiDocumentText,
-//   HiOutlineUserGroup,
-// } from "react-icons/hi";
-// import { styled } from "@mui/material/styles";
-// import Table from "@mui/material/Table";
-// import TableBody from "@mui/material/TableBody";
-// import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-// import TableContainer from "@mui/material/TableContainer";
-// import TableHead from "@mui/material/TableHead";
-// import TableRow from "@mui/material/TableRow";
-// import Paper from "@mui/material/Paper";
-
-// const AdminDashboard = () => {
-//   const backendURL = import.meta.env.VITE_BACKEND_URL;
-//   const [users, setUsers] = useState([]);
-//   const [comments, setComments] = useState([]);
-//   const [posts, setPosts] = useState([]);
-//   const [totalUsers, setTotalUsers] = useState(0);
-//   const [totalPosts, setTotalPosts] = useState(0);
-//   const [totalComments, setTotalComments] = useState(0);
-//   const [lastMonthUsers, setLastMonthUsers] = useState(0);
-//   const [lastMonthPosts, setLastMonthPosts] = useState(0);
-//   const [lastMonthComments, setLastMonthComments] = useState(0);
-//   const { userInfo } = useSelector((state) => state.auth);
-//   const [searchTerm, setSearchTerm] = useState("");
-
-//   const filteredUsers = users.filter((user) =>
-//     user.username.toLowerCase().includes(searchTerm.toLowerCase())
-//   );
-//   useEffect(() => {
-//     const fetchUsers = async () => {
-//       try {
-//         // const res = await fetch("/api/user/getusers?limit=5");
-//         const res = await fetch(`${backendURL}/api/getUsers`);
-//         const data = await res.json();
-//         if (res.ok) {
-//           setUsers(data.users);
-//           setTotalUsers(data.totalUsers);
-//           setLastMonthUsers(data.lastMonthUsers);
-//         }
-//       } catch (error) {
-//         console.log(error.message);
-//       }
-//     };
-//     const fetchPosts = async () => {
-//       try {
-//         const res = await fetch("/api/post/getposts?limit=5");
-//         const data = await res.json();
-//         if (res.ok) {
-//           setPosts(data.posts);
-//           setTotalPosts(data.totalPosts);
-//           setLastMonthPosts(data.lastMonthPosts);
-//         }
-//       } catch (error) {
-//         console.log(error.message);
-//       }
-//     };
-//     const fetchComments = async () => {
-//       try {
-//         const res = await fetch("/api/comment/getcomments?limit=5");
-//         const data = await res.json();
-//         if (res.ok) {
-//           setComments(data.comments);
-//           setTotalComments(data.totalComments);
-//           setLastMonthComments(data.lastMonthComments);
-//         }
-//       } catch (error) {
-//         console.log(error.message);
-//       }
-//     };
-//     if (userInfo) {
-//       fetchUsers();
-//       fetchPosts();
-//       fetchComments();
-//     }
-//   }, [userInfo]);
-
-//   const StyledTableCell = styled(TableCell)(({ theme }) => ({
-//     [`&.${tableCellClasses.head}`]: {
-//       backgroundColor: theme.palette.common.black,
-//       color: theme.palette.common.white,
-//     },
-//     [`&.${tableCellClasses.body}`]: {
-//       fontSize: 14,
-//     },
-//   }));
-
-//   const StyledTableRow = styled(TableRow)(({ theme }) => ({
-//     "&:nth-of-type(odd)": {
-//       backgroundColor: theme.palette.action.hover,
-//     },
-//     // hide last border
-//     "&:last-child td, &:last-child th": {
-//       border: 0,
-//     },
-//   }));
-
-//   function createData(name, calories, fat, carbs, protein) {
-//     return { name, calories, fat, carbs, protein };
-//   }
-
-//   const rows = [
-//     createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-//     createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-//     createData("Eclair", 262, 16.0, 24, 6.0),
-//     createData("Cupcake", 305, 3.7, 67, 4.3),
-//     createData("Gingerbread", 356, 16.0, 49, 3.9),
-//   ];
-//   return (
-//     <>
-//       <div className="flex flex-wrap gap-6 justify-center mb-12">
-//         <div className="flex flex-col p-4 bg-white dark:bg-slate-800 shadow-lg border border-purple rounded-md w-full sm:w-80 md:w-72 lg:w-64">
-//           <div className="flex justify-between items-center mb-4">
-//             <div>
-//               <h3 className="text-gray-500 text-md uppercase">Total Users</h3>
-//               <p className="text-2xl font-semibold">{totalUsers}</p>
-//             </div>
-//             <HiOutlineUserGroup className="bg-teal-600 text-white rounded-full text-5xl p-3 shadow-lg" />
-//           </div>
-//           <div className="flex items-center gap-2 text-sm text-gray-500">
-//             <span className="text-green-500 flex items-center">
-//               <HiArrowNarrowUp />
-//               {lastMonthUsers}
-//             </span>
-//             <div>Last month</div>
-//           </div>
-//         </div>
-
-//         <div className="flex flex-col p-4 bg-white dark:bg-slate-800 shadow-lg border border-purple rounded-md w-full sm:w-80 md:w-72 lg:w-64">
-//           <div className="flex justify-between items-center mb-4">
-//             <div>
-//               <h3 className="text-gray-500 text-md uppercase">
-//                 Total Comments
-//               </h3>
-//               <p className="text-2xl font-semibold">{totalComments}</p>
-//             </div>
-//             <HiAnnotation className="bg-indigo-600 text-white rounded-full text-5xl p-3 shadow-lg" />
-//           </div>
-//           <div className="flex items-center gap-2 text-sm text-gray-500">
-//             <span className="text-green-500 flex items-center">
-//               <HiArrowNarrowUp />
-//               {lastMonthComments}
-//             </span>
-//             <div>Last month</div>
-//           </div>
-//         </div>
-//         <div className="flex flex-col p-4 bg-white dark:bg-slate-800 shadow-lg border border-purple rounded-md w-full sm:w-80 md:w-72 lg:w-64">
-//           <div className="flex justify-between items-center mb-4">
-//             <div>
-//               <h3 className="text-gray-500 text-md uppercase">Total Posts</h3>
-//               <p className="text-2xl font-semibold">{totalPosts}</p>
-//             </div>
-//             <HiDocumentText className="bg-lime-600 text-white rounded-full text-5xl p-3 shadow-lg" />
-//           </div>
-//           <div className="flex items-center gap-2 text-sm text-gray-500">
-//             <span className="text-green-500 flex items-center">
-//               <HiArrowNarrowUp />
-//               {lastMonthPosts}
-//             </span>
-//             <div>Last month</div>
-//           </div>
-//         </div>
-//       </div>{" "}
-//       <TableContainer component={Paper}>
-//         <Table sx={{ minWidth: 700 }} aria-label="customized table">
-//           <TableHead>
-//             <TableRow>
-//               <StyledTableCell>Dessert (100g serving)</StyledTableCell>
-//               <StyledTableCell align="right">Calories</StyledTableCell>
-//               <StyledTableCell align="right">Fat&nbsp;(g)</StyledTableCell>
-//               <StyledTableCell align="right">Carbs&nbsp;(g)</StyledTableCell>
-//               <StyledTableCell align="right">Protein&nbsp;(g)</StyledTableCell>
-//             </TableRow>
-//           </TableHead>
-//           <TableBody>
-//             {rows.map((row) => (
-//               <StyledTableRow key={row.name}>
-//                 <StyledTableCell component="th" scope="row">
-//                   {row.name}
-//                 </StyledTableCell>
-//                 <StyledTableCell align="right">{row.calories}</StyledTableCell>
-//                 <StyledTableCell align="right">{row.fat}</StyledTableCell>
-//                 <StyledTableCell align="right">{row.carbs}</StyledTableCell>
-//                 <StyledTableCell align="right">{row.protein}</StyledTableCell>
-//               </StyledTableRow>
-//             ))}
-//           </TableBody>
-//         </Table>
-//       </TableContainer>
-//     </>
-//   );
-// };
-
-// export default AdminDashboard;
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { FaUserCircle } from "react-icons/fa";
-import { TextInput, Label, Button, Card } from "flowbite-react";
-import { HiOutlineSearch, HiOutlineUserCircle } from "react-icons/hi";
-import { motion } from "framer-motion";
-import { FaBriefcase } from "react-icons/fa";
 import {
   HiAnnotation,
-  HiArrowNarrowUp,
   HiDocumentText,
-  HiOutlineUserGroup,
+  HiArrowNarrowUp,
+  HiLightBulb,
+  HiMail,
+  HiUser,
+  HiArrowNarrowDown,
+  HiTrendingUp,
+  HiCalendar,
 } from "react-icons/hi";
-import { styled } from "@mui/material/styles";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import { Line } from "react-chartjs-2";
+import { CircularProgress } from "@mui/material";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from "chart.js";
+
+// Register ChartJS components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 const AdminDashboard = () => {
   const backendURL =
     import.meta.env.MODE === "production"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:3001";
-  const [users, setUsers] = useState([]);
-  const [comments, setComments] = useState([]);
-  const [posts, setPosts] = useState([]);
-  const [totalUsers, setTotalUsers] = useState(0);
-  const [totalPosts, setTotalPosts] = useState(0);
-  const [totalComments, setTotalComments] = useState(0);
-  const [lastMonthUsers, setLastMonthUsers] = useState(0);
-  const [lastMonthPosts, setLastMonthPosts] = useState(0);
-  const [lastMonthComments, setLastMonthComments] = useState(0);
-  const { userInfo } = useSelector((state) => state.auth);
-  const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredUsers = users.filter((user) =>
-    user?.username?.toLowerCase().includes(searchTerm.toLowerCase())
+  const [stats, setStats] = useState({
+    users: { total: 0, lastMonth: 0, data: [] },
+    comments: { total: 0, lastMonth: 0, data: [] },
+    posts: { total: 0, lastMonth: 0, data: [] },
+    solutions: { total: 0, lastMonth: 0, data: [] },
+    subscribers: {
+      total: 0,
+      weekly: 0,
+      monthly: 0,
+      prevMonth: 0,
+      weeklyBreakdown: [],
+      monthlyBreakdown: [],
+      growthRate: { monthly: 0 },
+    },
+  });
+  const [loading, setLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState("week");
+  const { userInfo } = useSelector((state) => state.auth);
+
+  const fetchData = useCallback(
+    async (endpoint) => {
+      try {
+        const res = await fetch(`${backendURL}/api/${endpoint}`);
+        return res.ok ? await res.json() : null;
+      } catch (error) {
+        console.error(`Error fetching ${endpoint}:`, error);
+        return null;
+      }
+    },
+    [backendURL]
   );
 
+  const fetchAllStats = useCallback(async () => {
+    const endpoints = {
+      users: "getUsers",
+      posts: "getPosts?limit=5",
+      comments: "getComments?limit=5",
+      solutions: "getAllSolutions?limit=5",
+      subscribers: "getNewsletterSubscribers",
+    };
+
+    const results = await Promise.all(
+      Object.entries(endpoints).map(async ([key, endpoint]) => {
+        const data = await fetchData(endpoint);
+        return [key, data];
+      })
+    );
+
+    setStats((prevStats) => {
+      const newStats = { ...prevStats };
+      results.forEach(([key, data]) => {
+        if (data) {
+          if (key === "subscribers") {
+            const subscriberStats = {
+              total: data.data.totalSubscribers || 0,
+              weekly: data.data.weeklySubscribers || 0,
+              monthly: data.data.monthlySubscribers || 0,
+              prevMonth: data.data.prevMonthSubscribers || 0,
+              weeklyBreakdown: data.data.weeklyBreakdown || [],
+              monthlyBreakdown: data.data.monthlyBreakdown || [],
+              growthRate: data.data.growthRate || { monthly: 0 },
+            };
+            newStats[key] = subscriberStats;
+          } else {
+            newStats[key] = {
+              total:
+                data[`total${key.charAt(0).toUpperCase() + key.slice(1)}`] || 0,
+              lastMonth: data.lastMonth || 0,
+              data: data[key] || [],
+            };
+          }
+        }
+      });
+      return newStats;
+    });
+  }, [fetchData]);
+  // Log 5: Add useEffect to monitor stats changes
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await fetch(`${backendURL}/api/getUsers`);
-        const data = await res.json();
-        if (res.ok) {
-          setUsers(data.users);
-          setTotalUsers(data.totalUsers);
-          setLastMonthUsers(data.lastMonthUsers);
-        }
-      } catch (error) {
-        console.log(error.message);
-      }
-    };
-
-    const fetchPosts = async () => {
-      try {
-        const res = await fetch("/api/post/getposts?limit=5");
-        const data = await res.json();
-        if (res.ok) {
-          setPosts(data.posts);
-          setTotalPosts(data.totalPosts);
-          setLastMonthPosts(data.lastMonthPosts);
-        }
-      } catch (error) {
-        console.log(error.message);
-      }
-    };
-
-    const fetchComments = async () => {
-      try {
-        const res = await fetch("/api/comment/getcomments?limit=5");
-        const data = await res.json();
-        if (res.ok) {
-          setComments(data.comments);
-          setTotalComments(data.totalComments);
-          setLastMonthComments(data.lastMonthComments);
-        }
-      } catch (error) {
-        console.log(error.message);
-      }
-    };
-
+    console.log("Stats updated:", stats);
+  }, [stats]);
+  useEffect(() => {
     if (userInfo) {
-      fetchUsers();
-      fetchPosts();
-      fetchComments();
+      setLoading(true);
+      fetchAllStats().finally(() => setLoading(false));
     }
-  }, [userInfo]);
+  }, [userInfo, fetchAllStats]);
 
-  const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      backgroundColor: theme.palette.common.white,
-      color: theme.palette.common.black,
-      fontWeight: "bold", // Bold font for table headers
-    },
-    [`&.${tableCellClasses.body}`]: {
-      fontSize: 14,
-      fontWeight: "normal", // Normal font for table body, you can change to 'bold' if needed
-    },
-  }));
-  const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    "&:nth-of-type(odd)": {
-      backgroundColor: theme.palette.action.hover,
-    },
-    "&:last-child td, &:last-child th": {
-      border: 0,
-    },
-  }));
+  const LoadingSpinner = useMemo(
+    () => (
+      <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+        <CircularProgress size={40} className="text-btColour" />
+      </div>
+    ),
+    []
+  );
 
-  return (
-    <>
-      <div className="flex flex-wrap gap-6 justify-center mb-12 overflow-x-hidden">
-        <div className="flex flex-col p-4 bg-white dark:bg-slate-800 shadow-lg border border-purple rounded-md w-full sm:w-80 md:w-72 lg:w-64">
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <h3 className="text-gray-500 text-md uppercase">Total Users</h3>
-              <p className="text-2xl font-semibold">{totalUsers}</p>
-            </div>
-            <HiOutlineUserGroup className="bg-teal-600 text-white rounded-full text-5xl p-3 shadow-lg" />
+  const StatCard = ({ title, stats, icon: Icon, bgColor }) => (
+    <div className="bg-white dark:bg-slate-800 shadow-lg rounded-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex-1">
+          <h3 className="text-gray-500 text-sm font-medium uppercase tracking-wide">
+            {title}
+          </h3>
+          <p className="text-3xl font-semibold mt-2">{stats.total}</p>
+        </div>
+        <div className={`${bgColor} p-4 rounded-full shadow-lg`}>
+          <Icon className="text-white text-xl" />
+        </div>
+      </div>
+      <div className="flex items-center gap-2 text-sm text-gray-500">
+        <span className="text-green-500 flex items-center gap-1">
+          <HiArrowNarrowUp />
+          {stats.lastMonth}
+        </span>
+        <span>Last month</span>
+      </div>
+    </div>
+  );
+
+  const SubscriberStats = () => {
+    const growthRate = stats.subscribers.growthRate.monthly;
+    const isGrowthPositive = growthRate > 0;
+    const growthDisplay =
+      growthRate === "Infinity"
+        ? "∞"
+        : `${Math.abs(parseFloat(growthRate)).toFixed(1)}%`;
+
+    return (
+      <div className="bg-white dark:bg-slate-800 shadow-lg rounded-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow ">
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex-1">
+            <h3 className="text-gray-500 text-sm font-medium uppercase tracking-wide">
+              Newsletter Subscribers
+            </h3>
+            <p className="text-3xl font-semibold mt-2">
+              {stats.subscribers.total}
+            </p>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <span className="text-green-500 flex items-center">
-              <HiArrowNarrowUp />
-              {lastMonthUsers}
-            </span>
-            <div>Last month</div>
+          <div className="bg-blue-600 p-4 rounded-full shadow-lg">
+            <HiMail className="text-white text-xl" />
           </div>
         </div>
-
-        <div className="flex flex-col p-4 bg-white dark:bg-slate-800 shadow-lg border border-purple rounded-md w-full sm:w-80 md:w-72 lg:w-64">
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <h3 className="text-gray-500 text-md uppercase">
-                Total Comments
-              </h3>
-              <p className="text-2xl font-semibold">{totalComments}</p>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gray-50 dark:bg-slate-700 p-3 rounded-lg">
+              <div className="flex items-center gap-2 mb-1">
+                <HiCalendar className="text-blue-500" />
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  This Week
+                </span>
+              </div>
+              <p className="text-lg font-semibold">
+                {stats.subscribers.weekly}
+              </p>
             </div>
-            <HiAnnotation className="bg-indigo-600 text-white rounded-full text-5xl p-3 shadow-lg" />
-          </div>
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <span className="text-green-500 flex items-center">
-              <HiArrowNarrowUp />
-              {lastMonthComments}
-            </span>
-            <div>Last month</div>
-          </div>
-        </div>
-        <div className="flex flex-col p-4 bg-white dark:bg-slate-800 shadow-lg border border-purple rounded-md w-full sm:w-80 md:w-72 lg:w-64">
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <h3 className="text-gray-500 text-md uppercase">Total Posts</h3>
-              <p className="text-2xl font-semibold">{totalPosts}</p>
+            <div className="bg-gray-50 dark:bg-slate-700 p-3 rounded-lg">
+              <div className="flex items-center gap-2 mb-1">
+                <HiTrendingUp className="text-blue-500" />
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  This Month
+                </span>
+              </div>
+              <p className="text-lg font-semibold">
+                {stats.subscribers.monthly}
+              </p>
             </div>
-            <HiDocumentText className="bg-lime-600 text-white rounded-full text-5xl p-3 shadow-lg" />
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <span className="text-green-500 flex items-center">
-              <HiArrowNarrowUp />
-              {lastMonthPosts}
+          <div className="flex items-center gap-2 text-sm bg-gray-50 dark:bg-slate-700 p-3 rounded-lg">
+            <span
+              className={`flex items-center gap-1 ${
+                isGrowthPositive ? "text-green-500" : "text-red-500"
+              }`}
+            >
+              {isGrowthPositive ? <HiArrowNarrowUp /> : <HiArrowNarrowDown />}
+              {growthDisplay}
             </span>
-            <div>Last month</div>
+            <span className="text-gray-500">Monthly Growth</span>
           </div>
         </div>
       </div>
-    </>
+    );
+  };
+
+  const SubscriberChart = useMemo(() => {
+    const breakdownData =
+      (timeRange === "week"
+        ? stats.subscribers.weeklyBreakdown
+        : stats.subscribers.monthlyBreakdown) || [];
+
+    if (!breakdownData.length) {
+      return (
+        <div className="flex-1 min-w-[280px] p-6 bg-white dark:bg-slate-800 shadow-lg border border-gray-200 rounded-lg">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-gray-500 text-md uppercase">
+              Subscriber Growth
+            </h3>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setTimeRange("week")}
+                className={`px-3 py-1 rounded-md text-sm ${
+                  timeRange === "week"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-600"
+                }`}
+              >
+                Week
+              </button>
+              <button
+                onClick={() => setTimeRange("month")}
+                className={`px-3 py-1 rounded-md text-sm ${
+                  timeRange === "month"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-600"
+                }`}
+              >
+                Month
+              </button>
+            </div>
+          </div>
+          <div className="h-[300px] flex items-center justify-center text-gray-500">
+            No data available for this period
+          </div>
+        </div>
+      );
+    }
+
+    const data = {
+      labels: breakdownData.map((item) => {
+        const date = new Date(item._id);
+        return timeRange === "week"
+          ? date.toLocaleDateString("en-US", {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+            })
+          : date.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            });
+      }),
+      datasets: [
+        {
+          label: "New Subscribers",
+          data: breakdownData.map((item) => item.count),
+          fill: true,
+          backgroundColor: "rgba(59, 130, 246, 0.1)",
+          borderColor: "rgb(59, 130, 246)",
+          tension: 0.4,
+        },
+      ],
+    };
+
+    const options = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          mode: "index",
+          intersect: false,
+          callbacks: {
+            title: (tooltipItems) => {
+              const date = new Date(
+                breakdownData[tooltipItems[0].dataIndex]._id
+              );
+              return date.toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              });
+            },
+          },
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            precision: 0,
+          },
+        },
+      },
+    };
+
+    return (
+      <div className="flex-1 min-w-[280px] p-6 bg-white dark:bg-slate-800 shadow-lg border border-gray-200 rounded-lg">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-gray-500 text-md uppercase">Subscriber Growth</h3>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setTimeRange("week")}
+              className={`px-3 py-1 rounded-md text-sm ${
+                timeRange === "week"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-600"
+              }`}
+            >
+              Week
+            </button>
+            <button
+              onClick={() => setTimeRange("month")}
+              className={`px-3 py-1 rounded-md text-sm ${
+                timeRange === "month"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-600"
+              }`}
+            >
+              Month
+            </button>
+          </div>
+        </div>
+        <div className="h-[300px]">
+          <Line data={data} options={options} />
+        </div>
+      </div>
+    );
+  }, [
+    stats.subscribers.weeklyBreakdown,
+    stats.subscribers.monthlyBreakdown,
+    timeRange,
+  ]);
+
+  if (loading) return LoadingSpinner;
+
+  return (
+    <div className="p-4 max-w-[1600px] mx-auto mid:mt-20">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
+        <StatCard
+          title="Total Users"
+          stats={stats.users}
+          icon={HiUser}
+          bgColor="bg-teal-600"
+        />
+        <StatCard
+          title="Total Comments"
+          stats={stats.comments}
+          icon={HiAnnotation}
+          bgColor="bg-indigo-600"
+        />
+        <StatCard
+          title="Total Blog_Posts"
+          stats={stats.posts}
+          icon={HiDocumentText}
+          bgColor="bg-lime-600"
+        />
+        <StatCard
+          title="Total Solution_Posts"
+          stats={stats.solutions}
+          icon={HiLightBulb}
+          bgColor="bg-amber-600"
+        />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+        <SubscriberStats />
+        <div className="lg:col-span-2">{SubscriberChart}</div>
+      </div>
+    </div>
   );
 };
 

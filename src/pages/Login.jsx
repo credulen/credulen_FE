@@ -76,29 +76,29 @@
 //     }
 //   };
 
-const handleOtpSubmit = (otp) => {
-  if (!tempUserId) {
-    setSnackbarMessage("User ID not found. Please try logging in again.");
-    setSnackbarSeverity("error");
-    setOpenSnackbar(true);
-    return;
-  }
+// const handleOtpSubmit = (otp) => {
+//   if (!tempUserId) {
+//     setSnackbarMessage("User ID not found. Please try logging in again.");
+//     setSnackbarSeverity("error");
+//     setOpenSnackbar(true);
+//     return;
+//   }
 
-  dispatch(verifyAdminOTP({ userId: tempUserId, otp }))
-    .unwrap()
-    .then((response) => {
-      console.log("OTP verification successful:", response);
-      setSnackbarMessage("OTP verified successfully!");
-      setSnackbarSeverity("success");
-      setOpenSnackbar(true);
-    })
-    .catch((error) => {
-      console.error("OTP verification failed:", error);
-      setSnackbarMessage(error || "OTP verification failed");
-      setSnackbarSeverity("error");
-      setOpenSnackbar(true);
-    });
-};
+//   dispatch(verifyAdminOTP({ userId: tempUserId, otp }))
+//     .unwrap()
+//     .then((response) => {
+//       console.log("OTP verification successful:", response);
+//       setSnackbarMessage("OTP verified successfully!");
+//       setSnackbarSeverity("success");
+//       setOpenSnackbar(true);
+//     })
+//     .catch((error) => {
+//       console.error("OTP verification failed:", error);
+//       setSnackbarMessage(error || "OTP verification failed");
+//       setSnackbarSeverity("error");
+//       setOpenSnackbar(true);
+//     });
+// };
 
 //   return (
 //     <>
@@ -276,7 +276,8 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if (userInfo && !isOtpRequired) {
+    // Only redirect if user is logged in AND (not an admin OR OTP is not required)
+    if (userInfo && (!userInfo.role === "admin" || !isOtpRequired)) {
       const timer = setTimeout(() => {
         if (userInfo.role === "admin") {
           navigate("/DashBoard/Admin_Dashboard");
