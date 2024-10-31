@@ -133,7 +133,7 @@ export default function CreateEditSolution() {
           : "Solution created successfully",
         "success"
       );
-      navigate("/dashboard/solutions");
+      navigate("/DashBoard/Admin/Solutions");
     } catch (error) {
       console.error("Error saving solution:", error);
       showSnackbar(error.message || "Failed to save solution", "error");
