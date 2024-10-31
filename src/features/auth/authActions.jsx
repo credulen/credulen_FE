@@ -12,9 +12,39 @@ const backendURL =
   import.meta.env.MODE === "production"
     ? import.meta.env.VITE_BACKEND_URL
     : "http://localhost:3001";
+
 export const setEmail = (email) => ({
   type: SET_EMAIL,
   payload: email,
+});
+
+const normalizeUserData = (response) => {
+  // For regular login response
+  if (response.data?.requireOTP) {
+    return response.data;
+  }
+
+  // Check if it's a Google login response
+  if (response.data?.token && response.data?.user) {
+    return {
+      token: response.data.token,
+      user: {
+        ...response.data.user,
+      },
+    };
+  }
+
+  // For other response structures, try to normalize them
+  const { token, user, ...rest } = response.data;
+  return {
+    token,
+    user: user || rest,
+  };
+};
+
+export const setCredentials = (data) => ({
+  type: "auth/setCredentials",
+  payload: data,
 });
 
 export const loginUser = createAsyncThunk(
@@ -30,23 +60,62 @@ export const loginUser = createAsyncThunk(
         }
       );
 
-      // For admin users requiring OTP, don't store anything in localStorage yet
-      if (response.data.requireOTP) {
-        return response.data;
+      const normalizedData = normalizeUserData(response);
+
+      if (normalizedData.requireOTP) {
+        return normalizedData;
       }
 
-      // For regular users, proceed with storing token and user info
-      const { token, user } = response.data;
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.message
+      // Store normalized data
+      localStorage.setItem("userToken", normalizedData.token);
+      localStorage.setItem(
+        "userInfo",
+        JSON.stringify({
+          ...normalizedData.user,
+          token: normalizedData.token,
+        })
       );
+
+      return normalizedData;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
+
+// Updated Google login helper function
+export const handleGoogleLogin = async (credential) => {
+  try {
+    const response = await axios.post(
+      `${backendURL}/api/google-login`,
+      { credential },
+      {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      }
+    );
+
+    if (!response.data) {
+      throw new Error("No data received from Google login");
+    }
+
+    const normalizedData = normalizeUserData(response);
+
+    // Store normalized data
+    localStorage.setItem("userToken", normalizedData.token);
+    localStorage.setItem(
+      "userInfo",
+      JSON.stringify({
+        ...normalizedData.user,
+        token: normalizedData.token,
+      })
+    );
+
+    return normalizedData;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Google login failed");
+  }
+};
 
 export const registerUser = createAsyncThunk(
   "auth/registerUser",

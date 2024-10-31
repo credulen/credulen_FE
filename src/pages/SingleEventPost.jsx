@@ -130,6 +130,30 @@ const RelatedEventsCarousel = ({ events }) => {
                   {event.title}
                 </Typography>
                 <Grid container spacing={1}>
+                  {event && (
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        color:
+                          new Date(event.date) < new Date()
+                            ? "#047481"
+                            : "#198754",
+                        mb: 2,
+                      }}
+                    >
+                      {new Date(event.date) < new Date()
+                        ? `Past Event${
+                            event.eventType === "webinar" &&
+                            event.videoUrl &&
+                            (typeof event.videoUrl === "string"
+                              ? event.videoUrl.trim().length > 0
+                              : event.videoUrl)
+                              ? " - Recording Available"
+                              : ""
+                          }`
+                        : "Upcoming Event"}
+                    </Typography>
+                  )}
                   <Grid
                     item
                     xs={12}
@@ -366,6 +390,7 @@ const SingleEventPost = () => {
   const [relatedEvents, setRelatedEvents] = useState([]);
   const navigate = useNavigate();
   const [eventData, setEventData] = useState(null);
+  const [eventDate, setEventDate] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [subLoading, setSubLoading] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -442,6 +467,11 @@ const SingleEventPost = () => {
       setSubLoading(true);
 
       try {
+        // Check if the event has already passed
+        const eventDate = new Date(eventData.date);
+        const currentDate = new Date();
+        const isPastEvent = eventDate < currentDate;
+
         const response = await fetch(`${backendURL}/api/register-event`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -462,12 +492,24 @@ const SingleEventPost = () => {
             icon: CheckCircle,
           });
           setFormData({ fullName: "", email: "", company: "", reason: "" });
+
+          // Show success message briefly before redirecting
+          setTimeout(() => {
+            if (isPastEvent) {
+              // If it's a past event, redirect to video page
+              navigate(`/eventVideo/${eventData.slug}`);
+            } else {
+              // If it's an upcoming event, show success message or different action
+              setShowModal(true);
+            }
+          }, 1500);
         } else {
           setAlertInfo({
             message: data.message || "Registration failed. Please try again.",
             variant: "destructive",
             icon: AlertCircle,
           });
+          setShowModal(true);
         }
       } catch (error) {
         setAlertInfo({
@@ -475,14 +517,13 @@ const SingleEventPost = () => {
           variant: "destructive",
           icon: AlertCircle,
         });
+        setShowModal(true);
       } finally {
         setSubLoading(false);
-        setShowModal(true);
       }
     },
-    [formData, eventData, backendURL]
+    [formData, eventData, navigate]
   );
-
   const fetchEventDetails = useCallback(async (slug) => {
     setIsLoading(true);
     try {
@@ -493,6 +534,7 @@ const SingleEventPost = () => {
       const data = await response.json();
       console.log("Fetched event data:", data);
       setEventData(data);
+      setEventDate(data.date);
       setLoading(false);
 
       // Fetch related events

@@ -5,6 +5,7 @@ import PasswordResset from "./pages/PasswordResset";
 import Conferences from "./pages/Conference";
 import Webinar from "./pages/Webinars";
 import Solutions from "./pages/Solution";
+import EventVideo from "../src/pages/EventVideo";
 import Contact from "./pages/Contactus";
 import RegisterAdmin from "../src/pages/RegisterAdmin";
 import Signup from "../src/pages/RegisterUser";
@@ -68,7 +69,7 @@ const AppContent = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/ForgotPassword" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<PasswordResset />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/eventVideo/:slug?" element={<EventVideo />} />
         {/* Protected users routes */}
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>

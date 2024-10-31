@@ -201,6 +201,7 @@ const Button1 = ({ children, onClick, primary, className, ...props }) => {
     </button>
   );
 };
+
 export const ExpandableCommentInput = ({
   onSubmit,
   userAvatar,
@@ -463,27 +464,6 @@ export default function Post() {
     </div>
   ));
 
-  // useEffect(() => {
-  //   const fetchPost = async () => {
-  //     try {
-  //       const response = await fetch(`${backendURL}/api/getPostBySlug/${slug}`);
-  //       if (!response.ok) {
-  //         throw new Error("Failed to fetch post");
-  //       }
-  //       const data = await response.json();
-  //       setPost(data);
-  //       setPostId(data._id);
-  //       setLikesCount(data.likes.length || 0);
-  //       setIsLiked(data.likes.includes(userId));
-  //     } catch (err) {
-  //       setError(err.message);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchPost();
-  // }, [slug]);
   const fetchPost = useCallback(async () => {
     try {
       setLoading(true);
@@ -870,11 +850,6 @@ export default function Post() {
     }
   };
 
-  // if (loading) return <Typography>Loading...</Typography>;
-  // if (error) return <Typography color="error">{error}</Typography>;
-  // if (!post) return <Typography>Post not found</Typography>;
-  // console.log(post, "post details");
-  // Loading states
   if (loading) return <LoadingSpinner />;
   if (error) return <Typography color="error">{error}</Typography>;
   if (!post) return <Typography>Post not found</Typography>;
@@ -1248,6 +1223,7 @@ export default function Post() {
               No comments yet. Be the first to comment!
             </Typography>
           )}
+
           {displayedComments.length < comments.length && (
             <Box className="flex justify-center mt-2">
               <button
