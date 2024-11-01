@@ -258,7 +258,7 @@ export default function AdminEventLists() {
   return (
     <div className="p-2 mid:mt-20">
       {loading ? (
-        <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
           <CircularProgress size={40} className="text-btColour" />
         </div>
       ) : (
