@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Snackbar } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import Spinner from "../components/tools/Spinner";
-import CredulenLogo from "../assets/CredulenLogo.png";
+import CredulenLogo from "../assets/CredulenLogo2.png";
 
 const backendURL =
   import.meta.env.MODE === "production"
@@ -63,7 +63,7 @@ const PasswordReset = () => {
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
         <div className="text-center">
           <div className="text-center">
-            <img src={CredulenLogo} alt="Autograph Logo" />
+            <img src={CredulenLogo} alt="Credulen Logo" />
 
             <p className="mt-2  font-bold text-lg text-gray-600">
               Reset Password

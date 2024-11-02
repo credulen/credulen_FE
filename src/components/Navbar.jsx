@@ -312,15 +312,13 @@
 
 // export default Navbar;
 
-export function DropdownItems() {
+export function DropdownItems({ closeDropdown }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { loading, userInfo, error, isOtpRequired, tempUserId } = useSelector(
-    (state) => state.auth
-  );
+  const { userInfo } = useSelector((state) => state.auth);
   const { profile } = useSelector((state) => state.profiles);
 
   const userId = userInfo?._id;
@@ -328,12 +326,6 @@ export function DropdownItems() {
     userInfo?.role === "admin"
       ? "/DashBoard/Admin_Dashboard"
       : "/DashBoard/profile";
-
-  useEffect(() => {
-    if (userId) {
-      dispatch(fetchProfileById(userId));
-    }
-  }, [dispatch, userId]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -347,25 +339,24 @@ export function DropdownItems() {
   }, []);
 
   const handleLogout = () => {
-    try {
-      dispatch(logoutUser());
-      navigate("/");
-      window.location.reload();
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+    dispatch(logoutUser());
+    navigate("/");
+    window.location.reload();
   };
 
   if (!userInfo) {
     return (
-      <div className="flex items-center gap-3">
-        <Link
+      <div className="flex items-center gap-3" ref={dropdownRef}>
+        <NavLink
+          onClick={() => {
+            closeDropdown(); // Close dropdown when clicking Login
+            setIsOpen(false);
+          }}
           to="/login"
-          type="button"
           className="text-white bg-gradient-to-r from-cyan-500 to-btColour hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-xs px-4 py-2 text-center me-2 mb-2"
         >
           Login
-        </Link>
+        </NavLink>
       </div>
     );
   }
@@ -412,18 +403,21 @@ export function DropdownItems() {
         <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-1 z-50 transform opacity-100 scale-100 transition-all duration-200">
           <div className="px-4 py-3 border-b border-gray-100">
             <p className="text-sm font-medium text-gray-900 truncate">
-              {userInfo?.email || "User email not available"}
+              {userInfo?.email || "User  email not available"}
             </p>
           </div>
 
           <NavLink
             to={dashboardPath}
             className={({ isActive }) =>
-              `block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50  hover:text-btColour transition-colors duration-150 ${
+              `block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-btColour transition-colors duration-150 ${
                 isActive ? "bg-gray-50 text-cyan-600" : ""
               }`
             }
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+              setIsOpen(false);
+              closeDropdown(); // Close the main dropdown when clicking a link
+            }}
           >
             Dashboard
           </NavLink>
@@ -432,6 +426,7 @@ export function DropdownItems() {
             onClick={() => {
               setIsOpen(false);
               handleLogout();
+              closeDropdown(); // Close the main dropdown when logging out
             }}
             className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-btColour transition-colors duration-150 flex justify-center items-center gap-2"
           >
@@ -454,6 +449,8 @@ import { IoPersonCircleOutline } from "react-icons/io5";
 import { HiOutlineLogout } from "react-icons/hi";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import CredulenLogo2 from "../assets/CredulenLogo2.png";
+import CredulenLogo from "../assets/CredulenLogo.png";
 
 const backendURL =
   import.meta.env.MODE === "production"
@@ -463,6 +460,92 @@ const backendURL =
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
+
+const DropdownMenu = ({ title, items, closeDropdown }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleMouseEnter = () => {
+    setIsOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsOpen(false);
+  };
+
+  return (
+    <div
+      ref={dropdownRef}
+      className="relative group"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="flex items-center cursor-pointer">
+        <span className="block py-2 px-3 rounded md:hover:bg-transparent hover:text-btColour md:p-0 transition-all duration-300">
+          {title}
+        </span>
+        <svg
+          className={`w-2.5 h-2.5 ms-2 transform transition-transform duration-300 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 10 6"
+        >
+          <path
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="m1 1 4 4 4-4"
+          />
+        </svg>
+      </div>
+
+      <div
+        className={`absolute z-10 right-[-3rem] mid:left-0 text-black rounded-lg shadow-lg w-44 mt-2 bg-white border transform transition-all duration-200 ease-in-out ${
+          isOpen
+            ? "opacity-100 translate-y-0 visible"
+            : "opacity-0 translate-y-1 invisible"
+        }`}
+      >
+        <ul className="py-2 text-sm">
+          {items.map((item, index) => (
+            <li key={index} className="relative group/item">
+              <NavLink
+                to={item.path}
+                className={({ isActive }) =>
+                  `block px-4 py-2 hover:bg-gray-50 hover:text-btColour transition-colors duration-200 ${
+                    isActive ? "text-btColour bg-gray-50" : "text-gray-700"
+                  }`
+                }
+                onClick={() => {
+                  setIsOpen(false);
+                  closeDropdown(); // Close the main dropdown when clicking a link
+                }}
+              >
+                <span className="relative z-10">{item.label}</span>
+                <div className="absolute inset-0 bg-gray-50 transform scale-x-0 group-hover/item:scale-x-100 transition-transform duration-200 origin-left" />
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+};
 
 const Navbar = () => {
   const userDropdownRef = useRef(null);
@@ -485,6 +568,10 @@ const Navbar = () => {
 
   const handleLinkClick = () => {
     if (isMenuOpen) setIsMenuOpen(false);
+  };
+
+  const closeDropdown = () => {
+    setIsMenuOpen(false);
   };
 
   const handleClickOutside = (event) => {
@@ -529,93 +616,6 @@ const Navbar = () => {
     isScrolled || location.pathname !== "/" ? "text-black" : " !text-white "
   }`;
 
-  const DropdownMenu = ({ title, items }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const dropdownRef = useRef(null);
-
-    useEffect(() => {
-      const handleClickOutside = (event) => {
-        if (
-          dropdownRef.current &&
-          !dropdownRef.current.contains(event.target)
-        ) {
-          setIsOpen(false);
-        }
-      };
-
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
-
-    const handleMouseEnter = () => {
-      setIsOpen(true);
-    };
-
-    const handleMouseLeave = () => {
-      setIsOpen(false);
-    };
-
-    return (
-      <div
-        ref={dropdownRef}
-        className="relative group"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        <div className="flex items-center cursor-pointer">
-          <span className="block py-2 px-3 rounded md:hover:bg-transparent hover:text-btColour md:p-0 transition-all duration-300">
-            {title}
-          </span>
-          <svg
-            className={`w-2.5 h-2.5 ms-2 transform transition-transform duration-300 ${
-              isOpen ? "rotate-180" : ""
-            }`}
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 10 6"
-          >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="m1 1 4 4 4-4"
-            />
-          </svg>
-        </div>
-
-        <div
-          className={`absolute z-10 right-[-3rem] mid:left-0 text-black rounded-lg shadow-lg w-44 mt-2 bg-white border transform transition-all duration-200 ease-in-out ${
-            isOpen
-              ? "opacity-100 translate-y-0 visible"
-              : "opacity-0 translate-y-1 invisible"
-          }`}
-        >
-          <ul className="py-2 text-sm">
-            {items.map((item, index) => (
-              <li key={index} className="relative group/item">
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `block px-4 py-2 hover:bg-gray-50 hover:text-btColour transition-colors duration-200 ${
-                      isActive ? "text-btColour bg-gray-50" : "text-gray-700"
-                    }`
-                  }
-                  onClick={() => setIsOpen(false)}
-                >
-                  <span className="relative z-10">{item.label}</span>
-                  <div className="absolute inset-0 bg-gray-50 transform scale-x-0 group-hover/item:scale-x-100 transition-transform duration-200 origin-left" />
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <>
       <nav className={navbarClass}>
@@ -625,17 +625,23 @@ const Navbar = () => {
             className="flex items-center space-x-3 rtl:space-x-reverse"
           >
             <img
-              src="https://flowbite.com/docs/images/logo.svg"
-              className="h-8"
+              src={
+                isScrolled || location.pathname !== "/"
+                  ? CredulenLogo2
+                  : CredulenLogo
+              }
+              // className="w-[13rem] h-12"
+              className={
+                isScrolled || location.pathname !== "/"
+                  ? "w-[13rem] h-12"
+                  : "w-[12.8rem] h-[3.8rem]"
+              }
               alt="Flowbite Logo"
             />
-            <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-              Credulen
-            </span>
           </Link>
 
           <span className="md:order-2 flex space-x-3 items-center mid:hidden align-middle text-center">
-            <DropdownItems />
+            <DropdownItems closeDropdown={closeDropdown} />
           </span>
 
           <button
@@ -698,6 +704,7 @@ const Navbar = () => {
                       path: "/solutions",
                     },
                   ]}
+                  closeDropdown={closeDropdown}
                 />
               </li>
 
@@ -707,7 +714,9 @@ const Navbar = () => {
                   to="/blog"
                   className={({ isActive }) =>
                     `block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
-                      isActive ? "text-btColour mid:text-white" : ""
+                      isActive
+                        ? "text-btColour mid:bg-btColour mid:text-white"
+                        : ""
                     }`
                   }
                   end
@@ -723,6 +732,7 @@ const Navbar = () => {
                     { label: "Webinars", path: "/webinars" },
                     { label: "Conferences", path: "/conferences" },
                   ]}
+                  closeDropdown={closeDropdown}
                 />
               </li>
 
@@ -745,7 +755,7 @@ const Navbar = () => {
 
               <li>
                 <span className="md:order-2 flex space-x-3 items-center md:hidden align-middle text-center">
-                  <DropdownItems />
+                  <DropdownItems closeDropdown={closeDropdown} />
                 </span>
               </li>
             </ul>

@@ -1,389 +1,376 @@
- import React, { useEffect, useState, useCallback, useMemo } from "react";
- import { useSelector } from "react-redux";
- import {
-   HiAnnotation,
-   HiDocumentText,
-   HiArrowNarrowUp,
-   HiLightBulb,
-   HiMail,
-   HiUser,
-   HiArrowNarrowDown,
-   HiTrendingUp,
-   HiCalendar,
- } from "react-icons/hi";
- import { Line } from "react-chartjs-2";
- import { CircularProgress } from "@mui/material";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  Button,
+  TextField,
+  MenuItem,
+  Box,
+  Select,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import { CircularProgress } from "@mui/material";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import { IoArrowBack } from "react-icons/io5";
+const backendURL =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_BACKEND_URL
+    : "http://localhost:3001";
 
- const AdminDashboard = () => {
-   const backendURL =
-     import.meta.env.MODE === "production"
-       ? import.meta.env.VITE_BACKEND_URL
-       : "http://localhost:3001";
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
-   const [stats, setStats] = useState({
-     users: { total: 0, lastMonth: 0, data: [] },
-     comments: { total: 0, lastMonth: 0, data: [] },
-     posts: { total: 0, lastMonth: 0, data: [] },
-     solutions: { total: 0, lastMonth: 0, data: [] },
-     subscribers: {
-       total: 0,
-       weekly: 0,
-       monthly: 0,
-       prevMonth: 0,
-       weeklyBreakdown: [],
-       monthlyBreakdown: [],
-       growthRate: { monthly: 0 },
-     },
-   });
-   const [loading, setLoading] = useState(true);
-   const [timeRange, setTimeRange] = useState("week");
-   const { userInfo } = useSelector((state) => state.auth);
+export default function CreatePosts() {
+  const { postId } = useParams();
+  const navigate = useNavigate();
+  const fileInputRef = useRef(null);
 
-   const fetchData = useCallback(
-     async (endpoint) => {
-       try {
-         const res = await fetch(`${backendURL}/api/${endpoint}`);
-         return res.ok ? await res.json() : null;
-       } catch (error) {
-         console.error(`Error fetching ${endpoint}:`, error);
-         return null;
-       }
-     },
-     [backendURL]
-   );
+  const [formData, setFormData] = useState({
+    title: "",
+    category: "uncategorized",
+    content: "",
+    authorId: "",
+  });
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [imageUploadProgress, setImageUploadProgress] = useState(0);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  const [authors, setAuthors] = useState([]);
 
-   const fetchAllStats = useCallback(async () => {
-     const endpoints = {
-       users: "getUsers",
-       posts: "getPosts?limit=5",
-       comments: "getComments?limit=5",
-       solutions: "getAllSolutions?limit=5",
-       subscribers: "getNewsletterSubscribers",
-     };
+  useEffect(() => {
+    const fetchAuthors = async () => {
+      try {
+        const res = await fetch(`${backendURL}/api/getAllAuthors`);
+        const data = await res.json();
+        // Ensure that each author object has an 'id' property
+        const formattedAuthors = data.map((author) => ({
+          id: author._id, // Assuming the backend sends '_id'
+          name: author.name,
+        }));
+        setAuthors(formattedAuthors);
+      } catch (error) {
+        console.error("Failed to fetch authors:", error);
+        showSnackbar("Failed to fetch authors", "error");
+      }
+    };
 
-     const results = await Promise.all(
-       Object.entries(endpoints).map(async ([key, endpoint]) => {
-         const data = await fetchData(endpoint);
-         return [key, data];
-       })
-     );
+    fetchAuthors();
+    const fetchPost = async () => {
+      if (postId) {
+        try {
+          const res = await fetch(`${backendURL}/api/getPostById/${postId}`);
+          const post = await res.json();
+          console.log("Raw API response:", post);
 
-     setStats((prevStats) => {
-       const newStats = { ...prevStats };
-       results.forEach(([key, data]) => {
-         if (data) {
-           if (key === "subscribers") {
-             const subscriberStats = {
-               total: data.data.totalSubscribers || 0,
-               weekly: data.data.weeklySubscribers || 0,
-               monthly: data.data.monthlySubscribers || 0,
-               prevMonth: data.data.prevMonthSubscribers || 0,
-               weeklyBreakdown: data.data.weeklyBreakdown || [],
-               monthlyBreakdown: data.data.monthlyBreakdown || [],
-               growthRate: data.data.growthRate || { monthly: 0 },
-             };
-             newStats[key] = subscriberStats;
-           } else {
-             newStats[key] = {
-               total:
-                 data[`total${key.charAt(0).toUpperCase() + key.slice(1)}`] ||
-                 0,
-               lastMonth: data.lastMonth || 0,
-               data: data[key] || [],
-             };
-           }
-         }
-       });
-       return newStats;
-     });
-   }, [fetchData]);
-   // Log 5: Add useEffect to monitor stats changes
-   useEffect(() => {
-     console.log("Stats updated:", stats);
-   }, [stats]);
-   useEffect(() => {
-     if (userInfo) {
-       setLoading(true);
-       fetchAllStats().finally(() => setLoading(false));
-     }
-   }, [userInfo, fetchAllStats]);
+          if (post) {
+            console.log("Setting form data with:", {
+              title: post.title || "",
+              category: post.category || "uncategorized",
+              content: post.content || "",
+              authorId: post.authorId || "",
+            });
 
-   const LoadingSpinner = useMemo(
-     () => (
-       <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
-         <CircularProgress size={40} className="text-btColour" />
-       </div>
-     ),
-     []
-   );
+            setFormData({
+              title: post.title || "",
+              category: post.category || "uncategorized",
+              content: post.content || "",
+              authorId: post.authorId || "",
+            });
 
-   const StatCard = ({ title, stats, icon: Icon, bgColor }) => (
-     <div className="bg-white dark:bg-slate-800 shadow-lg rounded-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
-       <div className="flex justify-between items-center mb-4">
-         <div className="flex-1">
-           <h3 className="text-gray-500 text-sm font-medium uppercase tracking-wide">
-             {title}
-           </h3>
-           <p className="text-3xl font-semibold mt-2">{stats.total}</p>
-         </div>
-         <div className={`${bgColor} p-4 rounded-full shadow-lg`}>
-           <Icon className="text-white text-xl" />
-         </div>
-       </div>
-       <div className="flex items-center gap-2 text-sm text-gray-500">
-         <span className="text-green-500 flex items-center gap-1">
-           <HiArrowNarrowUp />
-           {stats.lastMonth}
-         </span>
-         <span>Last month</span>
-       </div>
-     </div>
-   );
+            console.log("Form data after setting:", formData);
 
-   const SubscriberStats = () => {
-     const growthRate = stats.subscribers.growthRate.monthly;
-     const isGrowthPositive = growthRate > 0;
-     const growthDisplay =
-       growthRate === "Infinity"
-         ? "∞"
-         : `${Math.abs(parseFloat(growthRate)).toFixed(1)}%`;
+            setImagePreview(post.image ? `${backendURL}${post.image}` : null);
+          }
+        } catch (error) {
+          console.error("Error fetching post:", error);
+          showSnackbar("Failed to fetch post", "error");
+        }
+      }
+    };
+    fetchPost();
+  }, [postId]);
 
-     return (
-       <div className="bg-white dark:bg-slate-800 shadow-lg rounded-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
-         <div className="flex justify-between items-center mb-4">
-           <div className="flex-1">
-             <h3 className="text-gray-500 text-sm font-medium uppercase tracking-wide">
-               Newsletter Subscribers
-             </h3>
-             <p className="text-3xl font-semibold mt-2">
-               {stats.subscribers.total}
-             </p>
-           </div>
-           <div className="bg-blue-600 p-4 rounded-full shadow-lg">
-             <HiMail className="text-white text-xl" />
-           </div>
-         </div>
-         <div className="space-y-4">
-           <div className="grid grid-cols-2 gap-4">
-             <div className="bg-gray-50 dark:bg-slate-700 p-3 rounded-lg">
-               <div className="flex items-center gap-2 mb-1">
-                 <HiCalendar className="text-blue-500" />
-                 <span className="text-sm text-gray-600 dark:text-gray-300">
-                   This Week
-                 </span>
-               </div>
-               <p className="text-lg font-semibold">
-                 {stats.subscribers.weekly}
-               </p>
-             </div>
-             <div className="bg-gray-50 dark:bg-slate-700 p-3 rounded-lg">
-               <div className="flex items-center gap-2 mb-1">
-                 <HiTrendingUp className="text-blue-500" />
-                 <span className="text-sm text-gray-600 dark:text-gray-300">
-                   This Month
-                 </span>
-               </div>
-               <p className="text-lg font-semibold">
-                 {stats.subscribers.monthly}
-               </p>
-             </div>
-           </div>
-           <div className="flex items-center gap-2 text-sm bg-gray-50 dark:bg-slate-700 p-3 rounded-lg">
-             <span
-               className={`flex items-center gap-1 ${
-                 isGrowthPositive ? "text-green-500" : "text-red-500"
-               }`}
-             >
-               {isGrowthPositive ? <HiArrowNarrowUp /> : <HiArrowNarrowDown />}
-               {growthDisplay}
-             </span>
-             <span className="text-gray-500">Monthly Growth</span>
-           </div>
-         </div>
-       </div>
-     );
-   };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
-   const SubscriberChart = useMemo(() => {
-     const breakdownData =
-       (timeRange === "week"
-         ? stats.subscribers.weeklyBreakdown
-         : stats.subscribers.monthlyBreakdown) || [];
+  const handleQuillChange = (value) => {
+    setFormData({ ...formData, content: value });
+  };
 
-     if (!breakdownData.length) {
-       return (
-         <div className="flex-1 min-w-[280px] p-6 bg-white dark:bg-slate-800 shadow-lg border border-gray-200 rounded-lg">
-           <div className="flex justify-between items-center mb-6">
-             <h3 className="text-gray-500 text-md uppercase">
-               Subscriber Growth
-             </h3>
-             <div className="flex gap-2">
-               <button
-                 onClick={() => setTimeRange("week")}
-                 className={`px-3 py-1 rounded-md text-sm ${
-                   timeRange === "week"
-                     ? "bg-blue-600 text-white"
-                     : "bg-gray-100 text-gray-600"
-                 }`}
-               >
-                 Week
-               </button>
-               <button
-                 onClick={() => setTimeRange("month")}
-                 className={`px-3 py-1 rounded-md text-sm ${
-                   timeRange === "month"
-                     ? "bg-blue-600 text-white"
-                     : "bg-gray-100 text-gray-600"
-                 }`}
-               >
-                 Month
-               </button>
-             </div>
-           </div>
-           <div className="h-[300px] flex items-center justify-center text-gray-500">
-             No data available for this period
-           </div>
-         </div>
-       );
-     }
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
 
-     const data = {
-       labels: breakdownData.map((item) => {
-         const date = new Date(item._id);
-         return timeRange === "week"
-           ? date.toLocaleDateString("en-US", {
-               weekday: "short",
-               month: "short",
-               day: "numeric",
-             })
-           : date.toLocaleDateString("en-US", {
-               month: "short",
-               day: "numeric",
-             });
-       }),
-       datasets: [
-         {
-           label: "New Subscribers",
-           data: breakdownData.map((item) => item.count),
-           fill: true,
-           backgroundColor: "rgba(59, 130, 246, 0.1)",
-           borderColor: "rgb(59, 130, 246)",
-           tension: 0.4,
-         },
-       ],
-     };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.title || !formData.content || !formData.authorId) {
+      showSnackbar("Title, content, and author are required", "error");
+      return;
+    }
 
-     const options = {
-       responsive: true,
-       maintainAspectRatio: false,
-       plugins: {
-         legend: {
-           display: false,
-         },
-         tooltip: {
-           mode: "index",
-           intersect: false,
-           callbacks: {
-             title: (tooltipItems) => {
-               const date = new Date(
-                 breakdownData[tooltipItems[0].dataIndex]._id
-               );
-               return date.toLocaleDateString("en-US", {
-                 weekday: "long",
-                 year: "numeric",
-                 month: "long",
-                 day: "numeric",
-               });
-             },
-           },
-         },
-       },
-       scales: {
-         y: {
-           beginAtZero: true,
-           ticks: {
-             precision: 0,
-           },
-         },
-       },
-     };
+    setLoading(true);
+    try {
+      const postFormData = new FormData();
+      postFormData.append("title", formData.title);
+      postFormData.append("content", formData.content);
+      postFormData.append("category", formData.category);
+      postFormData.append("authorId", formData.authorId);
 
-     return (
-       <div className="flex-1 min-w-[280px] p-6 bg-white dark:bg-slate-800 shadow-lg border border-gray-200 rounded-lg">
-         <div className="flex justify-between items-center mb-6">
-           <h3 className="text-gray-500 text-md uppercase">
-             Subscriber Growth
-           </h3>
-           <div className="flex gap-2">
-             <button
-               onClick={() => setTimeRange("week")}
-               className={`px-3 py-1 rounded-md text-sm ${
-                 timeRange === "week"
-                   ? "bg-blue-600 text-white"
-                   : "bg-gray-100 text-gray-600"
-               }`}
-             >
-               Week
-             </button>
-             <button
-               onClick={() => setTimeRange("month")}
-               className={`px-3 py-1 rounded-md text-sm ${
-                 timeRange === "month"
-                   ? "bg-blue-600 text-white"
-                   : "bg-gray-100 text-gray-600"
-               }`}
-             >
-               Month
-             </button>
-           </div>
-         </div>
-         <div className="h-[300px]">
-           <Line data={data} options={options} />
-         </div>
-       </div>
-     );
-   }, [
-     stats.subscribers.weeklyBreakdown,
-     stats.subscribers.monthlyBreakdown,
-     timeRange,
-   ]);
+      if (selectedFile) {
+        postFormData.append("image", selectedFile);
+      }
 
-   if (loading) return LoadingSpinner;
+      // Log FormData contents (for debugging)
+      for (let [key, value] of postFormData.entries()) {
+        console.log(key, value);
+      }
 
-   return (
-     <div className="p-4 max-w-[1600px] mx-auto">
-       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
-         <StatCard
-           title="Total Users"
-           stats={stats.users}
-           icon={HiUser}
-           bgColor="bg-teal-600"
-         />
-         <StatCard
-           title="Total Comments"
-           stats={stats.comments}
-           icon={HiAnnotation}
-           bgColor="bg-indigo-600"
-         />
-         <StatCard
-           title="Total Posts"
-           stats={stats.posts}
-           icon={HiDocumentText}
-           bgColor="bg-lime-600"
-         />
-         <StatCard
-           title="Total Solutions"
-           stats={stats.solutions}
-           icon={HiLightBulb}
-           bgColor="bg-amber-600"
-         />
-       </div>
-       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-         <SubscriberStats />
-         <div className="lg:col-span-2">{SubscriberChart}</div>
-       </div>
-     </div>
-   );
- };
+      let response;
+      if (postId) {
+        response = await fetch(`${backendURL}/api/updatePost/${postId}`, {
+          method: "PUT",
+          body: postFormData,
+        });
+      } else {
+        response = await fetch(`${backendURL}/api/createPost`, {
+          method: "POST",
+          body: postFormData,
+        });
+      }
 
- export default AdminDashboard;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to save post");
+      }
+
+      const data = await response.json();
+      console.log("Response data:", data);
+
+      showSnackbar(
+        postId ? "Post updated successfully" : "Post created successfully",
+        "success"
+      );
+      navigate("/DashBoard/Admin/Posts");
+    } catch (error) {
+      console.error("Error saving post:", error);
+      showSnackbar(error.message || "Failed to save post", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const showSnackbar = (message, severity) => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const handleDelete = async () => {
+    if (!postId) return;
+
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      setLoading(true);
+      try {
+        const response = await fetch(`${backendURL}/api/deletePost/${postId}`, {
+          method: "DELETE",
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to delete post");
+        }
+
+        showSnackbar("Post deleted successfully", "success");
+        navigate("/dashboard");
+      } catch (error) {
+        console.error("Error deleting post:", error);
+        showSnackbar(error.message || "Failed to delete post", "error");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleBackClick = () => {
+    navigate(-1); // Go back to the previous page
+  };
+
+  return (
+    <>
+      <button
+        onClick={handleBackClick}
+        className="flex items-center text-blue-500 hover:text-blue-700 transition-colors duration-200"
+      >
+        <IoArrowBack className="mr-2" size={24} /> {/* Back Arrow Icon */}
+        Back
+      </button>
+      <Box className="p-3 max-w-3xl mx-auto min-h-screen">
+        <h1 className="text-center text-3xl my-7 font-semibold">
+          {postId ? "Edit Post" : "Create a Post"}
+        </h1>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <TextField
+            label="Title"
+            required
+            id="title"
+            name="title"
+            value={formData.title}
+            onChange={handleInputChange}
+            fullWidth
+          />
+          <TextField
+            select
+            label="Category"
+            id="category"
+            name="category"
+            value={formData.category}
+            onChange={handleInputChange}
+            fullWidth
+          >
+            <MenuItem value="uncategorized">Select a category</MenuItem>
+            <MenuItem value="Web3-&-Blockchain-Education">
+              Web3 & Blockchain Education
+            </MenuItem>
+
+            <MenuItem value="Web3 & Blockchain Trends">
+              Web3 & Blockchain Trends
+            </MenuItem>
+
+            <MenuItem value="Web3 & Blockchain Trends">
+              Web3 & Blockchain Trends
+            </MenuItem>
+
+            <MenuItem value="Big Data & A.I Trends">
+              Big Data & A.I Trends
+            </MenuItem>
+            <MenuItem value="Big Data & A.I Education">
+              Big Data & A.I Education
+            </MenuItem>
+            <MenuItem value="Data in Web3/DeFi">Data in Web3/DeFi</MenuItem>
+          </TextField>
+          <FormControl fullWidth>
+            <InputLabel id="author-select-label">Author</InputLabel>
+            <Select
+              labelId="author-select-label"
+              id="authorId"
+              name="authorId"
+              value={formData.authorId}
+              onChange={handleInputChange}
+              label="Author"
+              //   required
+            >
+              {authors.map((author) => (
+                <MenuItem key={author.id} value={author.id}>
+                  {author.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Box className="flex gap-4 items-center justify-between border-4 border-teal-500 border-dotted p-3">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              ref={fileInputRef}
+              style={{ display: "none" }}
+            />
+            <Button
+              variant="outlined"
+              onClick={() => fileInputRef.current.click()}
+            >
+              Choose File
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleFileChange}
+              disabled={!selectedFile || imageUploadProgress > 0}
+            >
+              {imageUploadProgress > 0 ? (
+                <CircularProgress
+                  variant="determinate"
+                  value={imageUploadProgress}
+                  size={24}
+                />
+              ) : (
+                "Upload Image"
+              )}
+            </Button>
+          </Box>
+          {imagePreview && (
+            <img
+              src={imagePreview}
+              alt="preview"
+              className="w-full h-[30rem]  object-cover"
+            />
+          )}
+          <ReactQuill
+            theme="snow"
+            placeholder="Write something..."
+            className="h-72 mb-12"
+            required
+            value={formData.content}
+            onChange={handleQuillChange}
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            disabled={loading}
+          >
+            {loading ? (
+              <CircularProgress size={24} />
+            ) : postId ? (
+              "Update Post"
+            ) : (
+              "Publish Post"
+            )}
+          </Button>
+          {postId && (
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={handleDelete}
+              disabled={loading}
+            >
+              Delete Post
+            </Button>
+          )}
+        </form>
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={snackbar.severity}
+            sx={{ width: "100%" }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </>
+  );
+}

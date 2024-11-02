@@ -599,9 +599,9 @@
 // ));
 
 // const LoadingSpinner = React.memo(() => (
-//   <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
-//     <CircularProgress size={40} className="text-btColour" />
-//   </div>
+// <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+//   <CircularProgress size={40} className="text-btColour" />
+// </div>
 // ));
 
 // const BlogPost = React.memo(({ post }) => {
@@ -799,7 +799,8 @@
 // export default BlogList;
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+
 import moment from "moment";
 import {
   Grid,
@@ -1042,9 +1043,16 @@ const BlogSidebar = React.memo(
 );
 
 const BlogList = () => {
+  const location = useLocation();
+
+  const query = new URLSearchParams(location.search);
+
+  const categoryFromQuery = query.get("category");
   const [posts, setPosts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(
+    categoryFromQuery || ""
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(6);
   const [isLoading, setIsLoading] = useState(true);

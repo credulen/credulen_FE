@@ -206,6 +206,7 @@ import React, { useState, useEffect } from "react";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { Bell, CheckCircle, AlertCircle, X, Loader } from "lucide-react";
 import { Alert, AlertDescription } from "../components/tools/Alert";
+import CredulenLogo from "../assets/CredulenLogo.png";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import { Button } from "@mui/material";
 
@@ -394,7 +395,11 @@ const Footer = () => {
           <div className="lg:col-span-5">
             <div className="max-w-md">
               {/* Logo */}
-              <img src="/logo.png" alt="Credulen" className="h-8 mb-6" />
+              <img
+                src={CredulenLogo}
+                alt="Credulen logo"
+                className="w-[13rem] h-[55px] mb-6"
+              />
 
               {/* Newsletter Section - Reduced size */}
               <div className="mb-6">

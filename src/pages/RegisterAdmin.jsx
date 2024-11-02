@@ -7,7 +7,7 @@ import MuiAlert from "@mui/material/Alert";
 import { registerAdmin } from "../features/auth/authActions";
 import { resetSuccess, resetError } from "../features/auth/authSlice";
 import { Eye, EyeOff, Mail, User, Lock } from "lucide-react";
-import CredulenLogo from "../assets/CredulenLogo.png";
+import CredulenLogo from "../assets/CredulenLogo2.png";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -79,10 +79,10 @@ const RegisterAdmin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 mt-10">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
         <div className="text-center">
-          <img src={CredulenLogo} alt="Autograph Logo" />
+          <img src={CredulenLogo} alt="Credulen Logo" />
 
           <p className="mt-2  font-bold text-lg text-gray-600">
             Register Admin

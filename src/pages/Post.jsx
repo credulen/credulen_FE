@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useRef,
 } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Snackbar, Alert, Grid } from "@mui/material";
 import ModeCommentOutlined from "@mui/icons-material/ModeCommentOutlined";
@@ -107,58 +107,72 @@ export const RelatedPosts = ({ category, currentPostId }) => {
       <h3 variant="h5" className="mb-4 font-semibold text-xl text-btColour">
         Related Posts
       </h3>
-      <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4 minilg:grid-cols-1">
-        {relatedPosts.map((post) => (
-          <Card
-            key={post._id}
-            className="flex flex-col cursor-pointer transition-all duration-300 ease-in-out 
-                       hover:shadow-md hover:border-gray-300"
-            onClick={() => handlePostClick(post.slug)}
-          >
-            <CardContent className="flex-grow p-4">
-              <Typography
-                className="font-semibold mb-2 hover:text-btColour hover:scale-105 transition-all duration-300 ease-in"
-                variant="h6"
-              >
-                {post.title}
-              </Typography>
-              <Box className="flex items-center mb-2">
-                <Avatar
-                  src={`${backendURL}${post.authorId.image}`}
-                  alt={post.authorId.name}
-                  sx={{ width: 24, height: 24, mr: 1 }} // 3rem size adjustment
-                />
 
-                <Typography variant="body2" className="text-gray-600">
-                  {post.authorId.name}
+      <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4 minilg:grid-cols-1">
+        {relatedPosts.length === 0 ? (
+          <Typography variant="body2" color="text.secondary" textAlign="center">
+            No related posts available.
+          </Typography>
+        ) : (
+          relatedPosts.map((post) => (
+            <Card
+              key={post._id}
+              className="flex flex-col cursor-pointer transition-all duration-300 ease-in-out 
+
+                       hover:shadow-md hover:border-gray-300"
+              onClick={() => handlePostClick(post.slug)}
+            >
+              <CardContent className="flex-grow p-4">
+                <Typography
+                  className="font-semibold mb-2 hover:text-btColour hover:scale-105 transition-all duration-300 ease-in"
+                  variant="h6"
+                >
+                  {post.title}
                 </Typography>
-              </Box>
-              <Typography
-                variant="caption"
-                className="text-gray-500 mb-2 block"
-              >
-                {moment(post.createdAt).format("MMMM D, YYYY")}
-              </Typography>
-              <Box className="flex items-center text-gray-500 mt-1">
-                <FavoriteBorder
-                  fontSize="small"
-                  sx={{ fontSize: 16, mr: 0.3 }}
-                />
-                <Typography variant="caption" sx={{}}>
-                  {post.likes ? post.likes.length : 0} likes{" "}
-                  <span className="mx-2">|</span>
+
+                <Box className="flex items-center mb-2">
+                  <Avatar
+                    src={`${backendURL}${post.authorId.image}`}
+                    alt={post.authorId.name}
+                    sx={{ width: 24, height: 24, mr: 1 }} // 3rem size adjustment
+                  />
+
+                  <Typography variant="body2" className="text-gray-600">
+                    {post.authorId.name}
+                  </Typography>
+                </Box>
+
+                <Typography
+                  variant="caption"
+                  className="text-gray-500 mb-2 block"
+                >
+                  {moment(post.createdAt).format("MMMM D, YYYY")}
                 </Typography>
-                <ChatBubbleOutline
-                  fontSize="small"
-                  sx={{ fontSize: 16, mr: 0.3, ml: 0 }}
-                />
-                <Typography variant="caption">
-                  {post.comments ? post.comments.length : 0} comments
-                </Typography>
-              </Box>
-            </CardContent>
-          </Card>
-        ))}
+
+                <Box className="flex items-center text-gray-500 mt-1">
+                  <FavoriteBorder
+                    fontSize="small"
+                    sx={{ fontSize: 16, mr: 0.3 }}
+                  />
+
+                  <Typography variant="caption" sx={{}}>
+                    {post.likes ? post.likes.length : 0} likes{" "}
+                    <span className="mx-2">|</span>
+                  </Typography>
+
+                  <ChatBubbleOutline
+                    fontSize="small"
+                    sx={{ fontSize: 16, mr: 0.3, ml: 0 }}
+                  />
+
+                  <Typography variant="caption">
+                    {post.comments ? post.comments.length : 0} comments
+                  </Typography>
+                </Box>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
     </Box>
   );
@@ -529,34 +543,6 @@ export default function Post() {
     window.open(shareUrl, "_blank");
   });
 
-  const handleLike = useCallback(async () => {
-    if (!postId || !currentUser?.userInfo?._id) return;
-
-    try {
-      setLoading(true);
-      const response = await fetch(`${backendURL}/api/likePost/${postId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: currentUser?.userInfo?._id }),
-      });
-
-      if (!response.ok) throw new Error("Failed to like post");
-
-      const data = await response.json();
-      setLikesCount(data.likesCount);
-      setIsLiked(data.isLiked);
-      setSnackbarMessage(data.message);
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
-    } catch (error) {
-      console.error("Error liking post:", error);
-      setSnackbarMessage("Failed to like post.");
-      setSnackbarSeverity("error");
-    } finally {
-      setLoading(false);
-    }
-  }, [postId, currentUser?.userInfo?._id]);
-
   const handleCommentSubmit = async (newComment) => {
     try {
       const commentData = {
@@ -850,6 +836,31 @@ export default function Post() {
     }
   };
 
+  const handleLike = useCallback(async () => {
+    if (!postId || !currentUser?.userInfo?._id) return;
+
+    try {
+      const response = await fetch(`${backendURL}/api/likePost/${postId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: currentUser?.userInfo?._id }),
+      });
+
+      if (!response.ok) throw new Error("Failed to like post");
+
+      const data = await response.json();
+      setLikesCount(data.likesCount);
+      setIsLiked(data.isLiked);
+      setSnackbarMessage(data.message);
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error("Error liking post:", error);
+      setSnackbarMessage("Failed to like post.");
+      setSnackbarSeverity("error");
+    }
+  }, [postId, currentUser?.userInfo?._id]);
+
   if (loading) return <LoadingSpinner />;
   if (error) return <Typography color="error">{error}</Typography>;
   if (!post) return <Typography>Post not found</Typography>;
@@ -857,7 +868,7 @@ export default function Post() {
   return (
     <Grid container spacing={3} sx={{ px: { xs: 2, md: 4 }, py: 11.5 }}>
       {/* Hero Section (keeping the same as before) */}
-      <div className="relative h-[90vh] w-full">
+      <div className="relativ h-[90vh] w-full ">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
@@ -869,15 +880,15 @@ export default function Post() {
 
         <div className="relative h-full flex flex-col justify-end pb-16 px-4 md:px-8 lg:px-16">
           <div className="mb-4">
-            <a
-              href="/society"
+            <Link
+              to={`/blog?category=${encodeURIComponent(post.category)}`} // Pass category as a query parameter
               className="inline-block bg-red-600 text-white text-sm px-4 py-1 rounded-sm hover:bg-red-700 transition-colors"
               style={{
                 opacity: 0.8,
               }}
             >
               {post.category}
-            </a>
+            </Link>
           </div>
 
           <h1

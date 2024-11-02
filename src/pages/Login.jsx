@@ -10,7 +10,7 @@ import {
 } from "../features/auth/authSlice";
 import { Alert, Snackbar } from "@mui/material";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-import CredulenLogo from "../assets/CredulenLogo.png";
+import CredulenLogo from "../assets/CredulenLogo2.png";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { handleGoogleLogin } from "../features/auth/authActions";
 
@@ -164,7 +164,7 @@ const Login = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 mt-10">
         <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
           <div className="text-center">
-            <img src={CredulenLogo} alt="Autograph Logo" />
+            <img src={CredulenLogo} alt="Credulen Logo " className="" />
             <p className="mt-2 font-bold text-lg text-gray-600">
               Sign in to your account
             </p>
