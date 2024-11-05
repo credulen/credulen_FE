@@ -38,7 +38,7 @@ import {
 } from "@mui/material";
 import { ChevronRight, Calendar, Eye, ArrowRight } from "lucide-react";
 import { CircularProgress } from "@mui/material";
-import { Favorite, FavoriteBorder } from "@mui/icons-material";
+import { Favorite, FavoriteBorder, Image } from "@mui/icons-material";
 import {
   ThumbUp,
   Edit,
@@ -132,13 +132,13 @@ export const RelatedPosts = ({ category, currentPostId }) => {
 
                 <Box className="flex items-center mb-2">
                   <Avatar
-                    src={`${backendURL}${post.authorId.image}`}
-                    alt={post.authorId.name}
+                    src={`${backendURL}${post.authorId?.image}`}
+                    alt={post.authorId?.name}
                     sx={{ width: 24, height: 24, mr: 1 }} // 3rem size adjustment
                   />
 
                   <Typography variant="body2" className="text-gray-600">
-                    {post.authorId.name}
+                    {post.authorId?.name}
                   </Typography>
                 </Box>
 
@@ -315,7 +315,7 @@ export const ExpandableCommentInput = ({
         }}
       >
         <Avatar
-          src={userAvatar}
+          src={userAvatar ? userAvatar : profile?.picture}
           sx={{ width: 32, height: 32, marginRight: "12px" }}
         />
         <input
@@ -543,6 +543,61 @@ export default function Post() {
     window.open(shareUrl, "_blank");
   });
 
+  // const handleCommentSubmit = async (newComment) => {
+  //   try {
+  //     const commentData = {
+  //       content: newComment,
+  //       postId: postId,
+  //       userId: userId,
+  //     };
+
+  //     const response = await fetch(`${backendURL}/api/createComment`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(commentData),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error("Failed to create comment");
+  //     }
+
+  //     const newCommentObj = await response.json();
+
+  //     // Create the complete comment object with user data
+  //     const commentWithUserData = {
+  //       ...newCommentObj,
+  //       userId: {
+  //         _id: userId,
+  //         username: name,
+  //         image: image,
+  //       },
+  //       likes: [], // Initialize empty likes array
+  //       likeCount: 0,
+  //     };
+
+  //     // Update both comments and displayedComments states
+  //     setComments((prevComments) => [...prevComments, commentWithUserData]);
+  //     setDisplayedComments((prevDisplayed) => {
+  //       // Only add to displayed comments if we haven't reached the page limit
+  //       if (prevDisplayed.length < currentPage * commentsPerPage) {
+  //         return [...prevDisplayed, commentWithUserData];
+  //       }
+  //       return prevDisplayed;
+  //     });
+
+  //     setSnackbarMessage("Comment submitted successfully!");
+  //     setSnackbarSeverity("success");
+  //     setSnackbarOpen(true);
+  //   } catch (error) {
+  //     console.error("Error submitting comment:", error);
+  //     setSnackbarMessage("Failed to submit comment.");
+  //     setSnackbarSeverity("error");
+  //     setSnackbarOpen(true);
+  //   }
+  // };
+
   const handleCommentSubmit = async (newComment) => {
     try {
       const commentData = {
@@ -565,16 +620,24 @@ export default function Post() {
 
       const newCommentObj = await response.json();
 
-      // Create the complete comment object with user data
+      // Fetch the current user's details to ensure we have the correct format
+      const userResponse = await fetch(`${backendURL}/api/users/${userId}`);
+      if (!userResponse.ok) {
+        throw new Error("Failed to fetch user details");
+      }
+      const userData = await userResponse.json();
+
+      // Create the complete comment object with properly structured user data
       const commentWithUserData = {
         ...newCommentObj,
         userId: {
-          _id: userId,
-          username: name,
-          image: image,
+          _id: userData._id,
+          username: userData.username,
+          image: userData.image,
         },
         likes: [], // Initialize empty likes array
         likeCount: 0,
+        createdAt: new Date().toISOString(), // Add creation timestamp
       };
 
       // Update both comments and displayedComments states
@@ -617,6 +680,7 @@ export default function Post() {
               `${backendURL}/api/users/${comment.userId}`
             );
             const userData = await userResponse.json();
+            console.log(userData);
             return {
               ...comment,
               userId: {
@@ -894,7 +958,7 @@ export default function Post() {
           <h1
             className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 max-w-4xl"
             style={{
-              opacity: 0.1,
+              opacity: 0.3,
             }}
           >
             {post.title}
@@ -903,7 +967,7 @@ export default function Post() {
           <div className="flex flex-wrap items-center gap-4 text-sm md:text-base text-gray-300">
             <div
               style={{
-                opacity: 0.1,
+                opacity: 0.3,
               }}
               className="flex items-center"
             >
@@ -917,15 +981,15 @@ export default function Post() {
                   sx={{ width: 30, height: 30 }}
                 >
                   {/* `${backendURL}${post.authorId.image}` */}
-                  {!post?.authorId?.image && <ImageIcon />}
+                  {!post?.authorId?.image && <Image />}
                 </Avatar>
-                <span className="ml-2">{post.authorId.name}</span>
+                <span className="ml-2">{post.authorId?.name}</span>
               </a>
             </div>
 
             <div
               style={{
-                opacity: 0.1,
+                opacity: 0.3,
               }}
               className="flex items-center"
             >
@@ -934,7 +998,7 @@ export default function Post() {
             </div>
             <div
               style={{
-                opacity: 0.1,
+                opacity: 0.3,
               }}
               className="flex items-center"
             ></div>
@@ -1082,9 +1146,12 @@ export default function Post() {
                   sx={{ mb: 2, bgcolor: "white", borderRadius: 1, p: 2 }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                    {/* Avatar */}
                     <Avatar
-                      src={`${backendURL}/uploads/${comment?.userId?.image}`}
+                      src={
+                        comment?.userId?.image
+                          ? `${backendURL}/uploads/${comment.userId.image}`
+                          : comment?.userId?.picture
+                      }
                       alt={comment.username}
                       sx={{ width: 22, height: 22, mr: 1, mb: 1 }}
                     />

@@ -698,10 +698,13 @@ const Navbar = () => {
                 <DropdownMenu
                   title="Solutions"
                   items={[
-                    { label: "Training Schools", path: "/solutions" },
+                    {
+                      label: "Training Schools",
+                      path: "/solutions/training_School",
+                    },
                     {
                       label: "Consulting Services",
-                      path: "/solutions",
+                      path: "/solutions/consulting_Services",
                     },
                   ]}
                   closeDropdown={closeDropdown}

@@ -398,6 +398,11 @@ const SingleEventPost = () => {
   const [showModal, setShowModal] = useState(false);
   const [alertInfo, setAlertInfo] = useState(null);
 
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [verifyEmail, setVerifyEmail] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verifyAlert, setVerifyAlert] = useState(null);
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -405,12 +410,55 @@ const SingleEventPost = () => {
     reason: "",
   });
 
-  console.log(relatedEvents);
-
   const backendURL =
     import.meta.env.MODE === "production"
       ? import.meta.env.VITE_BACKEND_URL
       : "http://localhost:3001";
+
+  const handleVerifyEmail = async (e) => {
+    e.preventDefault();
+    setIsVerifying(true);
+
+    try {
+      const response = await fetch(`${backendURL}/api/verify-registration`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: verifyEmail,
+          slug: eventData.slug,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setVerifyAlert({
+          message: "Verification successful!",
+          variant: "success",
+          icon: CheckCircle,
+        });
+
+        // Delay navigation to show success message
+        setTimeout(() => {
+          navigate(`/eventVideo/${eventData.slug}`);
+        }, 1500);
+      } else {
+        setVerifyAlert({
+          message: data.message || "Email not found in registration list.",
+          variant: "destructive",
+          icon: AlertCircle,
+        });
+      }
+    } catch (error) {
+      setVerifyAlert({
+        message: "An error occurred. Please try again.",
+        variant: "destructive",
+        icon: AlertCircle,
+      });
+    } finally {
+      setIsVerifying(false);
+    }
+  };
 
   const handleSubmit = useCallback(
     async (e) => {
@@ -669,6 +717,20 @@ const SingleEventPost = () => {
                       day: "numeric",
                     })}{" "}
                     at {new Date(eventData.date).toLocaleTimeString()} (+1GMT)
+                    <span className="text-red-300">
+                      {" "}
+                      {new Date(eventData.date) < new Date()
+                        ? `Past Event${
+                            eventData.eventType === "webinar" &&
+                            eventData.videoUrl &&
+                            (typeof eventData.videoUrl === "string"
+                              ? eventData.videoUrl.trim().length > 0
+                              : eventData.videoUrl)
+                              ? " - Recording Available"
+                              : ""
+                          }`
+                        : ""}
+                    </span>
                   </Typography>
                 </Box>
                 <Typography
@@ -824,6 +886,84 @@ const SingleEventPost = () => {
                     )}
                   </button>
                 </form>
+
+                {new Date(eventData.date) < new Date() &&
+                  eventData.eventType === "webinar" &&
+                  eventData.videoUrl && (
+                    <div className="mt-4">
+                      <button
+                        onClick={() => setShowVerifyModal(true)}
+                        className="text-sm text-teal-600 hover:text-teal-800 hover:underline"
+                      >
+                        Already registered? Watch recorded video
+                      </button>
+
+                      <Modal
+                        isOpen={showVerifyModal}
+                        onClose={() => setShowVerifyModal(false)}
+                      >
+                        <div className="p-6">
+                          <h3 className="text-lg font-medium mb-4">
+                            Verify Registration
+                          </h3>
+                          <form
+                            onSubmit={handleVerifyEmail}
+                            className="space-y-4"
+                          >
+                            <div>
+                              <label
+                                htmlFor="verify-email"
+                                className="block text-sm font-medium text-gray-700 mb-1"
+                              >
+                                Enter your registered email
+                              </label>
+                              <input
+                                type="email"
+                                id="verify-email"
+                                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-teal-500"
+                                value={verifyEmail}
+                                onChange={(e) => setVerifyEmail(e.target.value)}
+                                placeholder="Enter your email"
+                                required
+                              />
+                            </div>
+
+                            <button
+                              type="submit"
+                              className="w-full bg-teal-600 text-white py-2 px-4 rounded-md hover:bg-teal-700 disabled:opacity-50 flex items-center justify-center"
+                              disabled={isVerifying}
+                            >
+                              {isVerifying ? (
+                                <>
+                                  <Loader
+                                    className="animate-spin mr-2"
+                                    size={20}
+                                  />
+                                  Verifying...
+                                </>
+                              ) : (
+                                "Verify & Watch"
+                              )}
+                            </button>
+
+                            {verifyAlert && (
+                              <Alert
+                                variant={verifyAlert.variant}
+                                className="mt-4"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <verifyAlert.icon className="h-5 w-5 flex-shrink-0" />
+                                  <AlertDescription>
+                                    {verifyAlert.message}
+                                  </AlertDescription>
+                                </div>
+                              </Alert>
+                            )}
+                          </form>
+                        </div>
+                      </Modal>
+                    </div>
+                  )}
                 {/* End of Flowbite Form */}
 
                 <Modal isOpen={showModal} onClose={() => setShowModal(false)}>

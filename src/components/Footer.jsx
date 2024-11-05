@@ -243,8 +243,8 @@ const quickLinks = [
   {
     text: "Solutions",
     items: [
-      { text: "Training Schools", href: "/training-schools" },
-      { text: "Consulting Services", href: "/consulting-services" },
+      { text: "Training Schools", href: "/solutions/training_School" },
+      { text: "Consulting Services", href: "/solutions/consulting_Services" },
     ],
   },
   {
@@ -398,7 +398,7 @@ const Footer = () => {
               <img
                 src={CredulenLogo}
                 alt="Credulen logo"
-                className="w-[13rem] h-[55px] mb-6"
+                className="w-[13rem] h-[55apx] mb-6"
               />
 
               {/* Newsletter Section - Reduced size */}

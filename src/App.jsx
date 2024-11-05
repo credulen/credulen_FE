@@ -4,7 +4,8 @@ import Home from "./pages/Home";
 import PasswordResset from "./pages/PasswordResset";
 import Conferences from "./pages/Conference";
 import Webinar from "./pages/Webinars";
-import Solutions from "./pages/Solution";
+import TrainingSchool from "./pages/TrainingSchool";
+import ConsultingServices from "./pages/ConsultingServices";
 import EventVideo from "../src/pages/EventVideo";
 import Contact from "./pages/Contactus";
 import RegisterAdmin from "../src/pages/RegisterAdmin";
@@ -24,6 +25,7 @@ import DashBoardActivities from "./pages/UsersDashBoardPages/DashBoardActivities
 import DashBoardNotifications from "./pages/UsersDashBoardPages/DashBoardNotifications";
 import Post from "./pages/Post";
 import SolutionForm from "./pages/SolutionForm";
+import SolutionFormCS from "./pages/SolutionFormCS";
 // Admin
 
 import AdminLayout from "./components/Dashboard_Admin/AdminLayout";
@@ -61,8 +63,13 @@ const AppContent = () => {
         <Route path="/event/:slug" element={<SingleEventPost />} />
         <Route path="/webinars" element={<Webinar />} />
         <Route path="/conferences" element={<Conferences />} />
-        <Route path="/solutions" element={<Solutions />} />
+        <Route path="/solutions/training_School" element={<TrainingSchool />} />
+        <Route
+          path="/solutions/consulting_Services"
+          element={<ConsultingServices />}
+        />
         <Route path="/SolutionForm/:slug?" element={<SolutionForm />} />
+        <Route path="/SolutionFormCS/:slug?" element={<SolutionFormCS />} />
         <Route path="/contactus" element={<Contact />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/RegisterAdmin" element={<RegisterAdmin />} />

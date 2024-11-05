@@ -116,7 +116,7 @@ const SolutionCard = ({ event }) => (
   </div>
 );
 
-const Solutions = () => {
+const TrainingSchool = () => {
   const [solutions, setSolutions] = useState({
     TrainingSchool: [],
     ConsultingService: [],
@@ -176,6 +176,7 @@ const Solutions = () => {
     <div className="mt-[3rem] container mx-auto px-4 py-8 md:py-16 lg:px-12">
       <div className="pb-12">
         <h1 className="text-2xl font-semibold">Solutions</h1>
+
         <p className="mt-3">
           Credulen offers specialized training and consulting services designed
           to equip you with the skills and strategies needed to excel in a
@@ -185,6 +186,7 @@ const Solutions = () => {
 
       <div className="pb-12">
         <h2 className="text-xl font-medium">Training School</h2>
+
         <p className="mb-10">
           <span className="font-medium mr-1">
             Data Science & Engineering for Professionals:
@@ -200,6 +202,7 @@ const Solutions = () => {
           an individual or organization. Our training covers the latest AI tools
           and techniques to help you stay ahead of the curve.
         </p>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {solutions.TrainingSchool.length > 0 ? (
             solutions.TrainingSchool.map((event) => (
@@ -210,30 +213,8 @@ const Solutions = () => {
           )}
         </div>
       </div>
-
-      <div className="mt-24">
-        <h2 className="text-xl font-medium">Consulting Services</h2>
-        <p className="mb-10">
-          <span className="font-medium mr-1">
-            Data, Blockchain & AI Integration and Strategy:
-          </span>
-          We offer expert consulting to help organizations integrate data,
-          blockchain, and AI technologies seamlessly. Our strategic guidance
-          ensures that your technology investments drive maximum value creation
-          and business growth.
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {solutions.ConsultingService.length > 0 ? (
-            solutions.ConsultingService.map((event) => (
-              <SolutionCard key={event._id} event={event} />
-            ))
-          ) : (
-            <p>No consulting service solutions available.</p>
-          )}
-        </div>
-      </div>
     </div>
   );
 };
 
-export default Solutions;
+export default TrainingSchool;
