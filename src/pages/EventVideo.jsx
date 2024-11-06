@@ -266,29 +266,33 @@ const EventVideo = () => {
   // Render related webinar card
   const WebinarCard = useCallback(
     ({ webinar }) => (
-      <Card
-        className="mb-4 cursor-pointer hover:shadow-lg transition-shadow duration-200"
-        onClick={() => handleWebinarClick(webinar.slug)}
-      >
-        <CardMedia
-          component="img"
-          height="140"
-          image={`${backendURL}${webinar.image}`}
-          alt={webinar.title}
-          className="h-32 object-cover"
-        />
-        <CardContent className="p-3">
-          <Typography
-            variant="subtitle1"
-            className="font-medium line-clamp-2 mb-1"
-          >
-            {webinar.title}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {formatEventDate(webinar.date)}
-          </Typography>
-        </CardContent>
-      </Card>
+      <div className="w-full flex justify-center">
+        {" "}
+        {/* Container for centering */}
+        <Card
+          className="mb-4 cursor-pointer hover:shadow-lg transition-shadow duration-200 w-full sm:max-w-sm md:max-w-md mid:max-w-[20rem]"
+          onClick={() => handleWebinarClick(webinar.slug)}
+        >
+          <CardMedia
+            component="img"
+            height="140"
+            image={`${backendURL}${webinar.image}`}
+            alt={webinar.title}
+            className="h-32 object-cover"
+          />
+          <CardContent className="p-3">
+            <Typography
+              variant="subtitle1"
+              className="font-medium line-clamp-2 mb-1"
+            >
+              {webinar.title}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {formatEventDate(webinar.date)}
+            </Typography>
+          </CardContent>
+        </Card>
+      </div>
     ),
     [backendURL, formatEventDate, handleWebinarClick]
   );
@@ -375,7 +379,7 @@ const EventVideo = () => {
 
         {/* Sidebar */}
         <Grid item xs={12} md={3}>
-          <Box className="top-4 mt-2">
+          <Box className="top-4 mt-[4.6rem] ">
             <Typography
               variant="h6"
               component="h2"

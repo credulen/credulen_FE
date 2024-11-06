@@ -640,7 +640,7 @@ const SingleEventPost = () => {
     <>
       {" "}
       <Container maxWidth="lg">
-        <Box sx={{ mb: 5, mt: 8 }}>
+        <Box sx={{ mb: 5, mt: 11 }}>
           <Box
             sx={{
               mb: 4,

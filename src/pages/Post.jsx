@@ -930,7 +930,7 @@ export default function Post() {
   if (!post) return <Typography>Post not found</Typography>;
 
   return (
-    <Grid container spacing={3} sx={{ px: { xs: 2, md: 4 }, py: 11.5 }}>
+    <Grid container spacing={3} sx={{ px: { xs: 4, md: 8 }, py: 10 }}>
       {/* Hero Section (keeping the same as before) */}
       <div className="relativ h-[90vh] w-full ">
         <div
@@ -1007,7 +1007,14 @@ export default function Post() {
       </div>
 
       <Grid item xs={12} md={8}>
-        <Box sx={{ maxWidth: "100%", margin: "auto" }}>
+        <Box
+          sx={{
+            maxWidth: "100%",
+            margin: "auto",
+            pl: { md: 4 },
+            pr: { md: 2 },
+          }}
+        >
           <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
             <Avatar
               src={
@@ -1137,7 +1144,6 @@ export default function Post() {
             postId={postId}
             userId={userId}
           />
-
           {displayedComments.length > 0 ? (
             <Box sx={{ width: "100%", bgcolor: "#f5f5f5", p: 2 }}>
               {displayedComments.map((comment) => (
@@ -1301,7 +1307,6 @@ export default function Post() {
               No comments yet. Be the first to comment!
             </Typography>
           )}
-
           {displayedComments.length < comments.length && (
             <Box className="flex justify-center mt-2">
               <button
@@ -1343,6 +1348,8 @@ export default function Post() {
           </Menu>
 
           <Divider sx={{ my: 4 }} />
+
+          {/* ... (rest of the code remains the same) ... */}
         </Box>
       </Grid>
 

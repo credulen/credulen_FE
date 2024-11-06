@@ -633,8 +633,8 @@ const Navbar = () => {
               // className="w-[13rem] h-12"
               className={
                 isScrolled || location.pathname !== "/"
-                  ? "w-[13rem] h-12"
-                  : "w-[12.8rem] h-[3.8rem]"
+                  ? "w-[11rem] h-[3rem]"
+                  : "w-[11rem] h-[3.8rem]"
               }
               alt="Flowbite Logo"
             />
