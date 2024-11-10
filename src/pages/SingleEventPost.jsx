@@ -535,7 +535,8 @@ const SingleEventPost = () => {
 
         if (response.ok) {
           setAlertInfo({
-            message: "Registration successful!",
+            message:
+              "Registration successful! Please check your mail for confirmation and more details",
             variant: "success",
             icon: CheckCircle,
           });

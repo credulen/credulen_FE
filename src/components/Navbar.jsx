@@ -451,6 +451,7 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import CredulenLogo2 from "../assets/CredulenLogo2.png";
 import CredulenLogo from "../assets/CredulenLogo.png";
+import NotificationBanner from "../components/NavNotificationBanner";
 
 const backendURL =
   import.meta.env.MODE === "production"
@@ -609,11 +610,11 @@ const Navbar = () => {
   const navbarClass = `fixed w-full z-20 top-0 start-0 transition-all duration-300 ease-in-out ${
     isScrolled || location.pathname !== "/"
       ? "bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600"
-      : "bg-transparent text-white"
+      : ""
   }`;
 
   const scrlwhite = ` ${
-    isScrolled || location.pathname !== "/" ? "text-black" : " !text-white "
+    isScrolled || location.pathname !== "/" ? "text-black" : ""
   }`;
 
   return (
@@ -625,17 +626,8 @@ const Navbar = () => {
             className="flex items-center space-x-3 rtl:space-x-reverse"
           >
             <img
-              src={
-                isScrolled || location.pathname !== "/"
-                  ? CredulenLogo2
-                  : CredulenLogo
-              }
-              // className="w-[13rem] h-12"
-              className={
-                isScrolled || location.pathname !== "/"
-                  ? "w-[11rem] h-[3rem]"
-                  : "w-[11rem] h-[3.8rem]"
-              }
+              src={CredulenLogo2}
+              className="w-[11rem] h-[3rem]"
               alt="Flowbite Logo"
             />
           </Link>
@@ -765,6 +757,7 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
+      <NotificationBanner />
 
       <Snackbar
         open={openSnackbar}

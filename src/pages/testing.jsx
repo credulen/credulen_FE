@@ -1,282 +1,190 @@
-const nodemailer = require("nodemailer");
+import React, { useState, useEffect } from "react";
+import { X, Phone } from "lucide-react";
+import { Dialog } from "@/components/ui/dialog";
 
-// Create a transporter using your email service configuration
-const transporter = nodemailer.createTransport({
-  service: "Gmail", // or your email service
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false, // This will ignore self-signed certificate errors
-  },
-});
+const NotificationBanner = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    enrolled: "",
+  });
 
-// Function to send registration success email for individual solutions
-const sendRegSuccessMail1 = async (data) => {
-  const {
-    firstName,
-    lastName,
-    phoneNumber,
-    email,
-    employmentStatus,
-    jobTitle,
-    selectedSolution,
-  } = data;
+  useEffect(() => {
+    const lastShown = localStorage.getItem("bannerLastShown");
+    const today = new Date().toDateString();
 
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "Registration Confirmation",
-    html: `
-       <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Registration Confirmation</title>
-        </head>
-        <body>
-                <html lang="en">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Registration Confirmation</title>
-      </head>
-      <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5;">
-          <table cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: white;">
-              <tr>
-                 <td style="background-color: #1e293b; padding: 20px; text-align: center;">
-    <img src='https://res.cloudinary.com/dxmiz9idd/image/upload/v1730724855/CredulenLogo_n8wexs.png' 
-         alt="Creculen Logo" 
-         width="200" height="70"> <!-- Adjust the values as needed -->
-</td>
-              </tr>
-              <tr>
-                  <td style="padding: 40px 20px; text-align: center;">
-                      <h1 style="color: #047481; margin: 0 0 20px 0; font-size: 28px;">Registration Confirmed!</h1>
-                      <p style="color: #1e293b; font-size: 16px; line-height: 1.5; margin-bottom: 30px;">
-                          Thank you for registering for our solutions at Creculen. We're excited to help you unlock intelligence and create value in your journey.
-                      </p>
-                  </td>
-              </tr>
-              <tr>
-                  <td style="padding: 0 20px 30px;">
-                   <div style="position: relative; border-radius: 8px; overflow: hidden; padding: 20px;">
-   <div style="background-image: url(https://res.cloudinary.com/dxmiz9idd/image/upload/v1730725044/insight_gggtlk.jpg); background-size: cover; filter: blur(20px); position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;"></div>
-    <div style="background-color: rgba(248, 249, 250, 0.8); border-radius: 8px; position: relative; z-index: 1; padding: 20px;">
-        <h2 style="color: #047481; font-size: 20px; margin: 0 0 20px 0;">Registration Details</h2>
-        <table cellpadding="0" cellspacing="0" width="100%" style="color: #666;">
-          <tr>
-                                  <td style="padding: 8px 0;"><strong>Name:</strong></td>
-                                  <td style="padding: 8px 0;">${firstName} ${lastName}</td>
-                              </tr>
-                              <tr>
-                                  <td style="padding: 8px 0;"><strong>Email:</strong></td>
-                                  <td style="padding: 8px 0;">${email}</td>
-                              </tr>
-                              <tr>
-                                  <td style="padding: 8px 0;"><strong>Phone:</strong></td>
-                                  <td style="padding: 8px 0;">${phoneNumber}</td>
-                              </tr>
-                              <tr>
-                                  <td style="padding: 8px 0;"><strong>Employment Status:</strong></td>
-                                  <td style="padding: 8px 0;">${employmentStatus}</td>
-                              </tr>
-                              <tr>
-                                  <td style="padding: 8px 0;"><strong>Selected Solution:</strong></td>
-                                  <td style="padding: 8px 0;">${selectedSolution}</td>
-                              </tr>
-        </table>
-    </div>
-</div>
+    if (lastShown !== today) {
+      const timer = setTimeout(() => {
+        setIsVisible(true);
+        localStorage.setItem("bannerLastShown", today);
+      }, 30000);
 
-                  </td>
-              </tr>
-              <tr>
-                  <td style="padding: 0 20px 40px;">
-                      <p style="color: #1e293b; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-                          Our team will review your registration and contact you within the next 24-48 hours to discuss the next steps and customize our solution to your specific needs.
-                      </p>
-                      <p style="color: #1e293b; font-size: 16px; line-height: 1.5;">
-                          In the meantime, if you have any questions, please don't hesitate to reach out to our support team at <a href="mailto:support@creculen.com" style="color: #0066cc; text-decoration: none;">support@creculen.com</a>
-                      </p>
-                  </td>
-              </tr>
-              <tr>
-                  <td style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #eee;">
-                      <p style="color: #1e293b; font-size: 14px; margin: 0;">
-                          © 2024 Creculen. All rights reserved.
-                      </p>
-                  </td>
-              </tr>
-          </table>
-      </body>
-      </html>
-        </body>
-        </html>
-    `,
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleClose = () => {
+    setIsVisible(false);
   };
 
-  try {
-    await transporter.sendMail(mailOptions);
-    return true;
-  } catch (error) {
-    console.error("Error sending OTP email:", error);
-    throw new Error("Failed to send OTP email");
-  }
-};
-
-// Function to send registration success email for consulting services
-const sendRegSuccessMail2 = async (data) => {
-  const {
-    fullName,
-    phoneNumber,
-    email,
-    employmentStatus,
-    jobTitle,
-    selectedSolution,
-    slug,
-    solutionCategory,
-    companyName,
-    companyIndustry,
-    companySize,
-    country,
-    firstName,
-    lastName,
-    solutionType,
-  } = data;
-
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "Registration Confirmation",
-    html: `
-      
-         <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Registration Confirmation</title>
-        </head>
-        <body>
-                <html lang="en">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Registration Confirmation</title>
-      </head>
-      <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f5f5;">
-          <table cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: white;">
-              <tr>
-                 <td style="background-color: #1e293b; padding: 20px; text-align: center;">
-    <img src='https://res.cloudinary.com/dxmiz9idd/image/upload/v1730724855/CredulenLogo_n8wexs.png' 
-         alt="Creculen Logo" 
-         width="200" height="70"> <!-- Adjust the values as needed -->
-</td>
-              </tr>
-              <tr>
-                  <td style="padding: 40px 20px; text-align: center;">
-                      <h1 style="color: #047481; margin: 0 0 20px 0; font-size: 28px;">Registration Confirmed!</h1>
-                      <p style="color: #1e293b; font-size: 16px; line-height: 1.5; margin-bottom: 30px;">
-                          Thank you for registering for our solutions at Creculen. We're excited to help you unlock intelligence and create value in your journey.
-                      </p>
-                  </td>
-              </tr>
-              <tr>
-                  <td style="padding: 0 20px 30px;">
-                   <div style="position: relative; border-radius: 8px; overflow: hidden; padding: 20px;">
-   <div style="background-image: url(https://res.cloudinary.com/dxmiz9idd/image/upload/v1730725044/insight_gggtlk.jpg); background-size: cover; filter: blur(20px); position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;"></div>
-    <div style="background-color: rgba(248, 249, 250, 0.8); border-radius: 8px; position: relative; z-index: 1; padding: 20px;">
-        <h2 style="color: #047481; font-size: 20px; margin: 0 0 20px 0;">Registration Details</h2>
-        <table cellpadding="0" cellspacing="0" width="100%" style="color: #666;">
-        
-
-  <tr>
-                <td style="padding: 8px 0;"><strong>Name:</strong></td>
-                <td style="padding: 8px 0;">${fullName}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0;"><strong>Email:</strong></td>
-                <td style="padding: 8px 0;">${email}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0;"><strong>Phone:</strong></td>
-                <td style="padding: 8px 0;">${phoneNumber}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0;"><strong>Employment Status:</strong></td>
-                <td style="padding: 8px 0;">${employmentStatus}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0;"><strong>Job Title:</strong></td>
-                <td style="padding: 8px 0;">${jobTitle}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0;"><strong>Selected Solution:</strong></td>
-                <td style="padding: 8px 0;">${selectedSolution}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0;"><strong>Solution Type:</strong></td>
-                <td style="padding: 8px 0;">${solutionCategory}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0;"><strong>Company Name:</strong></td>
-                <td style="padding: 8px 0;">${companyName}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0;"><strong>Company Industry:</strong></td>
-                <td style="padding: 8px 0;">${companyIndustry}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0;"><strong>Company Size:</strong></td>
-                <td style="padding: 8px 0;">${companySize}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0;"><strong>Country:</strong></td>
-                <td style="padding: 8px 0;">${country}</td>
-            </tr>
-        </table>
-    </div>
-</div>
-
-                  </td>
-              </tr>
-              <tr>
-                  <td style="padding: 0 20px 40px;">
-                      <p style="color: #1e293b; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-                          Our team will review your registration and contact you within the next 24-48 hours to discuss the next steps and customize our solution to your specific needs.
-                      </p>
-                      <p style="color: #1e293b; font-size: 16px; line-height: 1.5;">
-                          In the meantime, if you have any questions, please don't hesitate to reach out to our support team at <a href="mailto:support@creculen.com" style="color: #0066cc; text-decoration: none;">support@creculen.com</a>
-                      </p>
-                  </td>
-              </tr>
-              <tr>
-                  <td style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #eee;">
-                      <p style="color: #1e293b; font-size: 14px; margin: 0;">
-                          © 2024 Creculen. All rights reserved.
-                      </p>
-                  </td>
-              </tr>
-          </table>
-      </body>
-      </html>
-        </body>
-        </html>
-        `,
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  try {
-    await transporter.sendMail(mailOptions);
-    return true;
-  } catch (error) {
-    console.error("Error sending OTP email:", error);
-    throw new Error("Failed to send OTP email");
-  }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle form submission here
+    console.log(formData);
+    setIsModalOpen(false);
+  };
+
+  return (
+    <>
+      <div className="fixed top-20 left-0 right-0 z-40 animate-slideDown">
+        <div className="bg-teal-800 text-white px-6">
+          <div className="max-w-7xl mx-auto flex items-center justify-between py-3">
+            <div className="flex-1">
+              <span className="text-base font-medium">
+                Join our Next Free Masterclass
+              </span>
+            </div>
+            <div className="flex items-center gap-6">
+              <button
+                className="bg-white rounded-md pl-4 pr-3 py-1.5 flex items-center"
+                onClick={() => setIsModalOpen(true)}
+              >
+                <span className="text-teal-800 font-semibold text-sm">
+                  Register Now
+                </span>
+                <svg
+                  viewBox="0 0 24 24"
+                  className="w-5 h-5 ml-1 text-teal-800"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5 12H19M19 12L12 5M19 12L12 19"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+              <button
+                onClick={handleClose}
+                className="text-white hover:text-gray-200 transition-colors"
+                aria-label="Close notification"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Registration Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg w-full max-w-md mx-4 relative">
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="p-6">
+              {/* Thumbnail Image */}
+              <div className="relative w-48 h-32 mx-auto mb-6">
+                <img
+                  src="/api/placeholder/192/128"
+                  alt="Tutorial preview"
+                  className="rounded-lg shadow-lg"
+                />
+                <div className="absolute -right-2 -top-2 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-white text-xs">
+                  1
+                </div>
+              </div>
+
+              {/* Form Header */}
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-bold mb-2">
+                  Prepare for a Career in Tech: Get FREE Lifetime Access to Case
+                  Studies & Video Tutorials
+                </h2>
+                <p className="text-gray-600 text-sm">
+                  Drop your email address to get access
+                </p>
+              </div>
+
+              {/* Registration Form */}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Your Name"
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                />
+
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email Address"
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                />
+
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Enter phone number"
+                    className="w-full p-3 pl-12 border border-gray-300 rounded-lg"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <select
+                  name="enrolled"
+                  className="w-full p-3 border border-gray-300 rounded-lg bg-white"
+                  value={formData.enrolled}
+                  onChange={handleInputChange}
+                >
+                  <option value="">Have you enrolled in any courses?</option>
+                  <option value="yes">
+                    Yes, I have enrolled in at least one course
+                  </option>
+                  <option value="no">
+                    No, I have not enrolled in any courses
+                  </option>
+                </select>
+
+                <button
+                  type="submit"
+                  className="w-full bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition-colors"
+                >
+                  Join our community today!
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </Dialog>
+    </>
+  );
 };
 
-// Export the email functions
-module.exports = {
-  sendRegSuccessMail1,
-  sendRegSuccessMail2,
-};
+export default NotificationBanner;

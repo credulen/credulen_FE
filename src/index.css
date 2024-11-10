@@ -91,3 +91,16 @@ h2 {
 ::-webkit-scrollbar-track {
   background-color: rgba(0, 0, 0, 0.1); /* Track background color */
 }
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.5s ease-out;
+}

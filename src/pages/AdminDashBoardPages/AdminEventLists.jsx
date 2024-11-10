@@ -292,10 +292,10 @@ export default function AdminEventLists() {
             ) : events.length > 0 ? (
               <Table hoverable>
                 <Table.Head>
-                  <Table.HeadCell>Date</Table.HeadCell>
+                  <Table.HeadCell>Event Date</Table.HeadCell>
                   <Table.HeadCell>Event Image</Table.HeadCell>
-                  <Table.HeadCell>Title</Table.HeadCell>
-                  <Table.HeadCell>Venue</Table.HeadCell>
+                  <Table.HeadCell>Event Title</Table.HeadCell>
+                  <Table.HeadCell> Event Venue</Table.HeadCell>
                   <Table.HeadCell>Event Type</Table.HeadCell>
                   <Table.HeadCell>Speakers</Table.HeadCell>
                   <Table.HeadCell>Delete</Table.HeadCell>
