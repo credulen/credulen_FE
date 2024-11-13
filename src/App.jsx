@@ -46,6 +46,7 @@ import CreateSolutions from "./pages/AdminDashBoardPages/CreateSolutions";
 import RegisteredSolutionsList from "./pages/AdminDashBoardPages/RegisteredSolutionsList";
 import AdminCommentLists from "./pages/AdminDashBoardPages/AdminCommentLists";
 import RegisteredEventLists from "./pages/AdminDashBoardPages/RegisteredEventLists";
+import CommunityUserList from "./pages/AdminDashBoardPages/CommunityUserList";
 
 const AppContent = () => {
   const location = useLocation();
@@ -142,6 +143,10 @@ const AppContent = () => {
             <Route
               path="/DashBoard/Admin/RegisteredEventList"
               element={<RegisteredEventLists />}
+            />
+            <Route
+              path="/DashBoard/Admin/CommunityUserList"
+              element={<CommunityUserList />}
             />
           </Route>
         </Route>

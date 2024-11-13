@@ -42,6 +42,7 @@ module.exports = {
         // => @media (min-width: 1280px) { ... }
         "2xl": "1536px",
         // // => @media (min-width: 1536px) { ... }
+        xsmall: { max: "399px" },
         mod: { max: "639px" },
         expcard: { max: "1066px" },
         minilg: { min: "899px" },

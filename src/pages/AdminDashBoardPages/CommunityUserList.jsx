@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Table, Button, Dropdown } from "flowbite-react";
+import { Table, Button } from "flowbite-react";
 import moment from "moment";
-import { HiOutlineTrash } from "react-icons/hi";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -40,12 +39,9 @@ const CommunityRegistrationRow = ({ registration, onDelete }) => (
       {moment(registration.registrationDate).format("MMMM D, HH:mm")}
     </Table.Cell>
     <Table.Cell>
-      {/* <Button color="red" onClick={() => onDelete(registration._id)} size="xs">
-        <AiTwotoneDelete size={16} />
-      </Button> */}
       <button
         onClick={() => onDelete(registration._id)}
-        className="font-medium text-red-500 bg-transparent border border-red-500 cursor-pointer hover:bg-btColour hover:text-white p-1 rounded-md "
+        className="font-medium text-red-500 bg-transparent border border-red-500 cursor-pointer hover:bg-btColour hover:text-white p-1 rounded-md"
       >
         Delete
       </button>
@@ -58,13 +54,30 @@ const CommunityUserList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedRegistrationId, setSelectedRegistrationId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [isBannerVisible, setIsBannerVisible] = useState(true);
-  const [bannerVisible, setBannerVisible] = useState(true);
+  const [bannerVisible, setBannerVisible] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
+
+  const fetchBannerStatus = useCallback(async () => {
+    try {
+      const res = await fetch(`${backendURL}/api/getBannerStatus`);
+      if (!res.ok) {
+        throw new Error("Failed to fetch banner status");
+      }
+      const data = await res.json();
+      setBannerVisible(data.isActive);
+    } catch (error) {
+      console.error("Error fetching banner status:", error);
+      setSnackbar({
+        open: true,
+        message: "Failed to fetch banner status",
+        severity: "error",
+      });
+    }
+  }, []);
 
   const fetchRegistrations = useCallback(async () => {
     try {
@@ -91,7 +104,8 @@ const CommunityUserList = () => {
 
   useEffect(() => {
     fetchRegistrations();
-  }, [fetchRegistrations]);
+    fetchBannerStatus();
+  }, [fetchRegistrations, fetchBannerStatus]);
 
   const handleBannerToggle = async (isActive) => {
     try {
@@ -106,7 +120,6 @@ const CommunityUserList = () => {
       }
 
       setBannerVisible(isActive);
-
       setSnackbar({
         open: true,
         message: `Banner ${isActive ? "enabled" : "disabled"} successfully`,
@@ -119,6 +132,7 @@ const CommunityUserList = () => {
         message: "Failed to update banner status",
         severity: "error",
       });
+      setBannerVisible(!isActive);
     }
   };
 
@@ -177,11 +191,12 @@ const CommunityUserList = () => {
         <h1 className="text-2xl font-semibold">Registered Community Members</h1>
       </div>
 
-      {/* REGISTRATION FORM NAV.  */}
-      <NotificationBanner
-        isVisible={bannerVisible}
-        setIsVisible={setBannerVisible}
-      />
+      {/* {bannerVisible && (
+        <NotificationBanner
+          isVisible={bannerVisible}
+          setIsVisible={setBannerVisible}
+        />
+      )} */}
 
       <div className="flex items-center mb-4">
         <SwitchNav

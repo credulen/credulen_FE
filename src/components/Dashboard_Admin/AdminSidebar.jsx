@@ -3,7 +3,7 @@ import { HiOutlineLogout, HiMenu, HiX } from "react-icons/hi";
 import { VscDashboard } from "react-icons/vsc";
 import { IoPerson } from "react-icons/io5";
 import { FaUserCircle, FaHome } from "react-icons/fa";
-import { FaUsersGear } from "react-icons/fa6";
+import { FaUsers } from "react-icons/fa"; // Updated icon for Users
 import { BiCommentDetail } from "react-icons/bi";
 import { MdEventNote, MdOutlineArticle } from "react-icons/md";
 import { GiPublicSpeaker } from "react-icons/gi";
@@ -30,9 +30,7 @@ const AdminSidebar = () => {
   const sidebarRef = useRef(null);
   const { userInfo } = useSelector((state) => state.auth);
   const userId = userInfo?._id;
-  const { profile, loading, success, error } = useSelector(
-    (state) => state.profiles
-  );
+  const { profile } = useSelector((state) => state.profiles);
 
   useEffect(() => {
     if (userId) {
@@ -71,7 +69,7 @@ const AdminSidebar = () => {
       label: "Dashboard",
     },
     { path: "/DashBoard/AdminProfile", icon: IoPerson, label: "Profile" },
-    { path: "/DashBoard/Users", icon: FaUsersGear, label: "Users" },
+    { path: "/DashBoard/Users", icon: FaUsers, label: "Users" }, // Updated icon for Users
     {
       path: "/DashBoard/Admin/Comments",
       icon: BiCommentDetail,
@@ -103,6 +101,11 @@ const AdminSidebar = () => {
       path: "/DashBoard/Admin/RegisteredEventList",
       icon: IoMdNotificationsOutline,
       label: "Registered Events",
+    },
+    {
+      path: "/DashBoard/Admin/CommunityUserList",
+      icon: IoMdNotificationsOutline,
+      label: "Registered Community Users",
     },
   ];
 
@@ -142,7 +145,7 @@ const AdminSidebar = () => {
       </div>
       <div
         ref={sidebarRef}
-        className={`fixed inset-y-0 left-0 z-30 w-64  bg-blue-700 text-white transition-all duration-300 ease-in-out transform 
+        className={`fixed inset-y-0 left-0 z-30 w-64 bg-blue-700 text-white transition-all duration-300 ease-in-out transform 
           ${isOpen ? "translate-x-0" : "-translate-x-full"} 
           ${isSmallScreen ? "top-16" : "top-0"}`}
       >
@@ -195,7 +198,7 @@ const AdminSidebar = () => {
           <div className="p-5">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center px-1 py-1 pl- text-sm bg-red-50 hover:text-white text-red-700 rounded-md hover:bg-red-700 transition-colors"
+              className="w-full flex items-center px-1 py-1 text-sm bg-red-50 hover:text-white text-red-700 rounded-md hover:bg-red-700 transition-colors"
             >
               <HiOutlineLogout className="w-5 h-5 mr-3" />
               <span>Sign out</span>

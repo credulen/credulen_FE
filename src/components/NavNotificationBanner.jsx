@@ -5,13 +5,14 @@ import { IoMdSend } from "react-icons/io";
 import PhoneIcon from "@mui/icons-material/Phone";
 import { Alert, AlertDescription } from "../components/tools/Alert";
 import { Loader, CheckCircle, AlertCircle } from "lucide-react";
+import FormImage from "../assets/formHeader.png";
+
 const backendURL =
   import.meta.env.MODE === "production"
     ? import.meta.env.VITE_BACKEND_URL
     : "http://localhost:3001";
 
-const NotificationBanner = () => {
-  const [isVisible, setIsVisible] = useState(false);
+const NotificationBanner = ({ isVisible, setIsVisible }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -53,23 +54,10 @@ const NotificationBanner = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  useEffect(() => {
-    const lastShown = localStorage.getItem("bannerLastShown");
-    const today = new Date().toDateString();
-
-    if (lastShown !== today) {
-      const timer = setTimeout(() => {
-        setIsVisible(true);
-        localStorage.setItem("bannerLastShown", today);
-      }, 30000);
-
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
   const handleClose = () => {
     setIsVisible(false);
   };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -115,7 +103,11 @@ const NotificationBanner = () => {
           phone: "",
           enrolled: "",
         });
-        setTimeout(() => setIsModalOpen(false), 2000);
+        // Delay modal closing to show success message
+        setTimeout(() => {
+          setIsModalOpen(false);
+          setAlertInfo(null);
+        }, 3000);
       } else {
         throw new Error(data.message || "Registration failed");
       }
@@ -129,14 +121,25 @@ const NotificationBanner = () => {
       setIsLoading(false);
     }
   };
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setAlertInfo(null);
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (alertInfo) {
-      setShowModal(true);
       const timer = setTimeout(() => {
-        setShowModal(false);
         setAlertInfo(null);
-      }, 5000);
+      }, 5000); // 5 seconds
+
       return () => clearTimeout(timer);
     }
   }, [alertInfo]);
@@ -145,7 +148,7 @@ const NotificationBanner = () => {
 
   return (
     <>
-      <div className="fixed top-20 left-0 right-0 z-50 animate-slideDown">
+      <div className="fixed top-20 left-0 right-0 z-10 animate-slideDown">
         <div className="bg-teal-800 text-white px-6">
           <div className="max-w-7xl mx-auto flex items-center justify-between py-3">
             <div className="flex-1">
@@ -153,6 +156,7 @@ const NotificationBanner = () => {
                 Join our Next Free Masterclass
               </span>
             </div>
+
             <div className="flex items-center gap-6">
               <button
                 onClick={() => setIsModalOpen(true)}
@@ -164,6 +168,7 @@ const NotificationBanner = () => {
 
                 <IoMdSend className=" w-4 h-4 ml-1 text-[#05505c]" />
               </button>
+
               <button
                 onClick={handleClose}
                 className="text-white hover:text-gray-200 transition-colors"
@@ -184,40 +189,51 @@ const NotificationBanner = () => {
       >
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="bg-white rounded-xl w-full max-w-md mx-4 relative shadow-2xl">
+            <div className="bg-white rounded-xl w-full max-w-lg mx-4 relative shadow-2xl">
               <button
-                onClick={() => setIsModalOpen(false)}
-                className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
+                onClick={handleModalClose}
+                className="absolut flex justify-end ml-auto right-4 top-8 text-gray-400 hover:text-gray-600 transition-colors"
               >
-                <X className="w-5 h-5" />
+                <X className="w-9 h-9 text-btColour hover:text-pink-500" />
               </button>
 
               <div className="p-6">
-                {/* Alert Component */}
-                {alertInfo && (
-                  <Alert variant={alertInfo.variant} className="mb-4">
-                    <alertInfo.icon className="h-4 w-4" />
-                    <AlertDescription>{alertInfo.message}</AlertDescription>
-                  </Alert>
-                )}
-
-                {/* Form Content */}
+                <span className="">
+                  {/* Modified Alert Component Usage */}
+                  {alertInfo && (
+                    <div className="sticky inset-0 z-[60] flex items-center justify-center bg-black/10">
+                      <Alert
+                        variant={alertInfo.variant}
+                        className="mx-4 max-w-md animate-fadeIn shadow-lg"
+                      >
+                        <div className="flex items-center gap-2">
+                          {alertInfo.icon && (
+                            <alertInfo.icon className="h-5 w-5" />
+                          )}
+                          <AlertDescription className="text-base font-medium">
+                            {alertInfo.message}
+                          </AlertDescription>
+                        </div>
+                      </Alert>
+                    </div>
+                  )}
+                </span>
                 <div className="space-y-6">
                   {/* Thumbnail */}
                   <div className="relative w-48 h-32 mx-auto">
                     <img
-                      src="/api/placeholder/192/128"
+                      src={FormImage}
                       alt="credulen form header image"
-                      className="rounded-lg shadow-lg"
+                      className=""
                     />
                     <div className="absolute -right-2 -top-2 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center text-white text-xs animate-pulse">
-                      1
+                      !
                     </div>
                   </div>
 
                   {/* Form Header */}
                   <div className="text-center mb-6">
-                    <h2 className="text-xl font-bold mb-2 text-btColour">
+                    <h2 className="text-xl font-bold mb-2 text-btColour my-12">
                       Prepare for a Career in Tech: Get FREE Lifetime Access to
                       Case Studies & Video Tutorials
                     </h2>

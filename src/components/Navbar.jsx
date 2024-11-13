@@ -1,317 +1,3 @@
-// import React, { useState, useEffect, useRef } from "react";
-// import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
-// import { FaUserCircle } from "react-icons/fa";
-// import { useDispatch, useSelector } from "react-redux";
-// import { logoutUser } from "../features/auth/authSlice";
-// import { fetchProfileById } from "../features/Users/userAction";
-// import { IoPersonCircleOutline } from "react-icons/io5";
-// import { HiOutlineLogout } from "react-icons/hi";
-// import Snackbar from "@mui/material/Snackbar";
-// import MuiAlert from "@mui/material/Alert";
-// const backendURL =
-//   import.meta.env.MODE === "production"
-//     ? import.meta.env.VITE_BACKEND_URL
-//     : "http://localhost:3001";
-
-// const Alert = React.forwardRef(function Alert(props, ref) {
-//   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-// });
-
-// const Navbar = () => {
-//   const userDropdownRef = useRef(null);
-//   const menuRef = useRef(null);
-//   const [userOpen, setUserOpen] = useState(false);
-//   const [isMenuOpen, setIsMenuOpen] = useState(false);
-//   const [activeLink, setActiveLink] = useState(null);
-
-//   const [openSnackbar, setOpenSnackbar] = useState(false);
-//   const [snackbarMessage, setSnackbarMessage] = useState("");
-//   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
-
-//   const [isScrolled, setIsScrolled] = useState(false);
-//   const location = useLocation();
-
-//   const navigate = useNavigate();
-
-//   const toggleMenu = () => {
-//     setIsMenuOpen(!isMenuOpen);
-//   };
-//   const handleLinkClick = () => {
-//     if (isMenuOpen) setIsMenuOpen(false);
-//     setUserOpen(false);
-//   };
-//   const toggleUserFile = () => setUserOpen(!userOpen);
-
-//   const handleClickOutside = (event) => {
-//     if (
-//       menuRef.current &&
-//       !menuRef.current.contains(event.target) &&
-//       !userDropdownRef.current.contains(event.target)
-//     ) {
-//       setIsMenuOpen(false);
-//       setUserOpen(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     document.addEventListener("mousedown", handleClickOutside);
-//     return () => {
-//       document.removeEventListener("mousedown", handleClickOutside);
-//     };
-//   }, []);
-
-//   const handleCloseSnackbar = (event, reason) => {
-//     if (reason === "clickaway") {
-//       return;
-//     }
-//     setOpenSnackbar(false);
-//   };
-
-//   useEffect(() => {
-//     const handleScroll = () => {
-//       const scrollPosition = window.scrollY;
-//       setIsScrolled(scrollPosition > 0);
-//     };
-
-//     window.addEventListener("scroll", handleScroll);
-
-//     return () => {
-//       window.removeEventListener("scroll", handleScroll);
-//     };
-//   }, []);
-
-//   const navbarClass = `fixed w-full z-20 top-0 start-0 transition-all duration-300 ease-in-out ${
-//     isScrolled || location.pathname !== "/"
-//       ? "bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600"
-//       : "bg-transparent text-white"
-//   }`;
-//   const scrlwhite = ` ${
-//     isScrolled || location.pathname !== "/" ? "text-black" : " !text-white "
-//   }`;
-
-//   return (
-//     <>
-//       <nav className={navbarClass}>
-//         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-//           <Link
-//             to="/"
-//             className="flex items-center space-x-3 rtl:space-x-reverse"
-//           >
-//             <img
-//               src="https://flowbite.com/docs/images/logo.svg"
-//               className="h-8"
-//               alt="Flowbite Logo"
-//             />
-//             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-//               Credulen
-//             </span>
-//           </Link>
-
-//           <span className="md:order-2 flex space-x-3 items-center mid:hidden align-middle text-center">
-//             <DropdownItems />
-//           </span>
-//           {/* here */}
-
-//           <button
-//             onClick={toggleMenu}
-//             data-collapse-toggle="navbar-sticky"
-//             type="button"
-//             className={`inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 ${scrlwhite}`}
-//             aria-controls="navbar-sticky"
-//             aria-expanded={isMenuOpen}
-//           >
-//             <span className="sr-only">Open main menu</span>
-//             <svg
-//               className={`w-5 h-5 transform transition-transform duration-300 ${
-//                 isMenuOpen ? "rotate-90" : ""
-//               }`}
-//               xmlns="http://www.w3.org/2000/svg"
-//               fill="none"
-//               viewBox="0 0 17 14"
-//             >
-//               <path
-//                 stroke="currentColor"
-//                 strokeLinecap="round"
-//                 strokeLinejoin="round"
-//                 strokeWidth="2"
-//                 d="M1 1h15M1 7h15M1 13h15"
-//               />
-//             </svg>
-//           </button>
-
-//           <div
-//             className={`${
-//               isMenuOpen ? "block" : "hidden"
-//             } w-full md:flex md:w-auto md:order-1 transition-all duration-500 ease-in-out`}
-//             id="navbar-sticky"
-//             ref={menuRef}
-//           >
-//             <ul
-//               className={`flex flex-col p-4 md:p-0 mt-4 font-medium border  rounded-lg  md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0  ${scrlwhite}`}
-//             >
-//               <li>
-//                 <NavLink
-//                   onClick={handleLinkClick}
-//                   to="/"
-//                   className={({ isActive }) =>
-//                     ` block py-2 px-3  rounded hover:bg-gray-10 md:hover:bg-transparent hover:text-btColour md:p-0 ${
-//                       isActive
-//                         ? " mid:bg-btColour mid:text-white"
-//                         : ` ${scrlwhite}`
-//                     }`
-//                   }
-//                   end
-//                 >
-//                   Home
-//                 </NavLink>
-//               </li>
-//               <li>
-//                 <NavLink
-//                   onClick={handleLinkClick}
-//                   to="/Solutions"
-//                   className={({ isActive }) =>
-//                     ` block py-2 px-3 mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
-//                       isActive
-//                         ? "text-btColour  mid:bg-btColour mid:text-white"
-//                         : ""
-//                     }`
-//                   }
-//                   end
-//                 >
-//                   Solutions
-//                 </NavLink>
-//               </li>
-
-//               <NavLink
-//                 onClick={handleLinkClick}
-//                 to="/blog"
-//                 className={({ isActive }) =>
-//                   ` block py-2 px-3  rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
-//                     isActive
-//                       ? "text-btColour   mid:text-white "
-//                       : ` ${""} hover:text-btColour`
-//                   }`
-//                 }
-//                 end
-//               >
-//                 Blog
-//               </NavLink>
-
-//               <div className="relative" ref={userDropdownRef}>
-//                 <div className="flex" onClick={toggleUserFile}>
-//                   <span className="block py-2 px-3  rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 cursor-pointer ">
-//                     Events
-//                   </span>
-//                   <span className="mt-2 mid:mt-4">
-//                     <svg
-//                       className={`w-2.5 h-2.5 ms-3 ${
-//                         userOpen ? "transform rotate-180" : ""
-//                       }`}
-//                       aria-hidden="true"
-//                       xmlns="http://www.w3.org/2000/svg"
-//                       fill="none"
-//                       viewBox="0 0 10 6"
-//                     >
-//                       <path
-//                         stroke="currentColor"
-//                         strokeLinecap="round"
-//                         strokeLinejoin="round"
-//                         strokeWidth="2"
-//                         d="m1 1 4 4 4-4"
-//                       />
-//                     </svg>
-//                   </span>
-//                 </div>
-
-//                 {userOpen && (
-//                   <div
-//                     id="dropdownInformation"
-//                     className="absolute z-10 right-[-3rem] mid:left-0 text-black divide-y divide-black rounded-sm shadow w-44 mt-1 bg-NavCl border bg-gray-50 text-center"
-//                   >
-//                     <ul
-//                       className="py-2 text-sm text-gray-700 dark:text-gray-200"
-//                       aria-labelledby="dropdownLargeButton"
-//                     >
-//                       <NavLink
-//                         onClick={handleLinkClick}
-//                         to="/webinars"
-//                         className={({ isActive }) =>
-//                           ` block py-2 px-3 mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
-//                             isActive
-//                               ? "text-btColour  mid:bg-btColour mid:text-white"
-//                               : "text-black"
-//                           }`
-//                         }
-//                         end
-//                       >
-//                         Webinars
-//                       </NavLink>
-
-//                       <li>
-//                         <NavLink
-//                           onClick={handleLinkClick}
-//                           to="/conferences"
-//                           className={({ isActive }) =>
-//                             ` block px-4 py-2   rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
-//                               isActive
-//                                 ? "text-btColour  mid:bg-btColour mid:text-white"
-//                                 : "text-black"
-//                             }`
-//                           }
-//                           end
-//                         >
-//                           Conferences
-//                         </NavLink>
-//                       </li>
-//                     </ul>
-//                   </div>
-//                 )}
-//               </div>
-
-//               <li>
-//                 <NavLink
-//                   onClick={handleLinkClick}
-//                   to="/contactus"
-//                   className={({ isActive }) =>
-//                     ` block py-2 px-3 mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
-//                       isActive
-//                         ? "text-btColour  mid:bg-btColour mid:text-white"
-//                         : ""
-//                     }`
-//                   }
-//                   end
-//                 >
-//                   Contact Us
-//                 </NavLink>
-//               </li>
-//               <li>
-//                 <span className="md:order-2 flex space-x-3 items-center md:hidden align-middle text-center">
-//                   <DropdownItems />
-//                 </span>
-//               </li>
-//             </ul>
-//           </div>
-//         </div>
-//       </nav>
-//       <Snackbar
-//         open={openSnackbar}
-//         autoHideDuration={6000}
-//         onClose={handleCloseSnackbar}
-//       >
-//         <Alert
-//           onClose={handleCloseSnackbar}
-//           severity={snackbarSeverity}
-//           sx={{ width: "100%" }}
-//         >
-//           {snackbarMessage}
-//         </Alert>
-//       </Snackbar>
-//     </>
-//   );
-// };
-
-// export default Navbar;
-
 export function DropdownItems({ closeDropdown }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -346,7 +32,7 @@ export function DropdownItems({ closeDropdown }) {
 
   if (!userInfo) {
     return (
-      <div className="flex items-center gap-3" ref={dropdownRef}>
+      <div className=" flex items-center gap-3" ref={dropdownRef}>
         <NavLink
           onClick={() => {
             closeDropdown(); // Close dropdown when clicking Login
@@ -362,7 +48,7 @@ export function DropdownItems({ closeDropdown }) {
   }
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative mid:ml-2" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 focus:outline-none"
@@ -400,7 +86,7 @@ export function DropdownItems({ closeDropdown }) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-1 z-50 transform opacity-100 scale-100 transition-all duration-200">
+        <div className="absolute  mid:left-0 right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-1 z-50 transform opacity-100 scale-100 transition-all duration-200">
           <div className="px-4 py-3 border-b border-gray-100">
             <p className="text-sm font-medium text-gray-900 truncate">
               {userInfo?.email || "User  email not available"}
@@ -439,7 +125,7 @@ export function DropdownItems({ closeDropdown }) {
   );
 }
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
@@ -492,7 +178,7 @@ const DropdownMenu = ({ title, items, closeDropdown }) => {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="flex items-center cursor-pointer">
+      <div className=" mid:mb-2  flex items-center cursor-pointer">
         <span className="block py-2 px-3 rounded md:hover:bg-transparent hover:text-btColour md:p-0 transition-all duration-300">
           {title}
         </span>
@@ -557,6 +243,12 @@ const Navbar = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [bannerVisible, setBannerVisible] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
@@ -606,15 +298,31 @@ const Navbar = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+  const fetchBannerStatus = useCallback(async () => {
+    try {
+      const res = await fetch(`${backendURL}/api/getBannerStatus`);
+      if (!res.ok) {
+        throw new Error("Failed to fetch banner status");
+      }
+      const data = await res.json();
+      setBannerVisible(data.isActive);
+    } catch (error) {
+      console.error("Error fetching banner status:", error);
+      setSnackbar({
+        open: true,
+        message: "Failed to fetch banner status",
+        severity: "error",
+      });
+    }
+  }, []);
+  useEffect(() => {
+    fetchBannerStatus();
+  }, [fetchBannerStatus]);
 
   const navbarClass = `fixed w-full z-20 top-0 start-0 transition-all duration-300 ease-in-out ${
     isScrolled || location.pathname !== "/"
       ? "bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600"
-      : ""
-  }`;
-
-  const scrlwhite = ` ${
-    isScrolled || location.pathname !== "/" ? "text-black" : ""
+      : "bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600  "
   }`;
 
   return (
@@ -638,7 +346,7 @@ const Navbar = () => {
 
           <button
             onClick={toggleMenu}
-            className={`inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 ${scrlwhite}`}
+            className={`inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200`}
             aria-controls="navbar-sticky"
             aria-expanded={isMenuOpen}
           >
@@ -669,15 +377,15 @@ const Navbar = () => {
             ref={menuRef}
           >
             <ul
-              className={`flex flex-col p-4 md:p-0 mt-4 font-medium border rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 ${scrlwhite}`}
+              className={`flex flex-col p-4 md:p-0 mt-4 font-medium border rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 `}
             >
               <li>
                 <NavLink
                   onClick={handleLinkClick}
                   to="/"
                   className={({ isActive }) =>
-                    `block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
-                      isActive ? "mid:bg-btColour mid:text-white" : scrlwhite
+                    `block py-2 px-3 mid:mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
+                      isActive ? "mid:bg-btColour mid:text-white" : ""
                     }`
                   }
                   end
@@ -708,7 +416,7 @@ const Navbar = () => {
                   onClick={handleLinkClick}
                   to="/blog"
                   className={({ isActive }) =>
-                    `block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
+                    `block mid:mb-2  py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
                       isActive
                         ? "text-btColour mid:bg-btColour mid:text-white"
                         : ""
@@ -736,7 +444,7 @@ const Navbar = () => {
                   onClick={handleLinkClick}
                   to="/contactus"
                   className={({ isActive }) =>
-                    `block py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
+                    `block mid:mb-2  py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
                       isActive
                         ? "text-btColour mid:bg-btColour mid:text-white"
                         : ""
@@ -757,7 +465,12 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
-      <NotificationBanner />
+      {bannerVisible && (
+        <NotificationBanner
+          isVisible={bannerVisible}
+          setIsVisible={setBannerVisible}
+        />
+      )}
 
       <Snackbar
         open={openSnackbar}
