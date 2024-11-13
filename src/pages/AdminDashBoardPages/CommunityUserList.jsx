@@ -12,7 +12,7 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import { CircularProgress } from "@mui/material";
 import SwitchNav from "../../components/tools/SwitchNav";
-import NotificationBanner from "../../components/NavNotificationBanner";
+import { NotificationBanner } from "../../components/NavNotificationBanner";
 
 const backendURL =
   import.meta.env.MODE === "production"

@@ -137,7 +137,10 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import CredulenLogo2 from "../assets/CredulenLogo2.png";
 import CredulenLogo from "../assets/CredulenLogo.png";
-import NotificationBanner from "../components/NavNotificationBanner";
+import {
+  NotificationBanner,
+  LayoutWrapper,
+} from "../components/NavNotificationBanner";
 
 const backendURL =
   import.meta.env.MODE === "production"
@@ -471,6 +474,7 @@ const Navbar = () => {
           setIsVisible={setBannerVisible}
         />
       )}
+      <LayoutWrapper bannerVisible={bannerVisible}></LayoutWrapper>
 
       <Snackbar
         open={openSnackbar}
