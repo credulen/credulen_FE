@@ -1,275 +1,238 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { Table, Button, Dropdown } from "flowbite-react";
-import moment from "moment";
-import { HiOutlineTrash } from "react-icons/hi";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import { IoClose } from "react-icons/io5";
-import { AiTwotoneDelete } from "react-icons/ai";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
-import { CircularProgress } from "@mui/material";
-import SwitchNav from "../../components/tools/SwitchNav";
-import NotificationBanner from "../../components/NavNotificationBanner";
+const Navbar = () => {
+  const userDropdownRef = useRef(null);
+  const menuRef = useRef(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeLink, setActiveLink] = useState(null);
 
-const backendURL =
-  import.meta.env.MODE === "production"
-    ? import.meta.env.VITE_BACKEND_URL
-    : "http://localhost:3001";
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
-const LoadingSpinner = () => (
-  <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
-    <CircularProgress size={40} className="text-btColour" />
-  </div>
-);
-
-const CommunityRegistrationRow = ({ registration, onDelete }) => (
-  <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-    <Table.Cell>{registration.name}</Table.Cell>
-    <Table.Cell>{registration.email}</Table.Cell>
-    <Table.Cell>{registration.phone}</Table.Cell>
-    <Table.Cell>{registration.enrolled}</Table.Cell>
-    <Table.Cell>
-      {moment(registration.registrationDate).format("MMMM D, HH:mm")}
-    </Table.Cell>
-    <Table.Cell>
-      {/* <Button color="red" onClick={() => onDelete(registration._id)} size="xs">
-        <AiTwotoneDelete size={16} />
-      </Button> */}
-      <button
-        onClick={() => onDelete(registration._id)}
-        className="font-medium text-red-500 bg-transparent border border-red-500 cursor-pointer hover:bg-btColour hover:text-white p-1 rounded-md "
-      >
-        Delete
-      </button>
-    </Table.Cell>
-  </Table.Row>
-);
-
-const CommunityUserList = () => {
-  const [registrations, setRegistrations] = useState([]);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedRegistrationId, setSelectedRegistrationId] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [isBannerVisible, setIsBannerVisible] = useState(true);
-  const [bannerVisible, setBannerVisible] = useState(true);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [bannerVisible, setBannerVisible] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
 
-  const fetchRegistrations = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(`${backendURL}/api/getAllRegistrations`);
-      const data = await res.json();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
 
-      if (!res.ok) {
-        throw new Error(data.message || "Failed to fetch registrations");
-      }
+  const navigate = useNavigate();
 
-      setRegistrations(data.data);
-    } catch (error) {
-      console.error("Error fetching registrations:", error);
-      setSnackbar({
-        open: true,
-        message: "Failed to fetch community registrations",
-        severity: "error",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
-  useEffect(() => {
-    fetchRegistrations();
-  }, [fetchRegistrations]);
+  const handleLinkClick = () => {
+    if (isMenuOpen) setIsMenuOpen(false);
+  };
 
-  const handleBannerToggle = async (isActive) => {
-    try {
-      const res = await fetch(`${backendURL}/api/updateBannerStatus`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isActive }),
-      });
+  const closeDropdown = () => {
+    setIsMenuOpen(false);
+  };
 
-      if (!res.ok) {
-        throw new Error("Failed to update banner status");
-      }
-
-      setBannerVisible(isActive);
-
-      setSnackbar({
-        open: true,
-        message: `Banner ${isActive ? "enabled" : "disabled"} successfully`,
-        severity: "success",
-      });
-    } catch (error) {
-      console.error("Error updating banner status:", error);
-      setSnackbar({
-        open: true,
-        message: "Failed to update banner status",
-        severity: "error",
-      });
+  const handleClickOutside = (event) => {
+    if (menuRef.current && !menuRef.current.contains(event.target)) {
+      setIsMenuOpen(false);
     }
   };
 
-  const handleDelete = useCallback(
-    async (registrationId) => {
-      try {
-        const res = await fetch(
-          `${backendURL}/api/deleteRegistration/${registrationId}`,
-          {
-            method: "DELETE",
-          }
-        );
-
-        if (!res.ok) {
-          throw new Error("Failed to delete registration");
-        }
-
-        setSnackbar({
-          open: true,
-          message: "Registration deleted successfully",
-          severity: "success",
-        });
-
-        setShowDeleteModal(false);
-        fetchRegistrations();
-      } catch (error) {
-        console.error("Error deleting registration:", error);
-        setSnackbar({
-          open: true,
-          message: "Failed to delete registration",
-          severity: "error",
-        });
-      }
-    },
-    [fetchRegistrations]
-  );
-
-  const handleDeleteConfirm = useCallback(() => {
-    if (selectedRegistrationId) {
-      handleDelete(selectedRegistrationId);
-    }
-  }, [handleDelete, selectedRegistrationId]);
-
-  const handleCloseSnackbar = useCallback((event, reason) => {
-    if (reason === "clickaway") return;
-    setSnackbar((prev) => ({ ...prev, open: false }));
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpenSnackbar(false);
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  const navbarClass = `fixed w-full z-20 top-0 start-0 transition-all duration-300 ease-in-out ${
+    isScrolled || location.pathname !== "/"
+      ? "bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600"
+      : "bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600  "
+  }`;
 
   return (
-    <div className="flex flex-col w-full h-full mid:mt-20">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4 p-3">
-        <h1 className="text-2xl font-semibold">Registered Community Members</h1>
-      </div>
+    <div
+      className={`transition-all duration-300 ${bannerVisible ? "mb-16" : ""}`}
+    >
+      <nav className={navbarClass}>
+        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+          <Link
+            to="/"
+            className="flex items-center space-x-3 rtl:space-x-reverse"
+          >
+            <img
+              src={CredulenLogo2}
+              className="w-[11rem] h-[3rem]"
+              alt="Flowbite Logo"
+            />
+          </Link>
 
-      {/* REGISTRATION FORM NAV.  */}
-      <NotificationBanner
-        isVisible={bannerVisible}
-        setIsVisible={setBannerVisible}
-      />
+          <span className="md:order-2 flex space-x-3 items-center mid:hidden align-middle text-center">
+            <DropdownItems closeDropdown={closeDropdown} />
+          </span>
 
-      <div className="flex items-center mb-4">
-        <SwitchNav
-          checked={bannerVisible}
-          onChange={(e) => handleBannerToggle(e.target.checked)}
-        >
-          {bannerVisible ? "Hide Banner" : "Show Banner"}
-        </SwitchNav>
-      </div>
+          <button
+            onClick={toggleMenu}
+            className={`inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200`}
+            aria-controls="navbar-sticky"
+            aria-expanded={isMenuOpen}
+          >
+            <span className="sr-only">Open main menu</span>
+            <svg
+              className={`w-5 h-5 transform transition-transform duration-300 ${
+                isMenuOpen ? "rotate-90" : ""
+              }`}
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 17 14"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M1 1h15M1 7h15M1 13h15"
+              />
+            </svg>
+          </button>
 
-      <div className="flex-grow overflow-x-auto">
-        <div className="h-full overflow-y-auto">
-          {registrations.length > 0 ? (
-            <Table hoverable className="shadow-md">
-              <Table.Head>
-                <Table.HeadCell>Name</Table.HeadCell>
-                <Table.HeadCell>Email</Table.HeadCell>
-                <Table.HeadCell>Phone</Table.HeadCell>
-                <Table.HeadCell>Ever Enrolled?</Table.HeadCell>
-                <Table.HeadCell>Registered Date/Time</Table.HeadCell>
-                <Table.HeadCell>Action</Table.HeadCell>
-              </Table.Head>
-              <Table.Body className="divide-y">
-                {registrations.map((registration) => (
-                  <CommunityRegistrationRow
-                    key={registration._id}
-                    registration={registration}
-                    onDelete={(id) => {
-                      setSelectedRegistrationId(id);
-                      setShowDeleteModal(true);
-                    }}
-                  />
-                ))}
-              </Table.Body>
-            </Table>
-          ) : (
-            <p className="text-center py-4">
-              No community registrations found!
-            </p>
-          )}
+          <div
+            className={`${
+              isMenuOpen ? "block" : "hidden"
+            } w-full md:flex md :w-auto md:order-1 transition-all duration-500 ease-in-out`}
+            id="navbar-sticky"
+            ref={menuRef}
+          >
+            <ul
+              className={`flex flex-col p-4 md:p-0 mt-4 font-medium border rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 `}
+            >
+              <li>
+                <NavLink
+                  onClick={handleLinkClick}
+                  to="/"
+                  className={({ isActive }) =>
+                    `block py-2 px-3 mid:mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
+                      isActive ? "mid:bg-btColour mid:text-white" : ""
+                    }`
+                  }
+                  end
+                >
+                  Home
+                </NavLink>
+              </li>
+
+              <li>
+                <DropdownMenu
+                  title="Solutions"
+                  items={[
+                    {
+                      label: "Training Schools",
+                      path: "/solutions/training_School",
+                    },
+                    {
+                      label: "Consulting Services",
+                      path: "/solutions/consulting_Services",
+                    },
+                  ]}
+                  closeDropdown={closeDropdown}
+                />
+              </li>
+
+              <li>
+                <NavLink
+                  onClick={handleLinkClick}
+                  to="/blog"
+                  className={({ isActive }) =>
+                    `block mid:mb-2  py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
+                      isActive
+                        ? "text-btColour mid:bg-btColour mid:text-white"
+                        : ""
+                    }`
+                  }
+                  end
+                >
+                  Blog
+                </NavLink>
+              </li>
+
+              <li>
+                <DropdownMenu
+                  title="Events"
+                  items={[
+                    { label: "Webinars", path: "/webinars" },
+                    { label: "Conferences", path: "/conferences" },
+                  ]}
+                  closeDropdown={closeDropdown}
+                />
+              </li>
+
+              <li>
+                <NavLink
+                  onClick={handleLinkClick}
+                  to="/contactus"
+                  className={({ isActive }) =>
+                    `block mid:mb-2  py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
+                      isActive
+                        ? "text-btColour mid:bg-btColour mid:text-white"
+                        : ""
+                    }`
+                  }
+                  end
+                >
+                  Contact Us
+                </NavLink>
+              </li>
+
+              <li>
+                <span className="md:order-2 flex space-x-3 items-center md:hidden align-middle text-center">
+                  <DropdownItems closeDropdown={closeDropdown} />
+                </span>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
-
-      <Dialog
-        open={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">Please Confirm Delete</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-              Are you sure you want to delete this users information?
-            </p>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setShowDeleteModal(false)}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <IoClose size={24} />
-          </Button>
-          <Button
-            onClick={handleDeleteConfirm}
-            className="text-red-500 hover:text-red-700"
-          >
-            <AiTwotoneDelete size={24} />
-          </Button>
-        </DialogActions>
-      </Dialog>
+      </nav>
+      {bannerVisible && (
+        <NotificationBanner
+          isVisible={bannerVisible}
+          setIsVisible={setBannerVisible}
+        />
+      )}
 
       <Snackbar
-        open={snackbar.open}
+        open={openSnackbar}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
       >
         <Alert
           onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
+          severity={snackbarSeverity}
           sx={{ width: "100%" }}
         >
-          {snackbar.message}
+          {snackbarMessage}
         </Alert>
       </Snackbar>
     </div>
   );
 };
 
-export default CommunityUserList;
+export default Navbar;

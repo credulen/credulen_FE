@@ -1,7 +1,7 @@
 import React from "react";
 import { CircularProgress } from "@mui/material";
 import UsePaginatedSolutions from "../components/tools/usePagination";
-import SolutionCard from "../components/SolutionCard";
+import { SolutionCard } from "../components/SolutionCard";
 import Pagination from "../components/tools/pagination";
 
 const TrainingSchool = () => {

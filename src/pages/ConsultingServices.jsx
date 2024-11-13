@@ -1,7 +1,7 @@
 import React from "react";
 import { CircularProgress } from "@mui/material";
 import UsePaginatedSolutions from "../components/tools/usePagination";
-import SolutionCard from "../components/SolutionCard";
+import { SolutionCard, SolutionCard2 } from "../components/SolutionCard";
 import Pagination from "../components/tools/pagination";
 
 const ConsultingServices = () => {
@@ -46,7 +46,7 @@ const ConsultingServices = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
           {solutions.length > 0 ? (
             solutions.map((event) => (
-              <SolutionCard key={event._id} event={event} />
+              <SolutionCard2 key={event._id} event={event} />
             ))
           ) : (
             <p>No consulting service solutions available.</p>

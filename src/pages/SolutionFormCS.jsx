@@ -194,6 +194,7 @@ const SolutionFormCS = () => {
             type="email"
             id="email"
             name="email"
+            autoComplete="email"
             value={formData.email}
             onChange={handleInputChange}
             className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-700 focus:border-teal-700"
@@ -341,11 +342,10 @@ const SolutionFormCS = () => {
                 required
               >
                 <option value="">Select Company Size</option>
-                <option value="2-7">2-7</option>
-                <option value="8-20">8-20</option>
+                <option value="1-9">1-9</option>
+                <option value="10-20">10-20</option>
                 <option value="21-50">21-50</option>
-                <option value="50-150">50-150</option>
-                <option value="150+">150 & above</option>
+                <option value="50 & above">50 & above</option>
               </select>
             </div>
 
