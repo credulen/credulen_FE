@@ -11,5 +11,18 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    chunkSizeWarningLimit: 1600,
+    minify: "terser",
+    cssCodeSplit: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom"],
+          // Add other large dependencies here
+        },
+      },
+    },
+  },
   plugins: [react()],
 });
