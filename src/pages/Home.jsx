@@ -106,183 +106,181 @@ const IntelligentHomepage = () => {
   return (
     <>
       {/* Hero Section  Start*/}
-      <div className="relative min-h-screen w-full overflow-hidden bg-white mt-20 mid:mt-[6rem] mid:mb-12">
+      <div className="relative min-h-screen w-full overflow-hidden bg-white">
         {/* Background Pattern */}
-        <div
-          className="absolute md:left-[10rem] md:bottom-16 inset-0 opacity-50"
-          style={{
-            backgroundImage: `url(${HeroBg})`,
-            backgroundSize: "95%",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-          }}
-        />
+        <div className="absolute inset-0 opacity-50 pointer-events-none">
+          <div className="w-full h-full bg-center bg-no-repeat bg-[length:95%]" />
+        </div>
 
-        {/* Main Content */}
-        {/* Main Content */}
-        <div className="relative flex flex-col md:flex-row items-center justify-between px-4 sm:px-6 lg:px-16 max-w-7xl mx-auto min-h-screen">
-          {/* Left Content */}
-          {/* <div className="w-full lg:w-1/2 space-y-6 pt-20 md:pt-0"></div> */}
-          <div className="w-full lg:w-1/2 space-y-6">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-5xl font-bold text-teal-800"
-            >
-              Data, AI & Blockchain
-            </motion.h1>
+        {/* Main Content Container */}
+        <div className="relative container mx-auto px-4 lg:px-8  lg:pt-0 min-h-screen">
+          <div className="grid lg:grid-cols-2 gap-8 items-center">
+            {/* Left Content */}
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="flex flex-co items-start gap-1"
-            >
-              {/* First title with pink underline */}
-              <div className="relative">
-                <h2 className="text-3xl font-semibold mb-2 "> Courses &</h2>
-                <div className="absolute -bottom-2 left-0 w-24">
-                  <svg viewBox="0 0 172 12" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M1 5.5C32 5.5 32 1 62 1C92 1 92 10 122 10C152 10 152 5.5 171 5.5"
-                      stroke="#EC4899"
-                      strokeWidth="2.5"
-                      fill="none"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </div>
-              </div>
-
-              {/* Second title with yellow underline */}
-              <div className="relative">
-                <h2 className="text-3xl font-semibold mb-2 mid:ml-5 ml-1 ">
-                  Digital Solutions
-                </h2>
-                <div className="absolute -bottom-2 left-0 w-44">
-                  <svg viewBox="0 0 172 12" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M1 5.5C32 5.5 32 1 62 1C92 1 92 10 122 10C152 10 152 5.5 171 5.5"
-                      stroke="#FCD34D"
-                      strokeWidth="2.5"
-                      fill="none"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-gray-600 max-w-xl"
-            >
-              Project-based training and Scenario-based Innovation Consulting to
-              master the skills & value creation in a rapidly changing world
-            </motion.p>
-
-            {/* Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="flex flex-wrap gap-4"
-            >
-              <Link to="/solutions/training_School">
-                <button className="relative px-8 py-3 bg-yellow-400 text-white rounded-full font-semibold hover:bg-yellow-500 transition-colors group">
-                  <span className="relative z-0">Courses</span>
-                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-[calc(100%-2rem)]"></div>
-                </button>
-              </Link>
-              <Link to="/solutions/consulting_Services">
-                <button className="relative px-8 py-3 bg-pink-500 text-white rounded-full font-semibold hover:bg-pink-600 transition-colors group">
-                  <span className="relative z-0">Solutions</span>
-                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-[calc(100%-2rem)]"></div>
-                </button>
-              </Link>
-            </motion.div>
-
-            {/* Watch Previous Link */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
-            >
-              <Link
-                to="/masterclasses"
-                className="text-gray-600 hover:text-teal-800 transition-colors"
+            <div className="space-y-6 pt-8 lg:pt-0">
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="text-4xl  md:text-5xl font-bold text-teal-800"
               >
-                Watch Our Previous Masterclasses here
-              </Link>
-            </motion.div>
-          </div>
+                Data, AI & Blockchain
+              </motion.h1>
 
-          {/* Right Content - Students Image with Stats */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 1 }}
-            className="w-full lg:w-1/2 relative mt-8 lg:mt-0 px-4 sm:px-0"
-          >
-            {/* Students and Flags Image Container */}
-            <div className="relative w-full overflow-hidden">
               <motion.div
-                className="relative"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: 1.2 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="flex flex-col sm:flex-row items-start gap-2 sm:gap-4"
               >
-                <img
-                  src={HeroRightImage}
-                  alt="Credulen International Students"
-                  className="w-full h-auto object-contain max-w-full"
-                />
-
-                {/* Stats Overlay */}
-                <motion.div
-                  className="md:absolute relative bottom-9 left-0 right-0 bg-white/90 backdrop-blur-l p-4 border border-pink-100 rounded-lg mx-0 sm:mx-4 mt-4 md:mt-0"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2, delay: 1.1 }}
-                >
-                  <div className="grid grid-cols-3 gap-2 text-center">
-                    <div>
-                      <div className="text-2xl md:text-3xl font-bold text-teal-800">
-                        1000+
-                      </div>
-                      <div className="text-xs md:text-sm text-gray-500">
-                        Students Impacted
-                      </div>
-                    </div>
-                    <div className="border-x-2 border-x-pink-300 border-gray-200">
-                      <div className="text-2xl md:text-3xl font-bold text-yellow-400">
-                        7+
-                      </div>
-                      <div className="text-xs md:text-sm text-gray-500">
-                        Courses
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-2xl md:text-3xl font-bold text-pink-500">
-                        5+
-                      </div>
-                      <div className="text-xs md:text-sm text-gray-500">
-                        Solutions
-                      </div>
-                    </div>
+                {/* Course Title */}
+                <div className="relative">
+                  <h2 className="text-2xl md:text-3xl font-semibold mb-2">
+                    Courses &
+                  </h2>
+                  <div className="absolute -bottom-2 left-0 w-24">
+                    <svg viewBox="0 0 172 12" className="w-full">
+                      <path
+                        d="M1 5.5C32 5.5 32 1 62 1C92 1 92 10 122 10C152 10 152 5.5 171 5.5"
+                        stroke="#EC4899"
+                        strokeWidth="2.5"
+                        fill="none"
+                        strokeLinecap="round"
+                      />
+                    </svg>
                   </div>
-                </motion.div>
+                </div>
+
+                {/* Digital Solutions Title */}
+                <div className="relative">
+                  <h2 className="text-2xl md:text-3xl font-semibold mb-2">
+                    Digital Solutions
+                  </h2>
+                  <div className="absolute -bottom-2 left-0 w-44">
+                    <svg viewBox="0 0 172 12" className="w-full">
+                      <path
+                        d="M1 5.5C32 5.5 32 1 62 1C92 1 92 10 122 10C152 10 152 5.5 171 5.5"
+                        stroke="#FCD34D"
+                        strokeWidth="2.5"
+                        fill="none"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="text-gray-600 max-w-xl text-base md:text-lg"
+              >
+                Project-based training and Scenario-based Innovation Consulting
+                to master the skills & value creation in a rapidly changing
+                world
+              </motion.p>
+
+              {/* Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="flex flex-wrap gap-4"
+              >
+                <Link to="/solutions/training_School">
+                  <button className="relative px-6 md:px-8 py-2 md:py-3 bg-yellow-400 text-white rounded-full font-semibold hover:bg-yellow-500 transition-colors group">
+                    <span className="relative z-0">Courses</span>
+                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-[calc(100%-2rem)]" />
+                  </button>
+                </Link>
+                <Link to="/solutions/consulting_Services">
+                  <button className="relative px-6 md:px-8 py-2 md:py-3 bg-pink-500 text-white rounded-full font-semibold hover:bg-pink-600 transition-colors group">
+                    <span className="relative z-0">Solutions</span>
+                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-[calc(100%-2rem)]" />
+                  </button>
+                </Link>
+              </motion.div>
+
+              {/* Watch Previous Link */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.8 }}
+                className="text-sm md:text-base"
+              >
+                <Link
+                  to="/masterclasses"
+                  className="text-gray-600 hover:text-teal-800 transition-colors"
+                >
+                  Watch Our Previous Masterclasses here
+                </Link>
               </motion.div>
             </div>
-          </motion.div>
+
+            {/* Right Content */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 1 }}
+              className="relative mt-8 lg:mt-0"
+            >
+              <div className="relative w-full">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, delay: 1.2 }}
+                  className="relative"
+                >
+                  <img
+                    src={HeroRightImage}
+                    alt="Credulen International Students"
+                    className="w-full h-auto object-contain max-w-full"
+                  />
+
+                  {/* Stats Overlay */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: 1.1 }}
+                    className="absolute -bottom-4 left-0 right-0 bg-white/90 backdrop-blur-sm p-4 mx-4 rounded-lg shadow-lg"
+                  >
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div>
+                        <div className="text-xl md:text-2xl lg:text-3xl font-bold text-teal-800">
+                          1000+
+                        </div>
+                        <div className="text-xs md:text-sm text-gray-500">
+                          Students Impacted
+                        </div>
+                      </div>
+                      <div className="border-x border-pink-300">
+                        <div className="text-xl md:text-2xl lg:text-3xl font-bold text-yellow-400">
+                          7+
+                        </div>
+                        <div className="text-xs md:text-sm text-gray-500">
+                          Courses
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-xl md:text-2xl lg:text-3xl font-bold text-pink-500">
+                          5+
+                        </div>
+                        <div className="text-xs md:text-sm text-gray-500">
+                          Solutions
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </div>
-      ;{/* Hero Section  ends*/}
+      {/* Hero Section  ends*/}
       {/* Main Content */}
-      <div className="min-h-screen bg-gradient-to-b from-blue-100 to-white text-gray-800 p-6">
+      <div className="min-h-screen bg-gradient-to-b from-blue-100 to-white text-gray-800 px-6">
         <motion.main
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

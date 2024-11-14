@@ -327,7 +327,13 @@ const Navbar = () => {
       ? "bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600"
       : "bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600  "
   }`;
+  const excludedPaths = ["/post", "/anotherPath", "/anotherpath"];
 
+  // Check if the current pathname starts with any of the excluded paths
+
+  const shouldRenderLayoutWrapper = !excludedPaths.some((path) =>
+    location.pathname.startsWith(path)
+  );
   return (
     <>
       <nav className={navbarClass}>
@@ -474,7 +480,9 @@ const Navbar = () => {
           setIsVisible={setBannerVisible}
         />
       )}
-      <LayoutWrapper bannerVisible={bannerVisible}></LayoutWrapper>
+      {shouldRenderLayoutWrapper && (
+        <LayoutWrapper bannerVisible={bannerVisible}></LayoutWrapper>
+      )}
 
       <Snackbar
         open={openSnackbar}

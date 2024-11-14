@@ -543,61 +543,6 @@ export default function Post() {
     window.open(shareUrl, "_blank");
   });
 
-  // const handleCommentSubmit = async (newComment) => {
-  //   try {
-  //     const commentData = {
-  //       content: newComment,
-  //       postId: postId,
-  //       userId: userId,
-  //     };
-
-  //     const response = await fetch(`${backendURL}/api/createComment`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(commentData),
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error("Failed to create comment");
-  //     }
-
-  //     const newCommentObj = await response.json();
-
-  //     // Create the complete comment object with user data
-  //     const commentWithUserData = {
-  //       ...newCommentObj,
-  //       userId: {
-  //         _id: userId,
-  //         username: name,
-  //         image: image,
-  //       },
-  //       likes: [], // Initialize empty likes array
-  //       likeCount: 0,
-  //     };
-
-  //     // Update both comments and displayedComments states
-  //     setComments((prevComments) => [...prevComments, commentWithUserData]);
-  //     setDisplayedComments((prevDisplayed) => {
-  //       // Only add to displayed comments if we haven't reached the page limit
-  //       if (prevDisplayed.length < currentPage * commentsPerPage) {
-  //         return [...prevDisplayed, commentWithUserData];
-  //       }
-  //       return prevDisplayed;
-  //     });
-
-  //     setSnackbarMessage("Comment submitted successfully!");
-  //     setSnackbarSeverity("success");
-  //     setSnackbarOpen(true);
-  //   } catch (error) {
-  //     console.error("Error submitting comment:", error);
-  //     setSnackbarMessage("Failed to submit comment.");
-  //     setSnackbarSeverity("error");
-  //     setSnackbarOpen(true);
-  //   }
-  // };
-
   const handleCommentSubmit = async (newComment) => {
     try {
       const commentData = {
@@ -930,9 +875,9 @@ export default function Post() {
   if (!post) return <Typography>Post not found</Typography>;
 
   return (
-    <Grid container spacing={3} sx={{ px: { xs: 4, md: 8 }, py: 10 }}>
+    <div className="min-h-screen">
       {/* Hero Section (keeping the same as before) */}
-      <div className="relativ h-[90vh] w-full ">
+      <div className="relativ h-[100vh] w-full ">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
@@ -942,7 +887,7 @@ export default function Post() {
           <div className="absolute inset-0 bg-black/50" />
         </div>
 
-        <div className="relative h-full flex flex-col justify-end pb-16 px-4 md:px-8 lg:px-16">
+        <div className="relative h-full flex flex-col justify-end pb-16 px-4 md:px-8 lg:px-[5.4rem]">
           <div className="mb-4">
             <Link
               to={`/blog?category=${encodeURIComponent(post.category)}`} // Pass category as a query parameter
@@ -1005,314 +950,331 @@ export default function Post() {
           </div>
         </div>
       </div>
-
-      <Grid item xs={12} md={8}>
-        <Box
-          sx={{
-            maxWidth: "100%",
-            margin: "auto",
-            pl: { md: 4 },
-            pr: { md: 2 },
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <Avatar
-              src={
-                post.authorId?.image
-                  ? `${backendURL}${post.authorId.image}`
-                  : "/default-avatar.jpg"
-              }
-              sx={{ width: 30, height: 30, mr: 2 }}
-            />
-            <Typography variant="subtitle1" sx={{ mr: 2 }}>
-              {post.authorId?.name || "Unknown Author"}
-            </Typography>
-            <Typography
-              variant="subtitle2"
-              color="text.secondary"
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                "&::before": {
-                  content: "'|'",
-                  mx: 1,
-                },
-              }}
-            >
-              {moment(post.createdAt).format("MMMM D, YYYY")}
-            </Typography>
-          </Box>
-
-          <h1
-            className="text-3xl md:text-4xl lg:text-4xl font-semibold text-[#1e293b] mb-6 max-w-4xl"
-            style={{
-              opacity: 0.9,
-            }}
-          >
-            {post.title}
-          </h1>
-
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              mb: 2,
-              ml: -1,
-              pl: 0,
-              width: "100%",
-            }}
-          >
-            <IconButton
-              onClick={handleLike}
-              size="small"
-              sx={{
-                transition:
-                  "color 0.3s ease-in-out, transform 0.3s ease-in-out",
-                color: isLiked ? "#" : "inherit",
-                "&:hover": {
-                  color: "#e57373", // Always use red on hover
-                  transform: "scale(1.2)",
-                },
-              }}
-            >
-              {isLiked ? (
-                <Favorite fontSize="small" />
-              ) : (
-                <FavoriteBorder fontSize="small" />
-              )}
-            </IconButton>
-            <Typography
-              sx={{
-                transition:
-                  "color 0.3s ease-in-out, transform 0.3s ease-in-out",
-                "&:hover": {
-                  color: isLiked ? "#e57373" : "inherit",
-                  transform: "scale(1.1)",
-                },
-                ml: 0,
-              }}
-              variant="body2"
-            >
-              {likesCount} likes
-            </Typography>
-          </Box>
-
-          <ReactQuill
-            value={post.content || ""}
-            readOnly={true}
-            theme="bubble"
-            className="custom-quill mb-5" // Add a custom class
-          />
-
-          {/* Share buttons */}
-          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <Typography variant="body2" sx={{ mr: 2 }}>
-              Share this:
-            </Typography>
-            <IconButton
-              onClick={() => handleShare("twitter")}
-              size="small"
-              sx={{ mr: 1 }}
-            >
-              <Twitter fontSize="small" sx={{ color: "#1DA1F2" }} />
-            </IconButton>
-            <IconButton
-              onClick={() => handleShare("facebook")}
-              size="small"
-              sx={{ mr: 1 }}
-            >
-              <Facebook fontSize="small" sx={{ color: "#4267B2" }} />
-            </IconButton>
-            <IconButton
-              onClick={() => handleShare("linkedin")}
-              size="small"
-              sx={{ mr: 1 }}
-            >
-              <LinkedIn fontSize="small" sx={{ color: "#0077b5" }} />
-            </IconButton>
-            <IconButton onClick={() => handleShare("whatsapp")} size="small">
-              <WhatsApp fontSize="small" sx={{ color: "#25D366" }} />
-            </IconButton>
-          </Box>
-
-          <Divider sx={{ mb: 3 }} />
-
-          <ExpandableCommentInput
-            onSubmit={handleCommentSubmit}
-            userAvatar={`${backendURL}/uploads/${profile?.image}`}
-            commentsCount={comments.length}
-            postId={postId}
-            userId={userId}
-          />
-          {displayedComments.length > 0 ? (
-            <Box sx={{ width: "100%", bgcolor: "#f5f5f5", p: 2 }}>
-              {displayedComments.map((comment) => (
-                <Box
-                  key={comment.id}
-                  sx={{ mb: 2, bgcolor: "white", borderRadius: 1, p: 2 }}
-                >
-                  <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                    <Avatar
-                      src={
-                        comment?.userId?.image
-                          ? `${backendURL}/uploads/${comment.userId.image}`
-                          : comment?.userId?.picture
-                      }
-                      alt={comment.username}
-                      sx={{ width: 22, height: 22, mr: 1, mb: 1 }}
-                    />
-
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        mb: 1,
-                        width: "100%",
-                      }}
-                    >
-                      {/* Text box containing the username and timestamp */}
-                      <Box sx={{ display: "flex", flexDirection: "row" }}>
-                        <Typography
-                          variant="subtitle2"
-                          sx={{ fontWeight: "light" }}
-                        >
-                          {comment.userId?.username || "Anonymous"}
-                        </Typography>
-
-                        <Typography
-                          variant="caption"
-                          sx={{ marginLeft: 1, marginTop: 0.1 }}
-                          color="text.secondary"
-                        >
-                          <span className="mx-1 ">-</span>
-                          {formatDistanceToNow(new Date(comment.createdAt), {
-                            addSuffix: true,
-                          })}
-                        </Typography>
-                      </Box>
-
-                      {/* MoreVert icon button aligned to the right */}
-                      {currentUser?.userInfo &&
-                        (currentUser.userInfo._id === comment.userId?._id ||
-                          currentUser.userInfo?.isAdmin) && (
-                          <IconButton
-                            size="small"
-                            onClick={(event) =>
-                              handleMenuOpen(event, comment._id)
-                            }
-                          >
-                            <MoreVert />
-                          </IconButton>
-                        )}
-                    </Box>
-                  </Box>
-
-                  {editingCommentId === comment._id ? (
-                    <Box sx={{ width: "100%" }}>
-                      <TextField
-                        fullWidth
-                        multiline
-                        rows={3}
-                        value={editedCommentContent}
-                        onChange={(e) =>
-                          setEditedCommentContent(e.target.value)
-                        }
-                        variant="outlined"
-                        sx={{ mb: 1 }}
-                      />
-                      <Box sx={{ display: "flex" }}>
-                        <Button
-                          className="text-btColour  hover:font-bold"
-                          onClick={() =>
-                            handleCommentEdit(comment._id, editedCommentContent)
-                          }
-                          sx={{ mr: 1 }}
-                        >
-                          Save
-                        </Button>
-                        <Button
-                          className="text-btColour  hover:font-bold"
-                          onClick={handleCancelEdit}
-                        >
-                          Cancel
-                        </Button>
-                      </Box>
-                    </Box>
-                  ) : (
-                    <Typography
-                      className="commentStyles"
-                      variant="body1"
-                      sx={{
-                        mb: 1,
-                        width: "100%",
-                        fontSize: "0.9rem", // Apply font size
-                        lineHeight: "1.6", // Apply line height
-                        color: "#201f1f", // Apply color if needed
-                      }}
-                    >
-                      {comment.content}
-                    </Typography>
-                  )}
-
-                  <Box
+      <div className="sm:container mx-auto  py-3  px-4">
+        <div className="flex flex-col lg:flex-row gap-8">
+          <main className="lg:w-[70%]">
+            <Grid item xs={12} md={8}>
+              <Box
+                sx={{
+                  maxWidth: "100%",
+                  margin: "auto",
+                  pl: { md: 4 },
+                  pr: { md: 2 },
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <Avatar
+                    src={
+                      post.authorId?.image
+                        ? `${backendURL}${post.authorId.image}`
+                        : "/default-avatar.jpg"
+                    }
+                    sx={{ width: 30, height: 30, mr: 2 }}
+                  />
+                  <Typography variant="subtitle1" sx={{ mr: 2 }}>
+                    {post.authorId?.name || "Unknown Author"}
+                  </Typography>
+                  <Typography
+                    variant="subtitle2"
+                    color="text.secondary"
                     sx={{
                       display: "flex",
                       alignItems: "center",
-                      mb: 2,
-                      ml: -1,
-                      pl: 0,
-                      width: "100%",
+                      "&::before": {
+                        content: "'|'",
+                        mx: 1,
+                      },
                     }}
                   >
-                    <IconButton
-                      onClick={() => handleCommentLike(comment._id)}
-                      size="small"
-                      sx={{
-                        transition:
-                          "color 0.3s ease-in-out, transform 0.3s ease-in-out",
-                        color: isLiked ? "#" : "inherit",
-                        "&:hover": {
-                          color: "#e57373", // Always use red on hover
-                          transform: "scale(1.2)",
-                        },
-                      }}
-                    >
-                      {isLiked ? (
-                        <Favorite fontSize="small" />
-                      ) : (
-                        <FavoriteBorder fontSize="small" />
-                      )}
-                    </IconButton>
-                    <Typography
-                      sx={{
-                        transition:
-                          "color 0.3s ease-in-out, transform 0.3s ease-in-out",
-                        "&:hover": {
-                          color: isLiked ? "#e57373" : "inherit",
-                          transform: "scale(1.1)",
-                        },
-                        ml: 0,
-                      }}
-                      variant="body2"
-                    >
-                      {comment.likes.length} likes
-                    </Typography>
-                  </Box>
+                    {moment(post.createdAt).format("MMMM D, YYYY")}
+                  </Typography>
                 </Box>
-              ))}
-            </Box>
-          ) : (
-            <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
-              No comments yet. Be the first to comment!
-            </Typography>
-          )}
-          {displayedComments.length < comments.length && (
-            <Box className="flex justify-center mt-2">
-              <button
-                onClick={handleShowMore}
-                disabled={loading}
-                className={`
+
+                <h1
+                  className="text-3xl md:text-4xl lg:text-4xl font-semibold text-[#1e293b] mb-6 max-w-4xl"
+                  style={{
+                    opacity: 0.9,
+                  }}
+                >
+                  {post.title}
+                </h1>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    mb: 2,
+                    ml: -1,
+                    pl: 0,
+                    width: "100%",
+                  }}
+                >
+                  <IconButton
+                    onClick={handleLike}
+                    size="small"
+                    sx={{
+                      transition:
+                        "color 0.3s ease-in-out, transform 0.3s ease-in-out",
+                      color: isLiked ? "#" : "inherit",
+                      "&:hover": {
+                        color: "#e57373", // Always use red on hover
+                        transform: "scale(1.2)",
+                      },
+                    }}
+                  >
+                    {isLiked ? (
+                      <Favorite fontSize="small" />
+                    ) : (
+                      <FavoriteBorder fontSize="small" />
+                    )}
+                  </IconButton>
+                  <Typography
+                    sx={{
+                      transition:
+                        "color 0.3s ease-in-out, transform 0.3s ease-in-out",
+                      "&:hover": {
+                        color: isLiked ? "#e57373" : "inherit",
+                        transform: "scale(1.1)",
+                      },
+                      ml: 0,
+                    }}
+                    variant="body2"
+                  >
+                    {likesCount} likes
+                  </Typography>
+                </Box>
+
+                <ReactQuill
+                  value={post.content || ""}
+                  readOnly={true}
+                  theme="bubble"
+                  className="custom-quill mb-5" // Add a custom class
+                />
+
+                {/* Share buttons */}
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <Typography variant="body2" sx={{ mr: 2 }}>
+                    Share this:
+                  </Typography>
+                  <IconButton
+                    onClick={() => handleShare("twitter")}
+                    size="small"
+                    sx={{ mr: 1 }}
+                  >
+                    <Twitter fontSize="small" sx={{ color: "#1DA1F2" }} />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => handleShare("facebook")}
+                    size="small"
+                    sx={{ mr: 1 }}
+                  >
+                    <Facebook fontSize="small" sx={{ color: "#4267B2" }} />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => handleShare("linkedin")}
+                    size="small"
+                    sx={{ mr: 1 }}
+                  >
+                    <LinkedIn fontSize="small" sx={{ color: "#0077b5" }} />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => handleShare("whatsapp")}
+                    size="small"
+                  >
+                    <WhatsApp fontSize="small" sx={{ color: "#25D366" }} />
+                  </IconButton>
+                </Box>
+
+                <Divider sx={{ mb: 3 }} />
+
+                <ExpandableCommentInput
+                  onSubmit={handleCommentSubmit}
+                  userAvatar={`${backendURL}/uploads/${profile?.image}`}
+                  commentsCount={comments.length}
+                  postId={postId}
+                  userId={userId}
+                />
+                {displayedComments.length > 0 ? (
+                  <Box sx={{ width: "100%", bgcolor: "#f5f5f5", p: 2 }}>
+                    {displayedComments.map((comment) => (
+                      <Box
+                        key={comment.id}
+                        sx={{ mb: 2, bgcolor: "white", borderRadius: 1, p: 2 }}
+                      >
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", mb: 1 }}
+                        >
+                          <Avatar
+                            src={
+                              comment?.userId?.image
+                                ? `${backendURL}/uploads/${comment.userId.image}`
+                                : comment?.userId?.picture
+                            }
+                            alt={comment.username}
+                            sx={{ width: 22, height: 22, mr: 1, mb: 1 }}
+                          />
+
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              mb: 1,
+                              width: "100%",
+                            }}
+                          >
+                            {/* Text box containing the username and timestamp */}
+                            <Box sx={{ display: "flex", flexDirection: "row" }}>
+                              <Typography
+                                variant="subtitle2"
+                                sx={{ fontWeight: "light" }}
+                              >
+                                {comment.userId?.username || "Anonymous"}
+                              </Typography>
+
+                              <Typography
+                                variant="caption"
+                                sx={{ marginLeft: 1, marginTop: 0.1 }}
+                                color="text.secondary"
+                              >
+                                <span className="mx-1 ">-</span>
+                                {formatDistanceToNow(
+                                  new Date(comment.createdAt),
+                                  {
+                                    addSuffix: true,
+                                  }
+                                )}
+                              </Typography>
+                            </Box>
+
+                            {/* MoreVert icon button aligned to the right */}
+                            {currentUser?.userInfo &&
+                              (currentUser.userInfo._id ===
+                                comment.userId?._id ||
+                                currentUser.userInfo?.isAdmin) && (
+                                <IconButton
+                                  size="small"
+                                  onClick={(event) =>
+                                    handleMenuOpen(event, comment._id)
+                                  }
+                                >
+                                  <MoreVert />
+                                </IconButton>
+                              )}
+                          </Box>
+                        </Box>
+
+                        {editingCommentId === comment._id ? (
+                          <Box sx={{ width: "100%" }}>
+                            <TextField
+                              fullWidth
+                              multiline
+                              rows={3}
+                              value={editedCommentContent}
+                              onChange={(e) =>
+                                setEditedCommentContent(e.target.value)
+                              }
+                              variant="outlined"
+                              sx={{ mb: 1 }}
+                            />
+                            <Box sx={{ display: "flex" }}>
+                              <Button
+                                className="text-btColour  hover:font-bold"
+                                onClick={() =>
+                                  handleCommentEdit(
+                                    comment._id,
+                                    editedCommentContent
+                                  )
+                                }
+                                sx={{ mr: 1 }}
+                              >
+                                Save
+                              </Button>
+                              <Button
+                                className="text-btColour  hover:font-bold"
+                                onClick={handleCancelEdit}
+                              >
+                                Cancel
+                              </Button>
+                            </Box>
+                          </Box>
+                        ) : (
+                          <Typography
+                            className="commentStyles"
+                            variant="body1"
+                            sx={{
+                              mb: 1,
+                              width: "100%",
+                              fontSize: "0.9rem", // Apply font size
+                              lineHeight: "1.6", // Apply line height
+                              color: "#201f1f", // Apply color if needed
+                            }}
+                          >
+                            {comment.content}
+                          </Typography>
+                        )}
+
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            mb: 2,
+                            ml: -1,
+                            pl: 0,
+                            width: "100%",
+                          }}
+                        >
+                          <IconButton
+                            onClick={() => handleCommentLike(comment._id)}
+                            size="small"
+                            sx={{
+                              transition:
+                                "color 0.3s ease-in-out, transform 0.3s ease-in-out",
+                              color: isLiked ? "#" : "inherit",
+                              "&:hover": {
+                                color: "#e57373", // Always use red on hover
+                                transform: "scale(1.2)",
+                              },
+                            }}
+                          >
+                            {isLiked ? (
+                              <Favorite fontSize="small" />
+                            ) : (
+                              <FavoriteBorder fontSize="small" />
+                            )}
+                          </IconButton>
+                          <Typography
+                            sx={{
+                              transition:
+                                "color 0.3s ease-in-out, transform 0.3s ease-in-out",
+                              "&:hover": {
+                                color: isLiked ? "#e57373" : "inherit",
+                                transform: "scale(1.1)",
+                              },
+                              ml: 0,
+                            }}
+                            variant="body2"
+                          >
+                            {comment.likes.length} likes
+                          </Typography>
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                ) : (
+                  <Typography
+                    variant="body2"
+                    sx={{ mt: 2, textAlign: "center" }}
+                  >
+                    No comments yet. Be the first to comment!
+                  </Typography>
+                )}
+                {displayedComments.length < comments.length && (
+                  <Box className="flex justify-center mt-2">
+                    <button
+                      onClick={handleShowMore}
+                      disabled={loading}
+                      className={`
   px-2 py-1 text-xs
   bg-gradient-to-r from-[#047481] to-[#198754] 
   text-transparent bg-clip-text
@@ -1323,47 +1285,56 @@ export default function Post() {
   focus:outline-none focus:ring-2 focus:ring-[#047481] focus:ring-opacity-50
   disabled:opacity-50 disabled:cursor-not-allowed
 `}
-              >
-                {loading ? "Loading..." : "Show More"}
-              </button>
-            </Box>
-          )}
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
-          >
-            <MenuItem
-              onClick={() =>
-                handleEditClick(
-                  comments.find((c) => c._id === selectedCommentId)
-                )
-              }
-            >
-              <Edit fontSize="small" sx={{ mr: 1 }} /> Edit
-            </MenuItem>
-            <MenuItem onClick={() => handleDeleteClick(selectedCommentId)}>
-              <Delete fontSize="small" sx={{ mr: 1 }} /> Delete
-            </MenuItem>
-          </Menu>
+                    >
+                      {loading ? "Loading..." : "Show More"}
+                    </button>
+                  </Box>
+                )}
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleMenuClose}
+                >
+                  <MenuItem
+                    onClick={() =>
+                      handleEditClick(
+                        comments.find((c) => c._id === selectedCommentId)
+                      )
+                    }
+                  >
+                    <Edit fontSize="small" sx={{ mr: 1 }} /> Edit
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => handleDeleteClick(selectedCommentId)}
+                  >
+                    <Delete fontSize="small" sx={{ mr: 1 }} /> Delete
+                  </MenuItem>
+                </Menu>
 
-          <Divider sx={{ my: 4 }} />
-
-          {/* ... (rest of the code remains the same) ... */}
-        </Box>
-      </Grid>
-
-      <Grid item xs={12} md={4}>
-        <Box
-          sx={{
-            top: 20,
-            maxHeight: { md: "calc(100vh - 40px)" },
-            padding: { lg: "20px" },
-          }}
-        >
-          <RelatedPosts category={post.category} currentPostId={post._id} />
-        </Box>
-      </Grid>
+                <Divider sx={{ my: 4 }} />
+              </Box>
+            </Grid>
+          </main>
+          <aside className="lg:w-[30%]">
+            <div className="top-4 ">
+              <Grid item xs={12} md={4}>
+                <Box
+                  sx={{
+                    top: 20,
+                    maxHeight: { md: "calc(100vh - 40px)" },
+                    padding: { lg: "20px" },
+                  }}
+                >
+                  <RelatedPosts
+                    category={post.category}
+                    currentPostId={post._id}
+                  />
+                </Box>
+              </Grid>
+            </div>
+          </aside>
+        </div>
+      </div>
 
       <Dialog open={deleteDialogOpen} onClose={handleDeleteCancel}>
         <DialogTitle>Are you sure you want to delete this comment?</DialogTitle>
@@ -1402,6 +1373,7 @@ export default function Post() {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-    </Grid>
+      {/* </Grid> */}
+    </div>
   );
 }
