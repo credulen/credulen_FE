@@ -212,7 +212,7 @@ const DropdownMenu = ({ title, items, closeDropdown }) => {
         }`}
       >
         <ul className="py-2 text-sm">
-          {items.map((item, index) => (
+          {/* {items.map((item, index) => (
             <li key={index} className="relative group/item">
               <NavLink
                 to={item.path}
@@ -224,6 +224,26 @@ const DropdownMenu = ({ title, items, closeDropdown }) => {
                 onClick={() => {
                   setIsOpen(false);
                   closeDropdown(); // Close the main dropdown when clicking a link
+                }}
+              >
+                <span className="relative z-10">{item.label}</span>
+                <div className="absolute inset-0 bg-gray-50 transform scale-x-0 group-hover/item:scale-x-100 transition-transform duration-200 origin-left" />
+              </NavLink>
+            </li>
+          ))} */}
+          {items.map((item, index) => (
+            <li key={index} className="relative group/item">
+              <NavLink
+                to={item.path}
+                target={item.external ? "_blank" : undefined}
+                className={({ isActive }) =>
+                  `block px-4 py-2 hover:bg-gray-50 hover:text-btColour transition-colors duration-200 ${
+                    isActive ? "text-btColour bg-gray-50" : "text-gray-700"
+                  }`
+                }
+                onClick={() => {
+                  setIsOpen(false);
+                  closeDropdown();
                 }}
               >
                 <span className="relative z-10">{item.label}</span>
@@ -441,8 +461,14 @@ const Navbar = () => {
                 <DropdownMenu
                   title="Events"
                   items={[
-                    { label: "Webinars", path: "/webinars" },
                     { label: "Conferences", path: "/conferences" },
+                    { label: "Webinars", path: "/webinars" },
+                    {
+                      label: "Podcasts",
+                      path: "https://podcast.credulen.com/",
+                      external: true,
+                      target: "_blank",
+                    },
                   ]}
                   closeDropdown={closeDropdown}
                 />

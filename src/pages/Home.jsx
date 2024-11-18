@@ -27,6 +27,7 @@ import {
 import heroImage1 from "../assets/heroImage.jpg";
 import heroImage2 from "../assets/heroImage2.jpg";
 import insightBg from "../assets/insight.jpg";
+import "../index.css";
 
 const heroImages = [heroImage1, heroImage2];
 
@@ -122,7 +123,7 @@ const IntelligentHomepage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
-                className="text-4xl  md:text-5xl font-bold text-teal-800"
+                className="text-4xl md:text-5xl font-bold text-teal-800"
               >
                 Data, AI & Blockchain
               </motion.h1>
@@ -131,11 +132,11 @@ const IntelligentHomepage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="flex flex-col sm:flex-row items-start gap-2 sm:gap-4"
+                className="flex flex-co sm:flex-row items-start gap-2 sm:gap-4"
               >
                 {/* Course Title */}
                 <div className="relative">
-                  <h2 className="text-2xl md:text-3xl font-semibold mb-2">
+                  <h2 className="text-2xl md:text-3xl font-semibold mb-2 ">
                     Courses &
                   </h2>
                   <div className="absolute -bottom-2 left-0 w-24">

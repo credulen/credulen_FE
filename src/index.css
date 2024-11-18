@@ -104,3 +104,37 @@ h2 {
 .animate-slideDown {
   animation: slideDown 0.5s ease-out;
 }
+
+.courses-digital-solutions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.courses-digital-solutions h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+@media (max-width: 767px) {
+  .courses-digital-solutions {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 319px) {
+  .courses-digital-solutions {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .courses-digital-solutions h2 {
+    margin-bottom: 0.5rem;
+  }
+}
