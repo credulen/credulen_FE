@@ -210,11 +210,10 @@ const IntelligentHomepage = () => {
                 transition={{ duration: 0.8, delay: 0.8 }}
                 className="text-sm md:text-base"
               >
-                <Link
-                  to="/masterclasses"
-                  className="text-gray-600 hover:text-teal-800 transition-colors"
-                >
-                  Watch Our Previous Masterclasses here
+                <Link target="blank" to="https://www.youtube.com/@credulen">
+                  <span className="text-gray-600 hover:text-teal-900 transform hover:scale-105 transition-all duration-300">
+                    Watch Our Previous Masterclasses here
+                  </span>
                 </Link>
               </motion.div>
             </div>
@@ -301,11 +300,13 @@ const IntelligentHomepage = () => {
                   icon={<Book className="w-12 h-12 text-blue-400" />}
                   title="Skill-up with our expert-led project-based courses"
                   description="Web3 & Web3 based Data Science, Data Engineering and Generative AI to increase your earning power."
+                  linkTo="/solutions/training_School"
                 />
                 <SkillCard
                   icon={<Lightbulb className="w-12 h-12 text-yellow-400" />}
                   title="Be at the cutting-edge of value creation"
                   description="For your organization through our consulting services in Data, Blockchain, and AI integration and strategy."
+                  linkTo="/solutions/consulting_Services"
                 />
               </motion.div>
             </div>
@@ -388,7 +389,14 @@ const IntelligentHomepage = () => {
 };
 
 // SkillCard Component
-const SkillCard = ({ icon, title, description }) => {
+
+const SkillCard = ({ icon, title, description, linkTo }) => {
+  const navigate = useNavigate();
+
+  const handleLearnMore = () => {
+    navigate(linkTo);
+  };
+
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
@@ -401,9 +409,10 @@ const SkillCard = ({ icon, title, description }) => {
       <p className="text-gray-300 mb-6">{description}</p>
       <motion.button
         whileHover={{ x: 5 }}
-        className="flex items-center text-blue-200 font-semibold"
+        className="flex items-center text-blue-200 hover:text-blue-500 font-semibold"
+        onClick={handleLearnMore}
       >
-        Learn More <ArrowRight className="w-5 h-5 ml-2" />
+        Learn More <ArrowRight className="w-5 h-5 ml-2 hover:text-blue-500" />
       </motion.button>
     </motion.div>
   );

@@ -1,238 +1,582 @@
-const Navbar = () => {
-  const userDropdownRef = useRef(null);
-  const menuRef = useRef(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeLink, setActiveLink] = useState(null);
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import NewsletterSignup from "../components/tools/NewsletterSignup";
+import { motion, AnimatePresence } from "framer-motion";
+import { useDispatch, useSelector } from "react-redux";
+import HeroBg from "../assets/heroBg.png";
+import HeroRightImage from "../assets/rightHero.png";
+import moment from "moment";
+const backendURL =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_BACKEND_URL
+    : "http://localhost:3001";
+import {
+  Clock,
+  BookOpen,
+  Lightbulb,
+  ArrowRight,
+  Book,
+  Award,
+  Target,
+  Compass,
+  Rocket,
+  Star,
+} from "lucide-react";
 
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
-  const [bannerVisible, setBannerVisible] = useState(false);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+// Import images directly
+import heroImage1 from "../assets/heroImage.jpg";
+import heroImage2 from "../assets/heroImage2.jpg";
+import insightBg from "../assets/insight.jpg";
 
-  const [isScrolled, setIsScrolled] = useState(false);
-  const location = useLocation();
+const heroImages = [heroImage1, heroImage2];
 
-  const navigate = useNavigate();
+const IntelligentHomepage = () => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [posts, setPosts] = useState([]);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const handleLinkClick = () => {
-    if (isMenuOpen) setIsMenuOpen(false);
-  };
-
-  const closeDropdown = () => {
-    setIsMenuOpen(false);
-  };
-
-  const handleClickOutside = (event) => {
-    if (menuRef.current && !menuRef.current.contains(event.target)) {
-      setIsMenuOpen(false);
+  const fetchPosts = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${backendURL}/api/getPosts`);
+      const data = await response.json();
+      console.log(data);
+      // Sort posts by date and take the last 5
+      const sortedPosts = (data.posts || []).sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setPosts(sortedPosts.slice(0, 5));
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
   }, []);
 
-  const handleCloseSnackbar = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
+  const fetchWebinars = useCallback(async () => {
+    try {
+      const response = await fetch(`${backendURL}/api/getEvents`);
+      const data = await response.json();
+
+      const webinars = Array.isArray(data.events)
+        ? data.events.filter((event) => event.eventType === "webinar")
+        : [];
+
+      const currentDate = new Date();
+      const upcoming = webinars.filter(
+        (event) => new Date(event.date) > currentDate
+      );
+      const past = webinars.filter(
+        (event) => new Date(event.date) <= currentDate
+      );
+
+      setUpcomingEvents(upcoming.slice(0, 5));
+      setPastEvents(past.slice(0, 5));
+    } catch (error) {
+      console.error("Error fetching webinars:", error);
+      setUpcomingEvents([]);
+      setPastEvents([]);
     }
-    setOpenSnackbar(false);
-  };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setIsScrolled(scrollPosition > 0);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
   }, []);
 
-  const navbarClass = `fixed w-full z-20 top-0 start-0 transition-all duration-300 ease-in-out ${
-    isScrolled || location.pathname !== "/"
-      ? "bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600"
-      : "bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-600  "
-  }`;
+  useEffect(() => {
+    fetchPosts();
+    fetchWebinars();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) =>
+        prevIndex === heroImages.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 10000); // Change image every 10 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const memoizedPosts = useMemo(() => posts, [posts]);
+  const memoizedUpcomingEvents = useMemo(
+    () => upcomingEvents,
+    [upcomingEvents]
+  );
+  const memoizedPastEvents = useMemo(() => pastEvents, [pastEvents]);
 
   return (
-    <div
-      className={`transition-all duration-300 ${bannerVisible ? "mb-16" : ""}`}
-    >
-      <nav className={navbarClass}>
-        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-          <Link
-            to="/"
-            className="flex items-center space-x-3 rtl:space-x-reverse"
-          >
-            <img
-              src={CredulenLogo2}
-              className="w-[11rem] h-[3rem]"
-              alt="Flowbite Logo"
-            />
-          </Link>
-
-          <span className="md:order-2 flex space-x-3 items-center mid:hidden align-middle text-center">
-            <DropdownItems closeDropdown={closeDropdown} />
-          </span>
-
-          <button
-            onClick={toggleMenu}
-            className={`inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200`}
-            aria-controls="navbar-sticky"
-            aria-expanded={isMenuOpen}
-          >
-            <span className="sr-only">Open main menu</span>
-            <svg
-              className={`w-5 h-5 transform transition-transform duration-300 ${
-                isMenuOpen ? "rotate-90" : ""
-              }`}
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 17 14"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M1 1h15M1 7h15M1 13h15"
-              />
-            </svg>
-          </button>
-
-          <div
-            className={`${
-              isMenuOpen ? "block" : "hidden"
-            } w-full md:flex md :w-auto md:order-1 transition-all duration-500 ease-in-out`}
-            id="navbar-sticky"
-            ref={menuRef}
-          >
-            <ul
-              className={`flex flex-col p-4 md:p-0 mt-4 font-medium border rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 `}
-            >
-              <li>
-                <NavLink
-                  onClick={handleLinkClick}
-                  to="/"
-                  className={({ isActive }) =>
-                    `block py-2 px-3 mid:mb-2 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
-                      isActive ? "mid:bg-btColour mid:text-white" : ""
-                    }`
-                  }
-                  end
-                >
-                  Home
-                </NavLink>
-              </li>
-
-              <li>
-                <DropdownMenu
-                  title="Solutions"
-                  items={[
-                    {
-                      label: "Training Schools",
-                      path: "/solutions/training_School",
-                    },
-                    {
-                      label: "Consulting Services",
-                      path: "/solutions/consulting_Services",
-                    },
-                  ]}
-                  closeDropdown={closeDropdown}
-                />
-              </li>
-
-              <li>
-                <NavLink
-                  onClick={handleLinkClick}
-                  to="/blog"
-                  className={({ isActive }) =>
-                    `block mid:mb-2  py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
-                      isActive
-                        ? "text-btColour mid:bg-btColour mid:text-white"
-                        : ""
-                    }`
-                  }
-                  end
-                >
-                  Blog
-                </NavLink>
-              </li>
-
-              <li>
-                <DropdownMenu
-                  title="Events"
-                  items={[
-                    { label: "Webinars", path: "/webinars" },
-                    { label: "Conferences", path: "/conferences" },
-                  ]}
-                  closeDropdown={closeDropdown}
-                />
-              </li>
-
-              <li>
-                <NavLink
-                  onClick={handleLinkClick}
-                  to="/contactus"
-                  className={({ isActive }) =>
-                    `block mid:mb-2  py-2 px-3 rounded hover:bg-gray-100 md:hover:bg-transparent hover:text-btColour md:p-0 ${
-                      isActive
-                        ? "text-btColour mid:bg-btColour mid:text-white"
-                        : ""
-                    }`
-                  }
-                  end
-                >
-                  Contact Us
-                </NavLink>
-              </li>
-
-              <li>
-                <span className="md:order-2 flex space-x-3 items-center md:hidden align-middle text-center">
-                  <DropdownItems closeDropdown={closeDropdown} />
-                </span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-      {bannerVisible && (
-        <NotificationBanner
-          isVisible={bannerVisible}
-          setIsVisible={setBannerVisible}
+    <>
+      {/* Hero Section  Start*/}
+      <div className="relative min-h-screen w-full overflow-hidden bg-white mt-20 mid:mt-[6rem] mid:mb-12">
+        {/* Background Pattern */}
+        <div
+          className="absolute md:left-[10rem] md:bottom-16 inset-0 opacity-50"
+          style={{
+            backgroundImage: `url(${HeroBg})`,
+            backgroundSize: "95%",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
         />
-      )}
 
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
+        {/* Main Content */}
+        {/* Main Content */}
+        <div className="relative flex flex-col md:flex-row items-center justify-between px-4 sm:px-6 lg:px-16 max-w-7xl mx-auto min-h-screen">
+          {/* Left Content */}
+          {/* <div className="w-full lg:w-1/2 space-y-6 pt-20 md:pt-0"></div> */}
+          <div className="w-full lg:w-1/2 space-y-6">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-5xl font-bold text-teal-800"
+            >
+              Data, AI & Blockchain
+            </motion.h1>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="flex flex-co items-start gap-1"
+            >
+              {/* First title with pink underline */}
+              <div className="relative">
+                <h2 className="text-3xl font-semibold mb-2 "> Courses &</h2>
+                <div className="absolute -bottom-2 left-0 w-24">
+                  <svg viewBox="0 0 172 12" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M1 5.5C32 5.5 32 1 62 1C92 1 92 10 122 10C152 10 152 5.5 171 5.5"
+                      stroke="#EC4899"
+                      strokeWidth="2.5"
+                      fill="none"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Second title with yellow underline */}
+              <div className="relative">
+                <h2 className="text-3xl font-semibold mb-2 mid:ml-5 ml-1 ">
+                  Digital Solutions
+                </h2>
+                <div className="absolute -bottom-2 left-0 w-44">
+                  <svg viewBox="0 0 172 12" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M1 5.5C32 5.5 32 1 62 1C92 1 92 10 122 10C152 10 152 5.5 171 5.5"
+                      stroke="#FCD34D"
+                      strokeWidth="2.5"
+                      fill="none"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-gray-600 max-w-xl"
+            >
+              Project-based training and Scenario-based Innovation Consulting to
+              master the skills & value creation in a rapidly changing world
+            </motion.p>
+
+            {/* Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="flex flex-wrap gap-4"
+            >
+              <Link to="/solutions/training_School">
+                <button className="relative px-8 py-3 bg-yellow-400 text-white rounded-full font-semibold hover:bg-yellow-500 transition-colors group">
+                  <span className="relative z-0">Courses</span>
+                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-[calc(100%-2rem)]"></div>
+                </button>
+              </Link>
+              <Link to="/solutions/consulting_Services">
+                <button className="relative px-8 py-3 bg-pink-500 text-white rounded-full font-semibold hover:bg-pink-600 transition-colors group">
+                  <span className="relative z-0">Solutions</span>
+                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-[calc(100%-2rem)]"></div>
+                </button>
+              </Link>
+            </motion.div>
+
+            {/* Watch Previous Link */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+            >
+              <Link
+                to="/masterclasses"
+                className="text-gray-600 hover:text-teal-800 transition-colors"
+              >
+                Watch Our Previous Masterclasses here
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* Right Content - Students Image with Stats */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 1 }}
+            className="w-full lg:w-1/2 relative mt-8 lg:mt-0 px-4 sm:px-0"
+          >
+            {/* Students and Flags Image Container */}
+            <div className="relative w-full overflow-hidden">
+              <motion.div
+                className="relative"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: 1.2 }}
+              >
+                <img
+                  src={HeroRightImage}
+                  alt="Credulen International Students"
+                  className="w-full h-auto object-contain max-w-full"
+                />
+
+                {/* Stats Overlay */}
+                <motion.div
+                  className="md:absolute relative bottom-9 left-0 right-0 bg-white/90 backdrop-blur-l p-4 border border-pink-100 rounded-lg mx-0 sm:mx-4 mt-4 md:mt-0"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: 1.1 }}
+                >
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div>
+                      <div className="text-2xl md:text-3xl font-bold text-teal-800">
+                        1000+
+                      </div>
+                      <div className="text-xs md:text-sm text-gray-500">
+                        Students Impacted
+                      </div>
+                    </div>
+                    <div className="border-x-2 border-x-pink-300 border-gray-200">
+                      <div className="text-2xl md:text-3xl font-bold text-yellow-400">
+                        7+
+                      </div>
+                      <div className="text-xs md:text-sm text-gray-500">
+                        Courses
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-2xl md:text-3xl font-bold text-pink-500">
+                        5+
+                      </div>
+                      <div className="text-xs md:text-sm text-gray-500">
+                        Solutions
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+      ;{/* Hero Section  ends*/}
+      {/* Main Content */}
+      <div className="min-h-screen bg-gradient-to-b from-blue-100 to-white text-gray-800 p-6">
+        <motion.main
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="max-w-6xl mx-auto"
         >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+          {/* Skills Section */}
+          <div className="bg-gray-90 text-white py-16">
+            <div className="max-w-6xl mx-auto px-4">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="grid md:grid-cols-2 gap-8"
+              >
+                <SkillCard
+                  icon={<Book className="w-12 h-12 text-blue-400" />}
+                  title="Skill-up with our expert-led project-based courses"
+                  description="Web3 & Web3 based Data Science, Data Engineering and Generative AI to increase your earning power."
+                />
+                <SkillCard
+                  icon={<Lightbulb className="w-12 h-12 text-yellow-400" />}
+                  title="Be at the cutting-edge of value creation"
+                  description="For your organization through our consulting services in Data, Blockchain, and AI integration and strategy."
+                />
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Insights Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="relative"
+          >
+            {/* Background Image */}
+            <div
+              className="absolute inset-0 bg-cover bg-center opacity-10"
+              style={{
+                backgroundImage: `url(${insightBg})`,
+              }}
+            />
+
+            {/* Content */}
+            <div className="relative bg-transparent py-16">
+              <div className="max-w-6xl mx-auto px-4">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8 }}
+                  className="grid md:grid-cols-2 gap-8"
+                >
+                  <TeaserSection
+                    title="Read our latest insights"
+                    items={posts}
+                    posts={posts}
+                    icon={<BookOpen className="w-6 h-6 text-blue-500" />}
+                    viewAllPath="/blog"
+                    contentType="post"
+                  />
+                  <TeaserSection
+                    title="Join our upcoming webinars"
+                    posts={upcomingEvents}
+                    icon={<Clock className="w-6 h-6 text-green-500" />}
+                    viewAllPath="/webinars"
+                    contentType="event"
+                  />
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Mission Section */}
+          <div className="bg-gray-10 py-16 flex justify-center items-center min-h-screen">
+            <div className="max-w-6xl mx-auto px-4 text-center lg:max-w-4xl">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="text-center mx-auto gap-8"
+              >
+                <MissionCard
+                  className="text-center mx-auto flex flex-col items-center"
+                  icon={<Rocket className="w-12 h-12 text-blue-400 mb-4" />}
+                  title="Our Mission"
+                  content="At Credulen, our mission is to empower individuals and organizations to harness emerging technologies as tools to unlock creativity, supercharge productivity, and enhance human authenticity like never before."
+                />
+                <MissionCard
+                  icon={<Star className="w-12 h-12 text-yellow-400" />}
+                  title="Our Approach"
+                  content="We deliver value through a combination of hands-on training and strategic consulting, designed to address the unique challenges of our rapidly evolving world."
+                />
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Newsletter Section */}
+          <NewsletterSignup />
+        </motion.main>
+      </div>
+    </>
+  );
+};
+
+// SkillCard Component
+const SkillCard = ({ icon, title, description }) => {
+  return (
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      className="bg-gray-800 p-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+    >
+      <div className="flex items-center mb-4">
+        {icon}
+        <h2 className="text-xl font-bold ml-4">{title}</h2>
+      </div>
+      <p className="text-gray-300 mb-6">{description}</p>
+      <motion.button
+        whileHover={{ x: 5 }}
+        className="flex items-center text-blue-200 font-semibold"
+      >
+        Learn More <ArrowRight className="w-5 h-5 ml-2" />
+      </motion.button>
+    </motion.div>
+  );
+};
+
+// TeaserSection Component
+const TeaserSection = ({ title, icon, posts, viewAllPath, contentType }) => {
+  const navigate = useNavigate();
+
+  const handleViewAll = () => {
+    navigate(viewAllPath);
+  };
+
+  const getItemLink = (item) => {
+    switch (contentType) {
+      case "blog":
+        return `/blog/${item.slug}`;
+      case "webinar":
+        return `/webinar/${item.slug}`;
+      default:
+        return `/${contentType}/${item.slug}`;
+    }
+  };
+
+  return (
+    <div className="bg-white shadow-blue-300 p-8 rounded-lg shadow-lg">
+      <h2 className="text-2xl text-teal-700 font-bold mb-6 flex items-center">
+        {icon}
+        <span className="ml-2">{title}</span>
+      </h2>
+      <ul className="space-y-4">
+        {posts.map((item) => (
+          <motion.li
+            key={item.id}
+            whileHover={{ x: 5 }}
+            className="border-b border-gray-200 pb-2"
+          >
+            <Link
+              to={getItemLink(item)}
+              className="text-teal-700 hover:text-gray-600 transition-colors duration-300"
+            >
+              <h3 className="font-semibold">{item.title}</h3>
+              <p className="text-sm text-gray-500">
+                {moment(item.date).format("MMMM D, YYYY")}
+              </p>
+            </Link>
+          </motion.li>
+        ))}
+      </ul>
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        className="mt-6 bg-teal-600 text-white px-3 py-1 rounded-md font-semibold hover:border-2 hover:border-teal-700 hover:bg-white hover:text-teal-700 transition-colors duration-300"
+        onClick={handleViewAll}
+      >
+        View All
+      </motion.button>
     </div>
   );
 };
 
-export default Navbar;
+// MissionCard Component
+const MissionCard = ({ icon, title, content, className }) => {
+  return (
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      className={`text-customBlack p-8 rounded-lg hover:shadow-sm transition-all duration-300 flex flex-col items-center text-center ${className}`}
+    >
+      <div className="flex flex-col items-center mb-4 text-customBlack">
+        {icon}
+        <h2 className="text-2xl font-bold mt-4">{title}</h2>
+      </div>
+      <p className="leading-relaxed text-customBlack">{content}</p>
+    </motion.div>
+  );
+};
+
+export default IntelligentHomepage;
+
+<div className="space-y-6 pt-8 lg:pt-0">
+  <motion.h1
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8 }}
+    className="text-4xl  md:text-5xl font-bold text-teal-800"
+  >
+    Data, AI & Blockchain
+  </motion.h1>
+
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8, delay: 0.2 }}
+    className="flex flex-col sm:flex-row items-start gap-2 sm:gap-4"
+  >
+    {/* Course Title */}
+    <div className="relative  ">
+      <h2 className="text-2xl md:text-3xl font-semibold mb-2 ">Courses &</h2>
+      <div className="absolute -bottom-2 left-0 w-24">
+        <svg viewBox="0 0 172 12" className="w-full">
+          <path
+            d="M1 5.5C32 5.5 32 1 62 1C92 1 92 10 122 10C152 10 152 5.5 171 5.5"
+            stroke="#EC4899"
+            strokeWidth="2.5"
+            fill="none"
+            strokeLinecap="round"
+          />
+        </svg>
+      </div>
+    </div>
+
+    {/* Digital Solutions Title */}
+    <div className="relative  ">
+      <h2 className="text-2xl md:text-3xl font-semibold mb-2">
+        Digital Solutions
+      </h2>
+      <div className="absolute -bottom-2 left-0 w-44">
+        <svg viewBox="0 0 172 12" className="w-full">
+          <path
+            d="M1 5.5C32 5.5 32 1 62 1C92 1 92 10 122 10C152 10 152 5.5 171 5.5"
+            stroke="#FCD34D"
+            strokeWidth="2.5"
+            fill="none"
+            strokeLinecap="round"
+          />
+        </svg>
+      </div>
+    </div>
+  </motion.div>
+
+  <motion.p
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8, delay: 0.4 }}
+    className="text-gray-600 max-w-xl text-base md:text-lg"
+  >
+    Project-based training and Scenario-based Innovation Consulting to master
+    the skills & value creation in a rapidly changing world
+  </motion.p>
+
+  {/* Buttons */}
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8, delay: 0.6 }}
+    className="flex flex-wrap gap-4"
+  >
+    <Link to="/solutions/training_School">
+      <button className="relative px-6 md:px-8 py-2 md:py-3 bg-yellow-400 text-white rounded-full font-semibold hover:bg-yellow-500 transition-colors group">
+        <span className="relative z-0">Courses</span>
+        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-[calc(100%-2rem)]" />
+      </button>
+    </Link>
+    <Link to="/solutions/consulting_Services">
+      <button className="relative px-6 md:px-8 py-2 md:py-3 bg-pink-500 text-white rounded-full font-semibold hover:bg-pink-600 transition-colors group">
+        <span className="relative z-0">Solutions</span>
+        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-[calc(100%-2rem)]" />
+      </button>
+    </Link>
+  </motion.div>
+
+  {/* Watch Previous Link */}
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8, delay: 0.8 }}
+    className="text-sm md:text-base"
+  >
+    <Link
+      to="/masterclasses"
+      className="text-gray-600 hover:text-teal-800 transition-colors"
+    >
+      Watch Our Previous Masterclasses here
+    </Link>
+  </motion.div>
+</div>;
