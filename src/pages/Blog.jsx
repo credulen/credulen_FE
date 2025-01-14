@@ -955,25 +955,10 @@ const BlogPost = React.memo(({ post }) => {
             height: 250,
             objectFit: "cover",
           }}
-          image={`${backendURL}${post.image}`}
+          image={`${post.image}`}
           alt={post.title}
           loading="lazy"
         />
-        {/* testing iamge url */}
-        <span>hello</span>
-        <span className="px-3">
-          <img
-            src={`${backendURL}${post.image}`}
-            alt="Post Thumbnail"
-            onError={() =>
-              console.error(
-                "Image failed to load:",
-                `${backendURL}${post.image}`
-              )
-            }
-          />
-        </span>
-        {/* testing iamge url */}
 
         <CardContent sx={{ flexGrow: 1, p: 1 }}>
           <Typography

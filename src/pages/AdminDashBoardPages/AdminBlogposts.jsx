@@ -33,7 +33,7 @@ const PostTableRow = React.memo(({ post, backendURL, onDeleteClick }) => {
         <Link to={`/post/${post.slug}`}>
           {post?.image ? (
             <img
-              src={`${backendURL}${post.image}`}
+              src={`${post.image}`}
               alt={post.title}
               className="w-10 h-10 rounded-full object-cover"
               onError={(e) => {

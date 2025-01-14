@@ -19,7 +19,8 @@ function Adminheader() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
-  const userId = userInfo?.user._id;
+  console.log(userInfo);
+  const userId = userInfo?._id;
   const { profile, loading, success, error } = useSelector(
     (state) => state.profiles
   );
@@ -108,12 +109,12 @@ function Adminheader() {
 
         <div className="flex items-center">
           <span className="mb-1 mr-2 font-medium first-letter:uppercase">
-            {profile?.username || "Guest"}
+            {profile?.data?.username || "Guest"}
           </span>
           <span className="mb-2">
-            {profile?.image ? (
+            {profile?.data?.image ? (
               <img
-                src={`${backendURL}/uploads/${profile?.image}`}
+                src={`${profile?.data?.image}`}
                 alt={`${userInfo.username}`}
                 className="w-7 h-7 rounded-full object-cover mr-4"
                 onError={(e) => {

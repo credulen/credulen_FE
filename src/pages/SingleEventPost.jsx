@@ -116,7 +116,7 @@ const RelatedEventsCarousel = ({ events }) => {
               <CardMedia
                 component="img"
                 sx={{ height: 160, objectFit: "cover" }}
-                image={`${backendURL}${event.image}`}
+                image={`${event.image}`}
                 alt={event.title}
               />
               <CardContent sx={{ p: 2 }}>
@@ -651,7 +651,7 @@ const SingleEventPost = () => {
             }}
           >
             <img
-              src={`${backendURL}${eventData.image}`}
+              src={`${eventData.image}`}
               alt="Event Banner"
               style={{
                 width: "100%",

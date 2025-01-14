@@ -57,6 +57,7 @@ function AdminProfile() {
     (state) => state.profiles
   );
   const userId = userInfo?._id;
+  console.log(profile, "profile");
 
   // Memoize backend URL calculation
   const backendURL = useMemo(
@@ -126,13 +127,13 @@ function AdminProfile() {
     if (profile) {
       setFormData((prev) => ({
         ...prev,
-        username: profile.username || "",
-        email: profile.email || "",
+        username: profile?.data?.username || "",
+        email: profile?.data?.email || "",
         password: "", // Do not prefill password
       }));
 
-      if (profile.image) {
-        setImagePreview(`${backendURL}/uploads/${profile.image}`);
+      if (profile?.data?.image) {
+        setImagePreview(`${profile?.data?.image}`);
       }
     }
   }, [profile, backendURL]);

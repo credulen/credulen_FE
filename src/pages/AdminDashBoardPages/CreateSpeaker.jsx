@@ -57,7 +57,7 @@ const CreateSpeaker = () => {
               occupation: speaker.occupation,
               CoName: speaker.CoName,
             });
-            setImagePreview(`${backendURL}${speaker.image}`);
+            setImagePreview(`${speaker.image}`);
           }
         } catch (error) {
           showSnackbar("Failed to fetch speaker", "error");

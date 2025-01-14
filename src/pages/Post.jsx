@@ -132,7 +132,7 @@ export const RelatedPosts = ({ category, currentPostId }) => {
 
                 <Box className="flex items-center mb-2">
                   <Avatar
-                    src={`${backendURL}${post.authorId?.image}`}
+                    src={`${post.authorId?.image}`}
                     alt={post.authorId?.name}
                     sx={{ width: 24, height: 24, mr: 1 }} // 3rem size adjustment
                   />
@@ -881,7 +881,7 @@ export default function Post() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url(${backendURL}${post.image})`,
+            backgroundImage: `url(${post.image})`,
           }}
         >
           <div className="absolute inset-0 bg-black/50" />
@@ -921,7 +921,7 @@ export default function Post() {
                 className="text-white hover:text-gray-300 flex items-center"
               >
                 <Avatar
-                  src={`${backendURL}${post?.authorId?.image}`}
+                  src={`${post?.authorId?.image}`}
                   alt={"post image"}
                   sx={{ width: 30, height: 30 }}
                 >
@@ -966,7 +966,7 @@ export default function Post() {
                   <Avatar
                     src={
                       post.authorId?.image
-                        ? `${backendURL}${post.authorId.image}`
+                        ? `${post.authorId.image}`
                         : "/default-avatar.jpg"
                     }
                     sx={{ width: 30, height: 30, mr: 2 }}
@@ -1089,7 +1089,7 @@ export default function Post() {
 
                 <ExpandableCommentInput
                   onSubmit={handleCommentSubmit}
-                  userAvatar={`${backendURL}/uploads/${profile?.image}`}
+                  userAvatar={`${profile?.data?.image}`}
                   commentsCount={comments.length}
                   postId={postId}
                   userId={userId}

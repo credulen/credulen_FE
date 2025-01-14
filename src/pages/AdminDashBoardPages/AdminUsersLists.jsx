@@ -124,7 +124,7 @@ const UserTableRow = React.memo(({ user, backendURL, onDeleteClick }) => {
       <Table.Cell>
         {user.image ? (
           <img
-            src={`${backendURL}/uploads/${user.image}`}
+            src={`${user.image}`}
             alt={user.username}
             className="w-10 h-10 rounded-full"
             onError={(e) => {
@@ -201,7 +201,7 @@ export default function AdminUsersLists() {
         );
         const data = await res.json();
         if (res.ok) {
-          setUsers(data.users);
+          setUsers(data?.data?.users);
           setTotalUsers(data.totalUsers);
           setTotalPages(data.totalPages);
         } else {

@@ -34,7 +34,10 @@ const LoadingSpinner = memo(() => (
 // Memoized solution table row component
 const SolutionTableRow = memo(({ solution }) => (
   <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-    <Table.Cell>{solution.fullName}</Table.Cell>
+    <Table.Cell>
+      {solution.firstName}
+      {""} {solution.lastName}
+    </Table.Cell>
     <Table.Cell>{solution.phoneNumber}</Table.Cell>
     <Table.Cell>{solution.email}</Table.Cell>
     <Table.Cell>{solution.employmentStatus}</Table.Cell>

@@ -16,7 +16,7 @@ export const SolutionCard = ({ event, isConsulting = false }) => (
   <div className="bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:scale-95 flex flex-col h-full">
     <img
       className="w-full h-48 object-cover"
-      src={`${backendURL}${event?.image}`}
+      src={`${event?.image}`}
       alt={event.title}
       style={{ minHeight: "15rem" }}
     />
@@ -56,7 +56,7 @@ export const SolutionCard2 = ({ event, isConsulting = false }) => (
   <div className="bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:scale-95 flex flex-col h-full">
     <img
       className="w-full h-48 object-cover"
-      src={`${backendURL}${event?.image}`}
+      src={`${event?.image}`}
       alt={event.title}
       style={{ minHeight: "15rem" }}
     />

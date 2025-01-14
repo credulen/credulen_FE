@@ -107,12 +107,12 @@ function Header() {
 
         <div className="flex items-center">
           <span className="mb-1 mr-2 font-medium first-letter:uppercase">
-            {profile?.username || "Guest"}
+            {profile?.data?.username || "Guest"}
           </span>
           <span className="mb-2">
-            {profile?.image ? (
+            {profile?.data?.image ? (
               <img
-                src={`${backendURL}/uploads/${profile?.image}`}
+                src={`${profile?.data?.image}`}
                 alt={`${userInfo.username}`}
                 className="w-7 h-7 rounded-full object-cover mr-4"
                 onError={(e) => {

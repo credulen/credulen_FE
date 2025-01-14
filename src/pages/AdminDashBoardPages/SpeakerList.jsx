@@ -131,7 +131,7 @@ const SpeakerList = () => {
                     <Table.Cell>
                       {speaker.image ? (
                         <img
-                          src={`${backendURL}${speaker.image}`}
+                          src={`${speaker.image}`}
                           alt={speaker.name}
                           className="w-10 h-10 rounded-full"
                           onError={(e) => {

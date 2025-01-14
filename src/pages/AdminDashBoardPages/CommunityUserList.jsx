@@ -188,7 +188,9 @@ const CommunityUserList = () => {
   return (
     <div className="flex flex-col w-full h-full mid:mt-20">
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 p-3">
-        <h1 className="text-2xl font-semibold">Registered Community Members</h1>
+        <h1 className="text-2xl font-semibold">
+          Registered Community Members/Courses
+        </h1>
       </div>
 
       {/* {bannerVisible && (

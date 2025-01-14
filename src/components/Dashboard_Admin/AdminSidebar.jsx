@@ -133,7 +133,7 @@ const AdminSidebar = () => {
             )}
           </span>
           <span className="mb-1 mr-2 font-medium text-xs">
-            {profile?.username || "Guest"}
+            {profile?.data?.username || "Guest"}
           </span>
         </div>
         <button
@@ -156,9 +156,9 @@ const AdminSidebar = () => {
             {!isSmallScreen && (
               <div className="flex items-center">
                 <span className="mb-2">
-                  {profile?.image ? (
+                  {profile?.data?.image ? (
                     <img
-                      src={`${backendURL}/uploads/${profile?.image}`}
+                      src={`${profile?.data?.image}`}
                       alt={`${userInfo.username}`}
                       className="w-7 h-7 rounded-full object-cover mr-4"
                       onError={(e) => {
@@ -171,7 +171,7 @@ const AdminSidebar = () => {
                   )}
                 </span>
                 <span className="mb-1 mr-2 font-extralight text-xs">
-                  {profile?.username || "Guest"}
+                  {profile?.data?.username || "Guest"}
                 </span>
               </div>
             )}

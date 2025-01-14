@@ -99,7 +99,7 @@ const EventRow = React.memo(({ event, onDelete, backendURL }) => (
     <Table.Cell>
       <div className="w-12 h-12 overflow-hidden rounded-full">
         <img
-          src={`${backendURL}${event.image}`}
+          src={`${event.image}`}
           alt={event.title}
           className="w-full h-full object-cover"
           loading="lazy"

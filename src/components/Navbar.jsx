@@ -54,9 +54,9 @@ export function DropdownItems({ closeDropdown }) {
         className="flex items-center gap-2 focus:outline-none"
       >
         <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-gray-200">
-          {profile?.image ? (
+          {profile?.data?.image ? (
             <img
-              src={`${backendURL}/uploads/${profile.image}`}
+              src={`${profile?.data?.image}`}
               alt={userInfo.username}
               className="w-full h-full object-cover"
               onError={(e) => {

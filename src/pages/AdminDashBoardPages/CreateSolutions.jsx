@@ -58,9 +58,7 @@ export default function CreateEditSolution() {
               category: solution.category || "uncategorized",
               content: solution.content || "",
             });
-            setImagePreview(
-              solution.image ? `${backendURL}${solution.image}` : null
-            );
+            setImagePreview(solution.image ? `${solution.image}` : null);
           }
         } catch (error) {
           console.error("Error fetching solution:", error);

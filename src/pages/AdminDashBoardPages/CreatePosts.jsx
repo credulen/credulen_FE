@@ -8,13 +8,14 @@
 //   Select,
 //   InputLabel,
 //   FormControl,
+//   CircularProgress,
 // } from "@mui/material";
 // import ReactQuill from "react-quill";
 // import "react-quill/dist/quill.snow.css";
-// import { CircularProgress } from "@mui/material";
 // import Snackbar from "@mui/material/Snackbar";
 // import MuiAlert from "@mui/material/Alert";
 // import { IoArrowBack } from "react-icons/io5";
+
 // const backendURL =
 //   import.meta.env.MODE === "production"
 //     ? import.meta.env.VITE_BACKEND_URL
@@ -38,6 +39,7 @@
 //   const [selectedFile, setSelectedFile] = useState(null);
 //   const [imagePreview, setImagePreview] = useState(null);
 //   const [loading, setLoading] = useState(false);
+//   const [pageLoading, setPageLoading] = useState(true);
 //   const [imageUploadProgress, setImageUploadProgress] = useState(0);
 //   const [snackbar, setSnackbar] = useState({
 //     open: false,
@@ -45,67 +47,82 @@
 //     severity: "success",
 //   });
 //   const [authors, setAuthors] = useState([]);
+//   const [error, setError] = useState(null);
 
+//   // Separate data fetching functions for better error handling
+//   const fetchAuthors = async () => {
+//     try {
+//       const res = await fetch(`${backendURL}/api/getAllAuthors`);
+//       if (!res.ok) throw new Error("Failed to fetch authors");
+//       const data = await res.json();
+//       return data.map((author) => ({
+//         id: author._id,
+//         name: author.name,
+//       }));
+//     } catch (error) {
+//       throw new Error(`Error fetching authors: ${error.message}`);
+//     }
+//   };
+
+//   const fetchPost = async (id) => {
+//     try {
+//       const res = await fetch(`${backendURL}/api/getPostById/${id}`);
+//       if (!res.ok) throw new Error("Failed to fetch post");
+//       return await res.json();
+//     } catch (error) {
+//       throw new Error(`Error fetching post: ${error.message}`);
+//     }
+//   };
+
+//   // Combined initialization effect
 //   useEffect(() => {
-//     const fetchAuthors = async () => {
+//     const initializeData = async () => {
+//       setPageLoading(true);
+//       setError(null);
+
 //       try {
-//         const res = await fetch(`${backendURL}/api/getAllAuthors`);
-//         const data = await res.json();
-//         // Ensure that each author object has an 'id' property
-//         const formattedAuthors = data.map((author) => ({
-//           id: author._id, // Assuming the backend sends '_id'
-//           name: author.name,
-//         }));
-//         setAuthors(formattedAuthors);
-//       } catch (error) {
-//         console.error("Failed to fetch authors:", error);
-//         showSnackbar("Failed to fetch authors", "error");
-//       }
-//     };
+//         // First fetch authors
+//         const fetchedAuthors = await fetchAuthors();
+//         setAuthors(fetchedAuthors);
 
-//     fetchAuthors();
-//     const fetchPost = async () => {
-//       if (postId) {
-//         try {
-//           const res = await fetch(`${backendURL}/api/getPostById/${postId}`);
-//           const post = await res.json();
-//           console.log("Raw API response:", post);
+//         // Then fetch post data if editing
+//         if (postId) {
+//           const post = await fetchPost(postId);
 
-//           if (post) {
-//             console.log("Setting form data with:", {
-//               title: post.title || "",
-//               category: post.category || "uncategorized",
-//               content: post.content || "",
-//               authorId: post.authorId || "",
-//             });
-
-//             setFormData({
-//               title: post.title || "",
-//               category: post.category || "uncategorized",
-//               content: post.content || "",
-//               authorId: post.authorId || "",
-//             });
-
-//             console.log("Form data after setting:", formData);
-
-//             setImagePreview(post.image ? `${backendURL}${post.image}` : null);
+//           // Validate required fields before setting state
+//           if (!post.title || !post.category || !post.authorId) {
+//             console.warn("Post data incomplete:", post);
 //           }
-//         } catch (error) {
-//           console.error("Error fetching post:", error);
-//           showSnackbar("Failed to fetch post", "error");
+
+//           setFormData({
+//             title: post.title || "",
+//             category: post.category || "uncategorized",
+//             content: post.content || "",
+//             authorId: post.authorId || "",
+//           });
+
+//           if (post.image) {
+//             setImagePreview(`${backendURL}${post.image}`);
+//           }
 //         }
+//       } catch (error) {
+//         setError(error.message);
+//         showSnackbar(error.message, "error");
+//       } finally {
+//         setPageLoading(false);
 //       }
 //     };
-//     fetchPost();
+
+//     initializeData();
 //   }, [postId]);
 
 //   const handleInputChange = (e) => {
 //     const { name, value } = e.target;
-//     setFormData({ ...formData, [name]: value });
+//     setFormData((prev) => ({ ...prev, [name]: value }));
 //   };
 
 //   const handleQuillChange = (value) => {
-//     setFormData({ ...formData, content: value });
+//     setFormData((prev) => ({ ...prev, content: value }));
 //   };
 
 //   const handleFileChange = (e) => {
@@ -118,7 +135,13 @@
 
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
-//     if (!formData.title || !formData.content || !formData.authorId) {
+
+//     // Validate form data
+//     if (
+//       !formData.title?.trim() ||
+//       !formData.content?.trim() ||
+//       !formData.authorId?.trim()
+//     ) {
 //       showSnackbar("Title, content, and author are required", "error");
 //       return;
 //     }
@@ -126,40 +149,27 @@
 //     setLoading(true);
 //     try {
 //       const postFormData = new FormData();
-//       postFormData.append("title", formData.title);
-//       postFormData.append("content", formData.content);
-//       postFormData.append("category", formData.category);
-//       postFormData.append("authorId", formData.authorId);
+//       Object.entries(formData).forEach(([key, value]) => {
+//         if (value) postFormData.append(key, value);
+//       });
 
 //       if (selectedFile) {
 //         postFormData.append("image", selectedFile);
 //       }
 
-//       // Log FormData contents (for debugging)
-//       for (let [key, value] of postFormData.entries()) {
-//         console.log(key, value);
-//       }
+//       const url = postId
+//         ? `${backendURL}/api/updatePost/${postId}`
+//         : `${backendURL}/api/createPost`;
 
-//       let response;
-//       if (postId) {
-//         response = await fetch(`${backendURL}/api/updatePost/${postId}`, {
-//           method: "PUT",
-//           body: postFormData,
-//         });
-//       } else {
-//         response = await fetch(`${backendURL}/api/createPost`, {
-//           method: "POST",
-//           body: postFormData,
-//         });
-//       }
+//       const response = await fetch(url, {
+//         method: postId ? "PUT" : "POST",
+//         body: postFormData,
+//       });
 
 //       if (!response.ok) {
 //         const errorData = await response.json();
 //         throw new Error(errorData.message || "Failed to save post");
 //       }
-
-//       const data = await response.json();
-//       console.log("Response data:", data);
 
 //       showSnackbar(
 //         postId ? "Post updated successfully" : "Post created successfully",
@@ -167,7 +177,6 @@
 //       );
 //       navigate("/DashBoard/Admin/Posts");
 //     } catch (error) {
-//       console.error("Error saving post:", error);
 //       showSnackbar(error.message || "Failed to save post", "error");
 //     } finally {
 //       setLoading(false);
@@ -179,49 +188,38 @@
 //   };
 
 //   const handleCloseSnackbar = (event, reason) => {
-//     if (reason === "clickaway") {
-//       return;
-//     }
-//     setSnackbar({ ...snackbar, open: false });
+//     if (reason === "clickaway") return;
+//     setSnackbar((prev) => ({ ...prev, open: false }));
 //   };
 
-//   const handleDelete = async () => {
-//     if (!postId) return;
+//   if (pageLoading) {
+//     return (
+//       <Box
+//         display="flex"
+//         justifyContent="center"
+//         alignItems="center"
+//         minHeight="100vh"
+//       >
+//         <CircularProgress />
+//       </Box>
+//     );
+//   }
 
-//     if (window.confirm("Are you sure you want to delete this post?")) {
-//       setLoading(true);
-//       try {
-//         const response = await fetch(`${backendURL}/api/deletePost/${postId}`, {
-//           method: "DELETE",
-//         });
-
-//         if (!response.ok) {
-//           const errorData = await response.json();
-//           throw new Error(errorData.message || "Failed to delete post");
-//         }
-
-//         showSnackbar("Post deleted successfully", "success");
-//         navigate("/dashboard");
-//       } catch (error) {
-//         console.error("Error deleting post:", error);
-//         showSnackbar(error.message || "Failed to delete post", "error");
-//       } finally {
-//         setLoading(false);
-//       }
-//     }
-//   };
-
-//   const handleBackClick = () => {
-//     navigate(-1); // Go back to the previous page
-//   };
+//   if (error) {
+//     return (
+//       <Box p={3}>
+//         <Alert severity="error">{error}</Alert>
+//       </Box>
+//     );
+//   }
 
 //   return (
 //     <>
 //       <button
-//         onClick={handleBackClick}
+//         onClick={() => navigate(-1)}
 //         className="flex items-center text-blue-500 hover:text-blue-700 transition-colors duration-200"
 //       >
-//         <IoArrowBack className="mr-2" size={24} /> {/* Back Arrow Icon */}
+//         <IoArrowBack className="mr-2" size={24} />
 //         Back
 //       </button>
 //       <Box className="p-3 max-w-3xl mx-auto min-h-screen">
@@ -237,47 +235,46 @@
 //             value={formData.title}
 //             onChange={handleInputChange}
 //             fullWidth
+//             error={!formData.title && formData.title !== undefined}
+//             helperText={
+//               !formData.title && formData.title !== undefined
+//                 ? "Title is required"
+//                 : ""
+//             }
 //           />
-//           <TextField
-//             select
-//             label="Category"
-//             id="category"
-//             name="category"
-//             value={formData.category}
-//             onChange={handleInputChange}
-//             fullWidth
-//           >
-//             <MenuItem value="uncategorized">Select a category</MenuItem>
-//             <MenuItem value="Web3-&-Blockchain-Education">
-//               Web3 & Blockchain Education
-//             </MenuItem>
 
-//             <MenuItem value="Web3 & Blockchain Trends">
-//               Web3 & Blockchain Trends
-//             </MenuItem>
-
-//             <MenuItem value="Web3 & Blockchain Trends">
-//               Web3 & Blockchain Trends
-//             </MenuItem>
-
-//             <MenuItem value="Big Data & A.I Trends">
-//               Big Data & A.I Trends
-//             </MenuItem>
-//             <MenuItem value="Big Data & A.I Education">
-//               Big Data & A.I Education
-//             </MenuItem>
-//             <MenuItem value="Data in Web3/DeFi">Data in Web3/DeFi</MenuItem>
-//           </TextField>
-//           <FormControl fullWidth>
-//             <InputLabel id="author-select-label">Author</InputLabel>
+//           <FormControl fullWidth required error={!formData.category}>
+//             <InputLabel>Category</InputLabel>
 //             <Select
-//               labelId="author-select-label"
-//               id="authorId"
+//               label="Category"
+//               name="category"
+//               value={formData.category}
+//               onChange={handleInputChange}
+//             >
+//               <MenuItem value="uncategorized">Select a category</MenuItem>
+//               <MenuItem value="Web3-&-Blockchain-Education">
+//                 Web3 & Blockchain Education
+//               </MenuItem>
+//               <MenuItem value="Web3 & Blockchain Trends">
+//                 Web3 & Blockchain Trends
+//               </MenuItem>
+//               <MenuItem value="Big Data & A.I Trends">
+//                 Big Data & A.I Trends
+//               </MenuItem>
+//               <MenuItem value="Big Data & A.I Education">
+//                 Big Data & A.I Education
+//               </MenuItem>
+//               <MenuItem value="Data in Web3/DeFi">Data in Web3/DeFi</MenuItem>
+//             </Select>
+//           </FormControl>
+
+//           <FormControl fullWidth required error={!formData.authorId}>
+//             <InputLabel>Author</InputLabel>
+//             <Select
+//               label="Author"
 //               name="authorId"
 //               value={formData.authorId}
 //               onChange={handleInputChange}
-//               label="Author"
-//               //   required
 //             >
 //               {authors.map((author) => (
 //                 <MenuItem key={author.id} value={author.id}>
@@ -300,29 +297,14 @@
 //             >
 //               Choose File
 //             </Button>
-//             <Button
-//               variant="contained"
-//               onClick={handleFileChange}
-//               disabled={!selectedFile || imageUploadProgress > 0}
-//             >
-//               {imageUploadProgress > 0 ? (
-//                 <CircularProgress
-//                   variant="determinate"
-//                   value={imageUploadProgress}
-//                   size={24}
-//                 />
-//               ) : (
-//                 "Upload Image"
-//               )}
-//             </Button>
+//             {imagePreview && (
+//               <img
+//                 src={imagePreview}
+//                 alt="preview"
+//                 className="w-[15rem] h-[10rem] object-cover rounded-sm"
+//               />
+//             )}
 //           </Box>
-//           {imagePreview && (
-//             <img
-//               src={imagePreview}
-//               alt="preview"
-//               className="w-full h-[30rem]  object-cover"
-//             />
-//           )}
 //           <ReactQuill
 //             theme="snow"
 //             placeholder="Write something..."
@@ -345,31 +327,22 @@
 //               "Publish Post"
 //             )}
 //           </Button>
-//           {postId && (
-//             <Button
-//               variant="outlined"
-//               color="secondary"
-//               onClick={handleDelete}
-//               disabled={loading}
-//             >
-//               Delete Post
-//             </Button>
-//           )}
-//         </form>
-//         <Snackbar
-//           open={snackbar.open}
-//           autoHideDuration={6000}
-//           onClose={handleCloseSnackbar}
-//           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-//         >
-//           <Alert
+
+//           <Snackbar
+//             open={snackbar.open}
+//             autoHideDuration={6000}
 //             onClose={handleCloseSnackbar}
-//             severity={snackbar.severity}
-//             sx={{ width: "100%" }}
+//             anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
 //           >
-//             {snackbar.message}
-//           </Alert>
-//         </Snackbar>
+//             <Alert
+//               onClose={handleCloseSnackbar}
+//               severity={snackbar.severity}
+//               sx={{ width: "100%" }}
+//             >
+//               {snackbar.message}
+//             </Alert>
+//           </Snackbar>
+//         </form>
 //       </Box>
 //     </>
 //   );
@@ -479,7 +452,7 @@ export default function CreatePosts() {
           });
 
           if (post.image) {
-            setImagePreview(`${backendURL}${post.image}`);
+            setImagePreview(post?.image);
           }
         }
       } catch (error) {
@@ -505,6 +478,28 @@ export default function CreatePosts() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        showSnackbar("File size should not exceed 5MB", "error");
+        return;
+      }
+
+      // Validate file type
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+        "image/svg+xml",
+      ];
+      if (!allowedTypes.includes(file.type)) {
+        showSnackbar(
+          "Please upload only image files (JPEG, PNG, GIF, SVG)",
+          "error"
+        );
+        return;
+      }
+
       setSelectedFile(file);
       setImagePreview(URL.createObjectURL(file));
     }
@@ -526,10 +521,13 @@ export default function CreatePosts() {
     setLoading(true);
     try {
       const postFormData = new FormData();
+
+      // Append all form data
       Object.entries(formData).forEach(([key, value]) => {
-        if (value) postFormData.append(key, value);
+        if (value) postFormData.append(key, value.trim());
       });
 
+      // Handle image upload
       if (selectedFile) {
         postFormData.append("image", selectedFile);
       }
@@ -548,12 +546,19 @@ export default function CreatePosts() {
         throw new Error(errorData.message || "Failed to save post");
       }
 
+      const result = await response.json();
+
       showSnackbar(
         postId ? "Post updated successfully" : "Post created successfully",
         "success"
       );
-      navigate("/DashBoard/Admin/Posts");
+
+      // Navigate after successful submission
+      setTimeout(() => {
+        navigate("/DashBoard/Admin/Posts");
+      }, 1500);
     } catch (error) {
+      console.error("Submission error:", error);
       showSnackbar(error.message || "Failed to save post", "error");
     } finally {
       setLoading(false);
