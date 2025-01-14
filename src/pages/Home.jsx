@@ -125,7 +125,7 @@ const IntelligentHomepage = () => {
                 transition={{ duration: 0.8 }}
                 className="text-4xl md:text-5xl font-bold text-teal-800"
               >
-                Data, AI & Blockchain
+                Data, AI & Blockchain.
               </motion.h1>
 
               <motion.div
