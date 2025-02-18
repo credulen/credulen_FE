@@ -115,11 +115,14 @@ const SolutionForm = () => {
       const timer = setTimeout(() => {
         setShowModal(false);
         setAlertInfo(null);
-      }, 5000);
+
+        if (alertInfo.variant === "success") {
+          (window.location.href = "https://t.me/credulensubscribers"), "_blank";
+        }
+      }, 3000); // Redirect after 3 seconds
       return () => clearTimeout(timer);
     }
   }, [alertInfo]);
-
   if (isPageLoading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
@@ -169,13 +172,11 @@ const SolutionForm = () => {
       </h1>
       <form
         onSubmit={handleSubmit}
-        className="space-y-6 shadow-sm rounded-sm px-6 py-9 bg-gray-50"
-      >
+        className="space-y-6 shadow-sm rounded-sm px-6 py-9 bg-gray-50">
         <div>
           <label
             htmlFor="firstName"
-            className="block mb-2 text-sm font-medium text-gray-900"
-          >
+            className="block mb-2 text-sm font-medium text-gray-900">
             First Name
           </label>
           <input
@@ -191,8 +192,7 @@ const SolutionForm = () => {
         <div>
           <label
             htmlFor="lastName"
-            className="block mb-2 text-sm font-medium text-gray-900"
-          >
+            className="block mb-2 text-sm font-medium text-gray-900">
             Last Name
           </label>
           <input
@@ -208,8 +208,7 @@ const SolutionForm = () => {
         <div>
           <label
             htmlFor="phoneNumber"
-            className="block mb-2 text-sm font-medium text-gray-900"
-          >
+            className="block mb-2 text-sm font-medium text-gray-900">
             Phone Number
           </label>
           <input
@@ -226,8 +225,7 @@ const SolutionForm = () => {
         <div>
           <label
             htmlFor="email"
-            className="block mb-2 text-sm font-medium text-gray-900"
-          >
+            className="block mb-2 text-sm font-medium text-gray-900">
             Email Address
           </label>
           <input
@@ -244,8 +242,7 @@ const SolutionForm = () => {
         <div>
           <label
             htmlFor="employmentStatus"
-            className="block mb-2 text-sm font-medium text-gray-900"
-          >
+            className="block mb-2 text-sm font-medium text-gray-900">
             Employment Status
           </label>
           <select
@@ -254,8 +251,7 @@ const SolutionForm = () => {
             value={formData.employmentStatus}
             onChange={handleInputChange}
             className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-teal-700 focus:border-teal-700  dark:bg-gray-700 dark:border-gray-600 placeholder-gray-400 dark:text-white "
-            required
-          >
+            required>
             <option value="">Select status</option>
             <option value="employed">Employed</option>
             <option value="unemployed">Unemployed</option>
@@ -266,8 +262,7 @@ const SolutionForm = () => {
         <div>
           <label
             htmlFor="jobTitle"
-            className="block mb-2 text-sm font-medium text-gray-900"
-          >
+            className="block mb-2 text-sm font-medium text-gray-900">
             Job Title
           </label>
           <input
@@ -283,8 +278,7 @@ const SolutionForm = () => {
         <button
           type="submit"
           className="text-white bg-[#198754] hover:text-[#198754] hover:bg-transparent hover:font-bold hover:border hover:border-[#198754] font-medium rounded-lg text-sm px-5 py-2.5 text-center w-full"
-          disabled={isLoading}
-        >
+          disabled={isLoading}>
           {isLoading ? (
             <>
               <Loader className="animate-spin mr-2 inline" size={20} />
@@ -321,8 +315,7 @@ const Modal = ({ isOpen, onClose, children }) => {
         <button
           onClick={onClose}
           className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-          aria-label="Close"
-        >
+          aria-label="Close">
           <X size={20} />
         </button>
         {children}

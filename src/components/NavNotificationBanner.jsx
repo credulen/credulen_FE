@@ -18,8 +18,7 @@ const LayoutWrapper = ({ children, bannerVisible }) => {
     <div
       className={`transition-all duration-300 ease-in-out ${
         bannerVisible ? "mt-[125px] xsmall:mt-[150px]" : "mt-[80px] "
-      }`}
-    >
+      }`}>
       {children}
     </div>
   );
@@ -177,8 +176,7 @@ const NotificationBanner = ({ isVisible, setIsVisible }) => {
             <div className="flex items-center gap-6">
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="bg-white rounded-md pl-4 pr-3 py-1.5 flex items-center"
-              >
+                className="bg-white rounded-md pl-4 pr-3 py-1.5 flex items-center">
                 <span className="text-teal-800 font-semibold text-sm">
                   Register Now
                 </span>
@@ -188,8 +186,7 @@ const NotificationBanner = ({ isVisible, setIsVisible }) => {
               <button
                 onClick={handleClose}
                 className="text-white hover:text-gray-200 transition-colors"
-                aria-label="Close notification"
-              >
+                aria-label="Close notification">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -200,15 +197,13 @@ const NotificationBanner = ({ isVisible, setIsVisible }) => {
       <Dialog
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        className="fixed inset-0 z-50 overflow-y-auto"
-      >
+        className="fixed inset-0 z-50 overflow-y-auto">
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4">
             <div className="bg-white rounded-xl w-full max-w-lg mx-4 relative shadow-2xl">
               <button
                 onClick={handleModalClose}
-                className="absolut flex justify-end ml-auto right-4 top-8 text-gray-400 hover:text-gray-600 transition-colors"
-              >
+                className="absolut flex justify-end ml-auto right-4 top-8 text-gray-400 hover:text-gray-600 transition-colors">
                 <X className="w-9 h-9 text-btColour hover:text-pink-500" />
               </button>
 
@@ -218,8 +213,7 @@ const NotificationBanner = ({ isVisible, setIsVisible }) => {
                     <div className="sticky inset-0 z-[60] flex items-center justify-center bg-black/10">
                       <Alert
                         variant={alertInfo.variant}
-                        className="mx-4 max-w-md animate-fadeIn shadow-lg"
-                      >
+                        className="mx-4 max-w-md animate-fadeIn shadow-lg">
                         <div className="flex items-center gap-2">
                           {alertInfo.icon && (
                             <alertInfo.icon className="h-5 w-5" />
@@ -256,8 +250,7 @@ const NotificationBanner = ({ isVisible, setIsVisible }) => {
 
                   <form
                     onSubmit={handleSubmit}
-                    className="space-y-4 overflow-y-auto"
-                  >
+                    className="space-y-4 overflow-y-auto">
                     <div>
                       <input
                         type="text"
@@ -320,8 +313,7 @@ const NotificationBanner = ({ isVisible, setIsVisible }) => {
                           errors.enrolled ? "border-red-500" : "border-gray-300"
                         }`}
                         value={formData.enrolled}
-                        onChange={handleInputChange}
-                      >
+                        onChange={handleInputChange}>
                         <option value="">
                           Have you enrolled in any courses?
                         </option>
@@ -342,8 +334,7 @@ const NotificationBanner = ({ isVisible, setIsVisible }) => {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full bg-btColour text-white py-3 rounded-lg font-medium hover:bg-pink-600 transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-                    >
+                      className="w-full bg-btColour text-white py-3 rounded-lg font-medium hover:bg-pink-600 transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2">
                       {isLoading ? (
                         <>
                           <Loader className="w-5 h-5 animate-spin" />
