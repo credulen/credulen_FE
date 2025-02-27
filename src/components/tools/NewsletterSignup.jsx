@@ -11,13 +11,12 @@ const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-4 max-w-sm w-full relative">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+      <div className="bg-white rounded-lg p-4 w-full max-w-md relative">
         <button
           onClick={onClose}
           className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-          aria-label="Close"
-        >
+          aria-label="Close">
           <X size={20} />
         </button>
         {children}
@@ -38,7 +37,7 @@ const NewsletterSignup = () => {
       const timer = setTimeout(() => {
         setShowModal(false);
         setAlertInfo(null);
-      }, 5000); // Increased to 5 seconds to give users time to read and close if desired
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, [alertInfo]);
@@ -82,7 +81,7 @@ const NewsletterSignup = () => {
   };
 
   return (
-    <div className="bg-sky-10 p-8 rounded-lg max-w-2xl mx-auto relative">
+    <div className="bg-sky-100 p-4 sm:p-6 md:p-8 rounded-lg max-w-2xl mx-auto relative overflow-hidden">
       <style jsx>{`
         @keyframes continuousRing {
           0%,
@@ -108,28 +107,29 @@ const NewsletterSignup = () => {
           transform-origin: top center;
         }
       `}</style>
-      <h3 className="text-3xl font-bold text-teal-600 mb-4 uppercase">
-        Sign up for our newsletter, stay updated!
+      <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-teal-600 mb-4 uppercase">
+        Sign up for our newsletter!
       </h3>
-      <p className="text-teal-700 mb-6">
+      <p className="text-teal-700 mb-4 text-sm sm:text-base">
         Join Our Newsletter for the latest updates and exclusive content.
       </p>
-      <form onSubmit={handleSubmit} className="flex gap-4">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col sm:flex-row gap-3 sm:gap-4">
         <input
           autoComplete="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="enter your email"
-          className="flex-grow p-2 border border-teal-500 rounded placeholder-slate-400"
+          placeholder="Enter your email"
+          className="flex-grow p-2 border border-teal-500 rounded placeholder-slate-400 text-sm sm:text-base w-full"
           required
           disabled={isLoading}
         />
         <button
           type="submit"
-          className="bg-teal-600 text-white px-4 py-2 rounded hover:font-medium  transition-colors flex items-center justify-center hover:border-2 hover:border-teal-700 hover:bg-white hover:text-teal-700  duration-300"
-          disabled={isLoading}
-        >
+          className="bg-teal-600 text-white px-4 py-2 rounded hover:font-medium transition-colors flex items-center justify-center hover:border-2 hover:border-teal-700 hover:bg-white hover:text-teal-700 duration-300 w-full sm:w-auto"
+          disabled={isLoading}>
           {isLoading ? (
             <>
               <Loader className="animate-spin mr-2" size={20} />
@@ -152,8 +152,8 @@ const NewsletterSignup = () => {
           </Alert>
         )}
       </Modal>
-      <div className="absolute top-4 right-4">
-        <Bell size={32} className="text-gray-700 ringing" />
+      <div className="absolute top-2 right-2 sm:top-4 sm:right-4">
+        <Bell size={24} className="text-gray-700 ringing" />
       </div>
     </div>
   );
