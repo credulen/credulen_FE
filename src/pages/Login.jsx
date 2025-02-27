@@ -228,8 +228,7 @@ const Login = () => {
                     <button
                       type="button"
                       className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
+                      onClick={() => setShowPassword(!showPassword)}>
                       {showPassword ? (
                         <EyeOff className="h-5 w-5 text-gray-400" />
                       ) : (
@@ -249,16 +248,14 @@ const Login = () => {
                 <div className="text-sm">
                   <Link
                     to="/signup"
-                    className="font-medium text-btColour hover:text-blue-500"
-                  >
+                    className="font-medium text-btColour hover:text-blue-500">
                     Don't have an account?
                   </Link>
                 </div>
                 <div className="text-sm">
                   <Link
                     to="/ForgotPassword"
-                    className="font-medium text-btColour hover:text-blue-500"
-                  >
+                    className="font-medium text-btColour hover:text-blue-500">
                     Forgot your password?
                   </Link>
                 </div>
@@ -268,8 +265,7 @@ const Login = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-[#1e293b] to-btColour hover:bg-gradient-to-bl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-btColour transition-all duration-200 ease-in-out"
-                >
+                  className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-btColour hover:bg-gradient-to-bl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-btColour transition-all duration-200 ease-in-out">
                   {isLoading ? (
                     <div className="w-5 h-5 border-t-2 border-white rounded-full animate-spin" />
                   ) : (
@@ -312,14 +308,12 @@ const Login = () => {
             open={snackbar.open}
             autoHideDuration={6000}
             onClose={handleCloseSnackbar}
-            anchorOrigin={{ vertical: "top", horizontal: "right" }}
-          >
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}>
             <Alert
               onClose={handleCloseSnackbar}
               severity={snackbar.severity}
               variant="filled"
-              sx={{ width: "100%" }}
-            >
+              sx={{ width: "100%" }}>
               {snackbar.message}
             </Alert>
           </Snackbar>
@@ -349,8 +343,7 @@ const OtpVerification = ({ onSubmit }) => {
       <div>
         <label
           htmlFor="otp"
-          className="block text-sm font-medium text-gray-700"
-        >
+          className="block text-sm font-medium text-gray-700">
           Enter OTP
         </label>
         <div className="mt-1">
@@ -370,8 +363,7 @@ const OtpVerification = ({ onSubmit }) => {
       <div>
         <button
           type="submit"
-          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-[#1e293b] to-btColour hover:bg-gradient-to-bl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-btColour"
-        >
+          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-[#1e293b] to-btColour hover:bg-gradient-to-bl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-btColour">
           Verify OTP
         </button>
       </div>

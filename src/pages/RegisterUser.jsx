@@ -158,8 +158,7 @@ const RegisterUser = () => {
                 <button
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
+                  onClick={() => setShowPassword(!showPassword)}>
                   {showPassword ? (
                     <EyeOff className="h-5 w-5 text-gray-400" />
                   ) : (
@@ -194,8 +193,7 @@ const RegisterUser = () => {
                 <button
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                   {showConfirmPassword ? (
                     <EyeOff className="h-5 w-5 text-gray-400" />
                   ) : (
@@ -215,8 +213,7 @@ const RegisterUser = () => {
             <div className="text-sm">
               <Link
                 to="/login"
-                className="font-medium text-btColour hover:text-blue-500"
-              >
+                className="font-medium text-btColour hover:text-blue-500">
                 Already have an account?
               </Link>
             </div>
@@ -226,8 +223,7 @@ const RegisterUser = () => {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-[#1e293b] to-btColour hover:bg-gradient-to-bl focus:outline-none focus:ring-2 focus :ring-offset-2 focus:ring-btColour transition-all duration-200 ease-in-out"
-            >
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-btColour hover:bg-gradient-to-bl focus:outline-none focus:ring-2 focus :ring-offset-2 focus:ring-btColour transition-all duration-200 ease-in-out">
               {loading ? (
                 <div className="w-5 h-5 border-t-2 border-white rounded-full animate-spin" />
               ) : (
@@ -240,8 +236,7 @@ const RegisterUser = () => {
         <Snackbar
           open={openSnackbar}
           autoHideDuration={6000}
-          onClose={handleCloseSnackbar}
-        >
+          onClose={handleCloseSnackbar}>
           <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity}>
             {snackbarMessage}
           </Alert>

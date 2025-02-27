@@ -39,8 +39,7 @@ export function DropdownItems({ closeDropdown }) {
             setIsOpen(false);
           }}
           to="/login"
-          className="text-white bg-gradient-to-r from-cyan-500 to-btColour hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-xs px-4 py-2 text-center me-2 mb-2"
-        >
+          className="text-white bg-btColour hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-xs px-4 py-2 text-center me-2 mb-2">
           Login
         </NavLink>
       </div>
@@ -51,8 +50,7 @@ export function DropdownItems({ closeDropdown }) {
     <div className="relative mid:ml-2" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 focus:outline-none"
-      >
+        className="flex items-center gap-2 focus:outline-none">
         <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-gray-200">
           {profile?.data?.image ? (
             <img
@@ -74,8 +72,7 @@ export function DropdownItems({ closeDropdown }) {
           }`}
           fill="none"
           viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
+          stroke="currentColor">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -103,8 +100,7 @@ export function DropdownItems({ closeDropdown }) {
             onClick={() => {
               setIsOpen(false);
               closeDropdown(); // Close the main dropdown when clicking a link
-            }}
-          >
+            }}>
             Dashboard
           </NavLink>
 
@@ -114,8 +110,7 @@ export function DropdownItems({ closeDropdown }) {
               handleLogout();
               closeDropdown(); // Close the main dropdown when logging out
             }}
-            className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-btColour transition-colors duration-150 flex justify-center items-center gap-2"
-          >
+            className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-btColour transition-colors duration-150 flex justify-center items-center gap-2">
             <span>Logout</span>
             <HiOutlineLogout className="w-4 h-4" />
           </button>
@@ -179,8 +174,7 @@ const DropdownMenu = ({ title, items, closeDropdown }) => {
       ref={dropdownRef}
       className="relative group"
       onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+      onMouseLeave={handleMouseLeave}>
       <div className=" mid:mb-2  flex items-center cursor-pointer">
         <span className="block py-2 px-3 rounded md:hover:bg-transparent hover:text-btColour md:p-0 transition-all duration-300">
           {title}
@@ -192,8 +186,7 @@ const DropdownMenu = ({ title, items, closeDropdown }) => {
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
-          viewBox="0 0 10 6"
-        >
+          viewBox="0 0 10 6">
           <path
             stroke="currentColor"
             strokeLinecap="round"
@@ -209,8 +202,7 @@ const DropdownMenu = ({ title, items, closeDropdown }) => {
           isOpen
             ? "opacity-100 translate-y-0 visible"
             : "opacity-0 translate-y-1 invisible"
-        }`}
-      >
+        }`}>
         <ul className="py-2 text-sm">
           {/* {items.map((item, index) => (
             <li key={index} className="relative group/item">
@@ -244,8 +236,7 @@ const DropdownMenu = ({ title, items, closeDropdown }) => {
                 onClick={() => {
                   setIsOpen(false);
                   closeDropdown();
-                }}
-              >
+                }}>
                 <span className="relative z-10">{item.label}</span>
                 <div className="absolute inset-0 bg-gray-50 transform scale-x-0 group-hover/item:scale-x-100 transition-transform duration-200 origin-left" />
               </NavLink>
@@ -360,8 +351,7 @@ const Navbar = () => {
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           <Link
             to="/"
-            className="flex items-center space-x-3 rtl:space-x-reverse"
-          >
+            className="flex items-center space-x-3 rtl:space-x-reverse">
             <img
               src={CredulenLogo2}
               className="w-[11rem] h-[3rem]"
@@ -377,8 +367,7 @@ const Navbar = () => {
             onClick={toggleMenu}
             className={`inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200`}
             aria-controls="navbar-sticky"
-            aria-expanded={isMenuOpen}
-          >
+            aria-expanded={isMenuOpen}>
             <span className="sr-only">Open main menu</span>
             <svg
               className={`w-5 h-5 transform transition-transform duration-300 ${
@@ -386,8 +375,7 @@ const Navbar = () => {
               }`}
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
-              viewBox="0 0 17 14"
-            >
+              viewBox="0 0 17 14">
               <path
                 stroke="currentColor"
                 strokeLinecap="round"
@@ -403,11 +391,9 @@ const Navbar = () => {
               isMenuOpen ? "block" : "hidden"
             } w-full md:flex md:w-auto md:order-1 transition-all duration-500 ease-in-out`}
             id="navbar-sticky"
-            ref={menuRef}
-          >
+            ref={menuRef}>
             <ul
-              className={`flex flex-col p-4 md:p-0 mt-4 font-medium border rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 `}
-            >
+              className={`flex flex-col p-4 md:p-0 mt-4 font-medium border rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 `}>
               <li>
                 <NavLink
                   onClick={handleLinkClick}
@@ -417,8 +403,7 @@ const Navbar = () => {
                       isActive ? "mid:bg-btColour mid:text-white" : ""
                     }`
                   }
-                  end
-                >
+                  end>
                   Home
                 </NavLink>
               </li>
@@ -451,8 +436,7 @@ const Navbar = () => {
                         : ""
                     }`
                   }
-                  end
-                >
+                  end>
                   Blog
                 </NavLink>
               </li>
@@ -485,8 +469,7 @@ const Navbar = () => {
                         : ""
                     }`
                   }
-                  end
-                >
+                  end>
                   Contact Us
                 </NavLink>
               </li>
@@ -513,13 +496,11 @@ const Navbar = () => {
       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-      >
+        onClose={handleCloseSnackbar}>
         <Alert
           onClose={handleCloseSnackbar}
           severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-        >
+          sx={{ width: "100%" }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>
