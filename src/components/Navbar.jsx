@@ -3,15 +3,47 @@ export function DropdownItems({ closeDropdown }) {
   const dropdownRef = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const [profile, setProfile] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
-  const { profile } = useSelector((state) => state.profiles);
-
   const userId = userInfo?._id;
   const dashboardPath =
     userInfo?.role === "admin"
       ? "/DashBoard/Admin_Dashboard"
       : "/DashBoard/profile";
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(
+          `https://credulen-backend.vercel.app/api/Users/${userId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch user profile");
+        }
+
+        const data = await response.json();
+        console.log(data, "data");
+
+        setProfile(data.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [userId]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -35,7 +67,7 @@ export function DropdownItems({ closeDropdown }) {
       <div className=" flex items-center gap-3" ref={dropdownRef}>
         <NavLink
           onClick={() => {
-            closeDropdown(); // Close dropdown when clicking Login
+            closeDropdown();
             setIsOpen(false);
           }}
           to="/login"
@@ -52,9 +84,9 @@ export function DropdownItems({ closeDropdown }) {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 focus:outline-none">
         <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-gray-200">
-          {profile?.data?.image ? (
+          {profile?.image ? (
             <img
-              src={`${profile?.data?.image}`}
+              src={`${profile?.image}`}
               alt={userInfo.username}
               className="w-full h-full object-cover"
               onError={(e) => {
@@ -204,25 +236,6 @@ const DropdownMenu = ({ title, items, closeDropdown }) => {
             : "opacity-0 translate-y-1 invisible"
         }`}>
         <ul className="py-2 text-sm">
-          {/* {items.map((item, index) => (
-            <li key={index} className="relative group/item">
-              <NavLink
-                to={item.path}
-                className={({ isActive }) =>
-                  `block px-4 py-2 hover:bg-gray-50 hover:text-btColour transition-colors duration-200 ${
-                    isActive ? "text-btColour bg-gray-50" : "text-gray-700"
-                  }`
-                }
-                onClick={() => {
-                  setIsOpen(false);
-                  closeDropdown(); // Close the main dropdown when clicking a link
-                }}
-              >
-                <span className="relative z-10">{item.label}</span>
-                <div className="absolute inset-0 bg-gray-50 transform scale-x-0 group-hover/item:scale-x-100 transition-transform duration-200 origin-left" />
-              </NavLink>
-            </li>
-          ))} */}
           {items.map((item, index) => (
             <li key={index} className="relative group/item">
               <NavLink

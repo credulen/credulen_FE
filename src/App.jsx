@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { TokenExpirationModal } from "./components/tools/TokenExpiration";
 import Home from "./pages/Home";
 import PasswordResset from "./pages/PasswordResset";
 import Conferences from "./pages/Conference";
@@ -159,6 +160,7 @@ const AppContent = () => {
 const App = () => {
   return (
     <BrowserRouter>
+      <TokenExpirationModal />
       <AppContent />
     </BrowserRouter>
   );
