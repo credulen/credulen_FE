@@ -21,12 +21,14 @@ import Footer from "./components/Footer";
 import Blog from "./pages/Blog";
 import ProtectedRoute from "./components/routes/ProtectedRoute";
 import Layout from "./components/UsersDashboard/Layout";
+// user DashBoard
 import HomeDashBoard from "./pages/UsersDashBoardPages/DashBoardProfile";
 import DashBoardActivities from "./pages/UsersDashBoardPages/DashBoardActivities";
-import DashBoardNotifications from "./pages/UsersDashBoardPages/DashBoardNotifications";
+import UserNotificationPage from "./pages/UsersDashBoardPages/UserNotificationPage";
 import Post from "./pages/Post";
 import SolutionForm from "./pages/SolutionForm";
 import SolutionFormCS from "./pages/SolutionFormCS";
+import PaymentConfirmation from "./pages/PaymentConfirmation";
 // Admin
 
 import AdminLayout from "./components/Dashboard_Admin/AdminLayout";
@@ -48,6 +50,7 @@ import RegisteredSolutionsList from "./pages/AdminDashBoardPages/RegisteredSolut
 import AdminCommentLists from "./pages/AdminDashBoardPages/AdminCommentLists";
 import RegisteredEventLists from "./pages/AdminDashBoardPages/RegisteredEventLists";
 import CommunityUserList from "./pages/AdminDashBoardPages/CommunityUserList";
+import AdminNotificationPage from "./pages/AdminDashBoardPages/AdminNotificationPage";
 
 const AppContent = () => {
   const location = useLocation();
@@ -72,6 +75,11 @@ const AppContent = () => {
         />
         <Route path="/SolutionForm/:slug?" element={<SolutionForm />} />
         <Route path="/SolutionFormCS/:slug?" element={<SolutionFormCS />} />
+        {/* payments */}
+        <Route path="/payment-success" element={<PaymentConfirmation />} />
+        <Route path="/payment-failed" element={<PaymentConfirmation />} />
+        {/* payments */}
+
         <Route path="/contactus" element={<Contact />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/RegisterAdmin" element={<RegisterAdmin />} />
@@ -79,7 +87,7 @@ const AppContent = () => {
         <Route path="/ForgotPassword" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<PasswordResset />} />
         <Route path="/eventVideo/:slug?" element={<EventVideo />} />
-        {/* Protected users routes */}
+        {/* Protected USERS routes */}
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/DashBoard/profile" element={<HomeDashBoard />} />
@@ -89,7 +97,7 @@ const AppContent = () => {
             />
             <Route
               path="/DashBoard/Notifications"
-              element={<DashBoardNotifications />}
+              element={<UserNotificationPage />}
             />
           </Route>
         </Route>
@@ -148,6 +156,10 @@ const AppContent = () => {
             <Route
               path="/DashBoard/Admin/CommunityUserList"
               element={<CommunityUserList />}
+            />
+            <Route
+              path="/DashBoard/Admin/NotificationPage"
+              element={<AdminNotificationPage />}
             />
           </Route>
         </Route>

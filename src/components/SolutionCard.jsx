@@ -29,16 +29,14 @@ export const SolutionCard = ({ event, isConsulting = false }) => (
       </p>
       <Link
         to={`/SolutionForm/${event.slug}`}
-        className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-teal-700 rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors duration-300 mt-auto self-start hover:bg-transparent hover:text-teal-700 hover:border-teal-700 hover:border-2 hover:font-semibold"
-      >
+        className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-teal-700 rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors duration-300 mt-auto self-start hover:bg-transparent hover:text-teal-700 hover:border-teal-700 hover:border-2 hover:font-semibold">
         Register Interest
         <svg
           className="w-3.5 h-3.5 ms-2"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 14 10"
-          aria-hidden="true"
-        >
+          aria-hidden="true">
           <path
             stroke="currentColor"
             strokeLinecap="round"
@@ -68,17 +66,15 @@ export const SolutionCard2 = ({ event, isConsulting = false }) => (
         {truncateText(stripHtmlTags(event.content), 100)}
       </p>
       <Link
-        to={`/SolutionFormCS/${event.slug}`}
-        className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-teal-700 rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors duration-300 mt-auto self-start hover:bg-transparent hover:text-teal-700 hover:border-teal-700 hover:border-2 hover:font-semibold"
-      >
+        to={`/SolutionForm/${event.slug}`}
+        className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-teal-700 rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors duration-300 mt-auto self-start hover:bg-transparent hover:text-teal-700 hover:border-teal-700 hover:border-2 hover:font-semibold">
         Register Interest
         <svg
           className="w-3.5 h-3.5 ms-2"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 14 10"
-          aria-hidden="true"
-        >
+          aria-hidden="true">
           <path
             stroke="currentColor"
             strokeLinecap="round"

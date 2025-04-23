@@ -9,6 +9,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { logoutUser } from "../../features/auth/authSlice";
 import { fetchProfileById } from "../../features/Users/userAction";
 import { FaHistory } from "react-icons/fa";
+import { useNotifications } from "../../components/Hooks/UseNotifications";
 
 const backendURL =
   import.meta.env.MODE === "production"
@@ -28,6 +29,7 @@ const Sidebar = () => {
   const { profile, loading, success, error } = useSelector(
     (state) => state.profiles
   );
+  const { unreadCount } = useNotifications();
 
   useEffect(() => {
     if (userId) {
@@ -60,18 +62,17 @@ const Sidebar = () => {
 
   const sidebarLinks = [
     { path: "/", icon: FaHome, label: "Home" },
-
     { path: "/DashBoard/profile", icon: IoPerson, label: "Profile" },
     {
       path: "/DashBoard/Activities",
       icon: FaHistory,
       label: "Activity Log",
     },
-
     {
       path: "/DashBoard/Notifications",
       icon: IoMdNotificationsOutline,
       label: "Notifications",
+      showBadge: true,
     },
   ];
 
@@ -80,8 +81,7 @@ const Sidebar = () => {
       <div
         className={`fixed top-0 left-0 right-0 z-40 bg-white shadow-md p-4 flex items-center justify-between ${
           isSmallScreen ? "" : "hidden"
-        }`}
-      >
+        }`}>
         <div className="flex items-center">
           <span className="mb-2">
             {profile?.data?.image ? (
@@ -104,17 +104,15 @@ const Sidebar = () => {
         </div>
         <button
           onClick={toggleSidebar}
-          className="text-purple-600 p-2 rounded-md focus:outline-none"
-        >
+          className="text-purple-600 p-2 rounded-md focus:outline-none">
           {isOpen ? <HiX size={24} /> : <HiMenu size={24} />}
         </button>
       </div>
       <div
         ref={sidebarRef}
-        className={`fixed inset-y-0 left-0 z-30 w-64  bg-blue-700 text-white transition-all duration-300 ease-in-out transform 
+        className={`fixed inset-y-0 left-0 z-30 w-64 bg-blue-700 text-white transition-all duration-300 ease-in-out transform 
           ${isOpen ? "translate-x-0" : "-translate-x-full"} 
-          ${isSmallScreen ? "top-16" : "top-0"}`}
-      >
+          ${isSmallScreen ? "top-16" : "top-0"}`}>
         <div className="flex flex-col h-full">
           <div className="p-5">
             <h1 className="text-2xl font-bold mb-1">Credulen</h1>
@@ -149,14 +147,20 @@ const Sidebar = () => {
                 key={link.path}
                 to={link.path}
                 onClick={() => isSmallScreen && setIsOpen(false)}
-                className={`flex items-center px-5 py-3 text-sm ${
+                className={`flex items-center justify-between px-5 py-3 text-sm ${
                   location.pathname === link.path
                     ? "bg-blue-500"
                     : "hover:bg-blue-600"
-                }`}
-              >
-                <link.icon className="w-5 h-5 mr-3" />
-                <span>{link.label}</span>
+                }`}>
+                <div className="flex items-center">
+                  <link.icon className="w-5 h-5 mr-3" />
+                  <span>{link.label}</span>
+                </div>
+                {link.showBadge && unreadCount > 0 && (
+                  <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {unreadCount}
+                  </span>
+                )}
               </Link>
             ))}
           </nav>
@@ -164,8 +168,7 @@ const Sidebar = () => {
           <div className="p-5">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center px-1 py-1 pl- text-sm bg-red-50 hover:text-white text-red-700 rounded-md hover:bg-red-700 transition-colors"
-            >
+              className="w-full flex items-center px-1 py-1 pl- text-sm bg-red-50 hover:text-white text-red-700 rounded-md hover:bg-red-700 transition-colors">
               <HiOutlineLogout className="w-5 h-5 mr-3" />
               <span>Sign out</span>
             </button>
@@ -176,8 +179,7 @@ const Sidebar = () => {
       <div
         className={`transition-all duration-300 ${
           isOpen && !isSmallScreen ? "ml-64" : "ml-0"
-        }`}
-      ></div>
+        }`}></div>
     </>
   );
 };

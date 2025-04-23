@@ -56,6 +56,15 @@ module.exports = {
         "montserrat-subrayada": ["Montserrat Subrayada", "sans-serif"],
         // Defined Montserrat and Montserrat Subrayada fonts
       },
+      animation: {
+        progress: "progress 3s ease-in-out forwards",
+      },
+      keyframes: {
+        progress: {
+          "0%": { width: "0%" },
+          "100%": { width: "100%" },
+        },
+      },
     },
   },
   variants: {

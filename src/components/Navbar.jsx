@@ -12,20 +12,21 @@ export function DropdownItems({ closeDropdown }) {
     userInfo?.role === "admin"
       ? "/DashBoard/Admin_Dashboard"
       : "/DashBoard/profile";
+  const backendURL =
+    import.meta.env.MODE === "production"
+      ? import.meta.env.VITE_BACKEND_URL
+      : "http://localhost:3001";
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         setLoading(true);
-        const response = await fetch(
-          `https://credulen-backend.vercel.app/api/Users/${userId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await fetch(`${backendURL}/api/Users/${userId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch user profile");

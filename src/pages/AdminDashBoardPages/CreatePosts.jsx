@@ -580,8 +580,7 @@ export default function CreatePosts() {
         display="flex"
         justifyContent="center"
         alignItems="center"
-        minHeight="100vh"
-      >
+        minHeight="100vh">
         <CircularProgress />
       </Box>
     );
@@ -599,8 +598,7 @@ export default function CreatePosts() {
     <>
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center text-blue-500 hover:text-blue-700 transition-colors duration-200"
-      >
+        className="flex items-center text-blue-500 hover:text-blue-700 transition-colors duration-200">
         <IoArrowBack className="mr-2" size={24} />
         Back
       </button>
@@ -631,8 +629,7 @@ export default function CreatePosts() {
               label="Category"
               name="category"
               value={formData.category}
-              onChange={handleInputChange}
-            >
+              onChange={handleInputChange}>
               <MenuItem value="uncategorized">Select a category</MenuItem>
               <MenuItem value="Web3-&-Blockchain-Education">
                 Web3 & Blockchain Education
@@ -656,8 +653,7 @@ export default function CreatePosts() {
               label="Author"
               name="authorId"
               value={formData.authorId}
-              onChange={handleInputChange}
-            >
+              onChange={handleInputChange}>
               {authors.map((author) => (
                 <MenuItem key={author.id} value={author.id}>
                   {author.name}
@@ -675,8 +671,7 @@ export default function CreatePosts() {
             />
             <Button
               variant="outlined"
-              onClick={() => fileInputRef.current.click()}
-            >
+              onClick={() => fileInputRef.current.click()}>
               Choose File
             </Button>
             {imagePreview && (
@@ -699,8 +694,7 @@ export default function CreatePosts() {
             type="submit"
             variant="contained"
             color="primary"
-            disabled={loading}
-          >
+            disabled={loading}>
             {loading ? (
               <CircularProgress size={24} />
             ) : postId ? (
@@ -714,13 +708,11 @@ export default function CreatePosts() {
             open={snackbar.open}
             autoHideDuration={6000}
             onClose={handleCloseSnackbar}
-            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          >
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
             <Alert
               onClose={handleCloseSnackbar}
               severity={snackbar.severity}
-              sx={{ width: "100%" }}
-            >
+              sx={{ width: "100%" }}>
               {snackbar.message}
             </Alert>
           </Snackbar>
