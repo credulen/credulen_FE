@@ -567,7 +567,7 @@ const SolutionForm = () => {
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="sm:p-6 p-2">
           <div className="grid md:grid-cols-2 gap-8">
             {/* Training Description */}
             <div>
@@ -587,7 +587,7 @@ const SolutionForm = () => {
                   value={solution.trainingDesc}
                   readOnly={true}
                   theme={"bubble"}
-                  className="border-none [&_.ql-editor]:text-lg"
+                  className="border-none [&_.ql-editor]:text-md"
                 />
               </div>
               {solution.price > 0 && (
