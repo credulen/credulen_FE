@@ -29,6 +29,7 @@ import Post from "./pages/Post";
 import SolutionForm from "./pages/SolutionForm";
 import SolutionFormCS from "./pages/SolutionFormCS";
 import PaymentConfirmation from "./pages/PaymentConfirmation";
+import PaymentPage from "./pages/PaymentPage";
 // Admin
 
 import AdminLayout from "./components/Dashboard_Admin/AdminLayout";
@@ -78,6 +79,7 @@ const AppContent = () => {
         {/* payments */}
         <Route path="/payment-success" element={<PaymentConfirmation />} />
         <Route path="/payment-failed" element={<PaymentConfirmation />} />
+        <Route path="/payment/:slug" element={<PaymentPage />} />
         {/* payments */}
 
         <Route path="/contactus" element={<Contact />} />

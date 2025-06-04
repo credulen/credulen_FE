@@ -1,6 +1,6 @@
-// components/SolutionCard.jsx
 import React from "react";
 import { Link } from "react-router-dom";
+
 const backendURL =
   import.meta.env.MODE === "production"
     ? import.meta.env.VITE_BACKEND_URL
@@ -13,76 +13,55 @@ function truncateText(text, maxLength) {
 }
 
 export const SolutionCard = ({ event, isConsulting = false }) => (
-  <div className="bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:scale-95 flex flex-col h-full">
-    <img
-      className="w-full h-48 object-cover"
-      src={`${event?.image}`}
-      alt={event.title}
-      style={{ minHeight: "15rem" }}
-    />
+  <div className="bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg flex flex-col h-full relative">
+    <Link to={`/SolutionForm/${event.slug}`}>
+      <img
+        className="w-full h-48 object-cover hover:scale-105 transition-all duration-500 "
+        src={`${event?.image}`}
+        alt={event.title}
+        style={{ minHeight: "15rem" }}
+      />
+    </Link>
     <div className="p-4 flex flex-col flex-grow">
-      <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-900 first-letter:uppercase">
+      {/* Category Label */}
+      <span className="text-xs text-gray-500 uppercase mb-1">
+        {isConsulting ? "Consulting Service" : "Training School"}
+      </span>
+      <h5 className="mb-2 text-3xl mid:text-2xl font-bold tracking-tight text-gray-900 first-letter:uppercase">
         {event.title}
       </h5>
-      <p className="mb-3 text-sm text-gray-700 line-clamp-3 flex-grow">
-        {truncateText(stripHtmlTags(event.content), 100)}
+      <p className="mb-3 text-sm text-gray-600 line-clamp-2 flex-grow">
+        {truncateText(stripHtmlTags(event.trainingDesc || event.content), 80)}
       </p>
-      <Link
-        to={`/SolutionForm/${event.slug}`}
-        className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-teal-700 rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors duration-300 mt-auto self-start hover:bg-transparent hover:text-teal-700 hover:border-teal-700 hover:border-2 hover:font-semibold">
-        Register Interest
-        <svg
-          className="w-3.5 h-3.5 ms-2"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 14 10"
-          aria-hidden="true">
-          <path
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M1 5h12m0 0L9 1m4 4L9 9"
-          />
-        </svg>
-      </Link>
-    </div>
-  </div>
-);
+      {/* Price and Discount */}
+      <div className="flex items-center mb-3">
+        {event.discountPercentage === 0 ? (
+          <span className="text-xl font-bold text-teal-700">
+            ₦{event.price?.toLocaleString()}
+          </span>
+        ) : (
+          <>
+            <span className="text-xl font-bold text-teal-700 mr-2">
+              ₦{event.amount?.toLocaleString()}
+            </span>
+            <span className="text-sm text-gray-500 line-through">
+              ₦{event.price?.toLocaleString()}
+            </span>
+            <span className="ml-2 text-xs text-red-500 font-semibold">
+              {event.discountPercentage}% Disc.
+            </span>
+          </>
+        )}
+      </div>
 
-export const SolutionCard2 = ({ event, isConsulting = false }) => (
-  <div className="bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:scale-95 flex flex-col h-full">
-    <img
-      className="w-full h-48 object-cover"
-      src={`${event?.image}`}
-      alt={event.title}
-      style={{ minHeight: "15rem" }}
-    />
-    <div className="p-4 flex flex-col flex-grow">
-      <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-900 first-letter:uppercase">
-        {event.title}
-      </h5>
-      <p className="mb-3 text-sm text-gray-700 line-clamp-3 flex-grow">
-        {truncateText(stripHtmlTags(event.content), 100)}
-      </p>
       <Link
-        to={`/SolutionForm/${event.slug}`}
-        className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-teal-700 rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors duration-300 mt-auto self-start hover:bg-transparent hover:text-teal-700 hover:border-teal-700 hover:border-2 hover:font-semibold">
-        Register Interest
-        <svg
-          className="w-3.5 h-3.5 ms-2"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 14 10"
-          aria-hidden="true">
-          <path
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M1 5h12m0 0L9 1m4 4L9 9"
-          />
-        </svg>
+        to={
+          event.category === "TrainingSchool"
+            ? `/SolutionForm/${event.slug}`
+            : `/SolutionFormCS/${event.slug}`
+        }
+        className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-md hover:bg-teal-700 duration-300 mt-auto self-start transition-all hover:scale-105">
+        More Details
       </Link>
     </div>
   </div>

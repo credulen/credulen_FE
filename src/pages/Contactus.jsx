@@ -143,8 +143,7 @@ const ContactUs = () => {
                   href={method.href}
                   className="group relative"
                   target="_blank"
-                  rel="noopener noreferrer"
-                >
+                  rel="noopener noreferrer">
                   <Icon className="h-6 w-6 text-gray-500 hover:text-btColour transition-colors duration-200 transform hover:scale-110" />
                   <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-max opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-sm text-gray-500">
                     {method.label}
@@ -191,8 +190,7 @@ const ContactUs = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-[#1e293b] to-btColour hover:bg-gradient-to-bl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-btColour transition-all duration-300 ease-in-out disabled:opacity-70 transform hover:scale-[1.02]"
-          >
+            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-[#1e293b]  hover:bg-gradient-to-bl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-btColour transition-all duration-300 ease-in-out disabled:opacity-70 transform hover:scale-[1.02]">
             {isLoading ? (
               "Sending..."
             ) : (
@@ -209,14 +207,12 @@ const ContactUs = () => {
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
         <Alert
           onClose={handleSnackbarClose}
           severity={snackbar.severity}
           sx={{ width: "100%" }}
-          variant="filled"
-        >
+          variant="filled">
           {snackbar.message}
         </Alert>
       </Snackbar>
