@@ -12,7 +12,7 @@ function truncateText(text, maxLength) {
   return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 }
 
-export const SolutionCard = ({ event, isConsulting = false }) => (
+export const SolutionCard = ({ event }) => (
   <div className="bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg flex flex-col h-full relative">
     <Link to={`/SolutionForm/${event.slug}`}>
       <img
@@ -22,11 +22,15 @@ export const SolutionCard = ({ event, isConsulting = false }) => (
         style={{ minHeight: "15rem" }}
       />
     </Link>
+
     <div className="p-4 flex flex-col flex-grow">
       {/* Category Label */}
       <span className="text-xs text-gray-500 uppercase mb-1">
-        {isConsulting ? "Consulting Service" : "Training School"}
+        {event?.category === "TrainingSchool"
+          ? "Training school"
+          : "Consulting service"}
       </span>
+
       <h5 className="mb-2 text-3xl mid:text-2xl font-bold tracking-tight text-gray-900 first-letter:uppercase">
         {event.title}
       </h5>
