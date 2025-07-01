@@ -827,7 +827,9 @@
 // };
 
 // export default CampaignPage;
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect, useRef, useCallback } from "react";
+
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import AOS from "aos";
@@ -844,6 +846,7 @@ import {
   BookOpen,
   Share2,
   Menu,
+  X,
 } from "lucide-react";
 
 import { Alert, AlertDescription } from "../components/tools/Alerts2";
@@ -960,11 +963,9 @@ const ShareModal = ({ isOpen, onClose }) => {
               onClick={handleCopyLink}
               className={`p-3 rounded-lg transition-colors duration-200 ${
                 isCopied
-                  ? "bg-green-500 text-white"
+                  ? "bg-green text-white"
                   : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-              } hover:scale-105`}
-              data-aos="zoom-in"
-              data-aos-duration="600">
+              } hover:scale-105`}>
               {isCopied ? <Check size={20} /> : <Copy size={20} />}
             </button>
           </div>
@@ -1175,24 +1176,51 @@ const RegistrationModal = ({ isOpen, onClose }) => {
 
 const Navbar = ({ onShare }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  // Close mobile menu on outside click
+  const handleOutsideClick = (event) => {
+    if (
+      mobileMenuOpen &&
+      menuRef.current &&
+      !menuRef.current.contains(event.target)
+    ) {
+      console.log("Closing mobile menu due to outside click");
+      setMobileMenuOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.addEventListener("mousedown", handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [mobileMenuOpen]);
+
+  const toggleMobileMenu = () => {
+    console.log("Toggling mobile menu. Current state:", mobileMenuOpen);
+    setMobileMenuOpen((prev) => !prev);
+  };
 
   return (
-    <nav className="bg-gradient-to-r from-[#0F0B78] to-[#1A1B5C] text-white p-4 w-full z-50 shadow-lg a top-0">
+    <nav className="top-0 left-0 right-0  text-white p-4 w-full z-50 shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex-shrink-0">
           <Link to="/" className="flex items-center">
             <img
               src={CredulenLogo2}
-              className="w-32 h-8 sm:w-40 sm:h-10 object-contain"
+              className="w-28 h-7 sm:w-36 sm:h-9 object-contain"
               alt="Credulen Logo"
             />
           </Link>
         </div>
 
         <div className="hidden md:flex items-center space-x-4">
-          <Link target="_blank" to={"/solutions/training_School"}>
+          <Link target="_blank" to="/solutions/training_School">
             <span
-              className="text-sm font-medium px-4 py-2 rounded-full bg-[#0F0B78] hover:bg-gradient-to-r from-[#F4A261] to-[#E2FF02] text-white transition-all duration-300 hover:scale-105"
+              className="text-sm font-medium px-4 py-2 rounded-full bg-[#0F0B78] hover:bg-[#F4A261] text-white transition-all duration-300 hover:scale-105"
               data-aos="zoom-in"
               data-aos-duration="600">
               Solutions
@@ -1200,15 +1228,16 @@ const Navbar = ({ onShare }) => {
           </Link>
           <Link target="_blank" to={"/contactus"}>
             <span
-              className="text-sm font-medium px-4 py-2 rounded-full bg-[#0F0B78] hover:bg-gradient-to-r from-[#F4A261] to-[#E2FF02] text-white transition-all duration-300 hover:scale-105"
+              className="text-sm font-medium px-4 py-2 rounded-full bg-[#0F0B78] hover:bg-[#F4A261] text-white transition-all duration-300 hover:scale-105"
               data-aos="zoom-in"
               data-aos-duration="600">
               Contact
             </span>
           </Link>
+
           <Link target="_blank" to={"/"}>
             <span
-              className="text-sm font-medium px-4 py-2 rounded-full bg-[#0F0B78] hover:bg-gradient-to-r from-[#F4A261] to-[#E2FF02] text-white transition-all duration-300 hover:scale-105"
+              className="text-sm font-medium px-4 py-2 rounded-full bg-[#0F0B78] hover:bg-[#F4A261] text-white transition-all duration-300 hover:scale-105"
               data-aos="zoom-in"
               data-aos-duration="600">
               About
@@ -1219,20 +1248,17 @@ const Navbar = ({ onShare }) => {
         <div className="flex items-center space-x-3">
           <button
             onClick={onShare}
-            className="bg-yellow-300 text-white p-2 rounded-full hover:bg-gradient-to-r from-[#F4A261] to-[#E2FF02] transition-all duration-300 hover:scale-105 shadow-lg"
-            title="Share this page"
-            data-aos="zoom-in"
-            data-aos-duration="600">
+            className="hover:bg-[#E2FF02] bg-[#F4A261] text-white p-2 rounded-full transition-all duration-300 hover:scale-105 shadow-md"
+            title="Share this page">
             <Share2 size={18} />
           </button>
 
           <div className="md:hidden">
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-white p-2 rounded-full bg-white/10 hover:bg-gradient-to-r from-[#F4A261]/20 to-[#E2FF02]/20 transition-all duration-300 hover:scale-105"
-              data-aos="zoom-in"
-              data-aos-duration="600">
-              <Menu size={24} />
+              onClick={toggleMobileMenu}
+              className="text-white p-2 rounded-full bg-[#0F0B78] hover:bg-gray-700 transition-all duration-300 hover:scale-105"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}>
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
@@ -1240,26 +1266,35 @@ const Navbar = ({ onShare }) => {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#0F0B78] absolute top-full left-0 right-0 shadow-lg rounded-b-lg z-50">
-          <div className="px-4 py-3 space-y-3">
+        <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40">
+          <div
+            ref={menuRef}
+            className="mobile-menu bg-white w-64 h-full pt-16 px-4 space-y-3 transform transition-transform duration-300 ease-in-out fixed top-0 right-0">
+            <button
+              onClick={toggleMobileMenu}
+              className="absolute top-4 right-4 text-gray-900 p-2 rounded-full hover:border-2 hover:border-red-50 transition-all duration-300"
+              aria-label="Close menu">
+              <X size={24} />
+            </button>
+
             <Link
               target="_blank"
-              to={"/solutions/training_School"}
-              className="block px-4 py-2 rounded-full bg-[#0F0B78] hover:bg-gradient-to-r from-[#F4A261] to-[#E2FF02] text-white transition-all duration-300"
+              to="/solutions/training_School"
+              className=" block text-sm font-medium px-4 py-2 rounded-full bg-[#0F0B78] hover:bg-[#F4A261] text-white transition-all duration-300 hover:scale-105"
               onClick={() => setMobileMenuOpen(false)}>
               Solutions
             </Link>
             <Link
               target="_blank"
-              to={"/contactus"}
-              className="block px-4 py-2 rounded-full bg-[#0F0B78] hover:bg-gradient-to-r from-[#F4A261] to-[#E2FF02] text-white transition-all duration-300"
+              to="/contactus"
+              className=" block text-sm font-medium px-4 py-2 rounded-full bg-[#0F0B78] hover:bg-[#F4A261] text-white transition-all duration-300 hover:scale-105"
               onClick={() => setMobileMenuOpen(false)}>
               Contact
             </Link>
             <Link
               target="_blank"
-              to={"/"}
-              className="block px-4 py-2 rounded-full bg-[#0F0B78] hover:bg-gradient-to-r from-[#F4A261] to-[#E2FF02] text-white transition-all duration-300"
+              to="/"
+              className=" block text-sm font-medium px-4 py-2 rounded-full bg-[#0F0B78] hover:bg-[#F4A261] text-white transition-all duration-300 hover:scale-105"
               onClick={() => setMobileMenuOpen(false)}>
               About
             </Link>
@@ -1272,7 +1307,7 @@ const Navbar = ({ onShare }) => {
 
 const HeroSection = ({ onRegister }) => (
   <section
-    className="text-white pt-24 pb-16 lg:py-20 px-4 max-w-6xl mx-auto"
+    className="text-white  pb-16 lg:py-20 px-4 max-w-6xl mx-auto"
     data-aos="zoom-in"
     data-aos-duration="1000"
     data-aos-offset="200">
@@ -1283,8 +1318,10 @@ const HeroSection = ({ onRegister }) => (
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-3xl sm:text-4xl lg:text-5xl xl:text-5xl font-bold mb-6 leading-tight">
-            <span className="text-[#E2FF02]">Data + AI + Blockchain:</span>
+            className="text-3xl  sm:text-4xl lg:text-5xl xl:text-5xl font-bold mb-6 leading-tight">
+            <span className="text-[#E2FF02] mid:text-6xl">
+              Data + AI + Blockchain:
+            </span>
             <br />
             <span className="text-[#0F0B78]">
               What Every Innovator Needs to Know
@@ -1435,7 +1472,7 @@ const MasterclassSection = () => (
             <img
               src={masterclassImage}
               alt="Masterclass Preview"
-              className="w-[90%] h-auto max-h-[400px] object-fit rounded-2xl shadow-2xl"
+              className="w-full h-auto max-h-[400px] object-fit rounded-2xl shadow-2xl"
             />
           </motion.div>
         </div>
