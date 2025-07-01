@@ -330,6 +330,11 @@ const AdminSidebar = () => {
       label: "Registered Community Users",
     },
     {
+      path: "/DashBoard/Admin/FreeMasterClassregister",
+      icon: IoMdNotificationsOutline,
+      label: "Free Master Class Register",
+    },
+    {
       path: "/DashBoard/Admin/NotificationPage",
       icon: IoMdNotificationsOutline,
       label: "Notifications",

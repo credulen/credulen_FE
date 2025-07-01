@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { TokenExpirationModal } from "./components/tools/TokenExpiration";
 import Home from "./pages/Home";
+import CampaignPage from "./pages/CampaignPage";
 import PasswordResset from "./pages/PasswordResset";
 import Conferences from "./pages/Conference";
 import Webinar from "./pages/Webinars";
@@ -50,12 +51,16 @@ import CreateSolutions from "./pages/AdminDashBoardPages/CreateSolutions";
 import RegisteredSolutionsList from "./pages/AdminDashBoardPages/RegisteredSolutionsList";
 import AdminCommentLists from "./pages/AdminDashBoardPages/AdminCommentLists";
 import RegisteredEventLists from "./pages/AdminDashBoardPages/RegisteredEventLists";
+import FreeMAsterClassList from "./pages/AdminDashBoardPages/FreeMAsterClassList";
 import CommunityUserList from "./pages/AdminDashBoardPages/CommunityUserList";
 import AdminNotificationPage from "./pages/AdminDashBoardPages/AdminNotificationPage";
 
 const AppContent = () => {
   const location = useLocation();
-  const isDashboardRoute = location.pathname.startsWith("/DashBoard");
+  const isDashboardRoute = [
+    "/DashBoard",
+    "/Credulen-freeMasterClass-Join2025",
+  ].some((path) => location.pathname.startsWith(path));
 
   return (
     <>
@@ -63,6 +68,10 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="*" element={<PageNotFound />} />
+        <Route
+          path="/Credulen-freeMasterClass-Join2025"
+          element={<CampaignPage />}
+        />
 
         <Route path="/Post/:slug" element={<Post />} />
         <Route path="/blog" element={<Blog />} />
@@ -162,6 +171,10 @@ const AppContent = () => {
             <Route
               path="/DashBoard/Admin/NotificationPage"
               element={<AdminNotificationPage />}
+            />
+            <Route
+              path="/DashBoard/Admin/FreeMasterClassregister"
+              element={<FreeMAsterClassList />}
             />
           </Route>
         </Route>

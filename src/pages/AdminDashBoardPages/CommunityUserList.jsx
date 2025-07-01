@@ -41,8 +41,7 @@ const CommunityRegistrationRow = ({ registration, onDelete }) => (
     <Table.Cell>
       <button
         onClick={() => onDelete(registration._id)}
-        className="font-medium text-red-500 bg-transparent border border-red-500 cursor-pointer hover:bg-btColour hover:text-white p-1 rounded-md"
-      >
+        className="font-medium text-red-500 bg-transparent border border-red-500 cursor-pointer hover:bg-btColour hover:text-white p-1 rounded-md">
         Delete
       </button>
     </Table.Cell>
@@ -203,8 +202,7 @@ const CommunityUserList = () => {
       <div className="flex items-center mb-4">
         <SwitchNav
           checked={bannerVisible}
-          onChange={(e) => handleBannerToggle(e.target.checked)}
-        >
+          onChange={(e) => handleBannerToggle(e.target.checked)}>
           {bannerVisible ? "Hide Banner" : "Show Banner"}
         </SwitchNav>
       </div>
@@ -246,8 +244,7 @@ const CommunityUserList = () => {
         open={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
+        aria-describedby="alert-dialog-description">
         <DialogTitle id="alert-dialog-title">Please Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
@@ -259,14 +256,12 @@ const CommunityUserList = () => {
         <DialogActions>
           <Button
             onClick={() => setShowDeleteModal(false)}
-            className="text-gray-500 hover:text-gray-700"
-          >
+            className="text-gray-500 hover:text-gray-700">
             <IoClose size={24} />
           </Button>
           <Button
             onClick={handleDeleteConfirm}
-            className="text-red-500 hover:text-red-700"
-          >
+            className="text-red-500 hover:text-red-700">
             <AiTwotoneDelete size={24} />
           </Button>
         </DialogActions>
@@ -275,13 +270,11 @@ const CommunityUserList = () => {
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-      >
+        onClose={handleCloseSnackbar}>
         <Alert
           onClose={handleCloseSnackbar}
           severity={snackbar.severity}
-          sx={{ width: "100%" }}
-        >
+          sx={{ width: "100%" }}>
           {snackbar.message}
         </Alert>
       </Snackbar>

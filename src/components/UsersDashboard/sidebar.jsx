@@ -99,7 +99,7 @@ const Sidebar = () => {
             )}
           </span>
           <span className="mb-1 mr-2 font-medium text-xs">
-            {profile?.data?.username || "Guest....?."}
+            {profile?.data?.username || "Guest"}
           </span>
         </div>
         <button
