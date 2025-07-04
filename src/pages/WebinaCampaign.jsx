@@ -571,7 +571,7 @@ const HeroSection = () => (
         className="flex flex-wrap justify-center gap-6 mb-8">
         <div className="flex items-center text-[#0F0B78]">
           <Clock size={20} className="mr-2" />
-          <span className="text-sm">45 min webinar</span>
+          <span className="text-sm">31 min webinar</span>
         </div>
         <div className="flex items-center text-[#0F0B78]">
           <Users size={20} className="mr-2" />
@@ -579,7 +579,7 @@ const HeroSection = () => (
         </div>
         <div className="flex items-center text-[#0F0B78]">
           <Star size={20} className="mr-2" />
-          <span className="text-sm">4.5/5 rating</span>
+          <span className="text-sm">4.6/5 rating</span>
         </div>
         <div className="flex items-center text-[#0F0B78]">
           <TrendingUp size={20} className="mr-2" />
@@ -601,7 +601,7 @@ const VideoSection = ({ onEnroll }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="relative bg-[#1A1A5C] rounded-2xl overflow-hidden shadow-2xl w-full sm:w-[90%] md:w-[80%] mx-auto">
-          <div className="relative aspect-video w-full h-[250px] sm:h-[300px] md:h-[350px]">
+          <div className="relative aspect-video w-full h-[300px] sm:h-[400px] md:h-[450px]">
             <iframe
               src="https://www.youtube.com/embed/lLdBCV6tjUw"
               frameBorder="0"
@@ -612,7 +612,7 @@ const VideoSection = ({ onEnroll }) => {
           </div>
 
           <div className="absolute bottom-4 right-4 bg-[#0F0B78] text-[#E2FF02] px-3 py-1 rounded-full text-sm">
-            45:23
+            31:22
           </div>
         </motion.div>
 
