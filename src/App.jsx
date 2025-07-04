@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { TokenExpirationModal } from "./components/tools/TokenExpiration";
 import Home from "./pages/Home";
 import CampaignPage from "./pages/CampaignPage";
+import WebinaCampaign from "./pages/WebinaCampaign";
 import PasswordResset from "./pages/PasswordResset";
 import Conferences from "./pages/Conference";
 import Webinar from "./pages/Webinars";
@@ -30,6 +31,7 @@ import Post from "./pages/Post";
 import SolutionForm from "./pages/SolutionForm";
 import SolutionFormCS from "./pages/SolutionFormCS";
 import PaymentConfirmation from "./pages/PaymentConfirmation";
+import WebinarPaymentConfirmation from "./pages/WebinarPaymentConfirmation";
 import PaymentPage from "./pages/PaymentPage";
 // Admin
 
@@ -60,6 +62,8 @@ const AppContent = () => {
   const isDashboardRoute = [
     "/DashBoard",
     "/Credulen-freeMasterClass-Join2025",
+    "/Credulen-Webinar-Register2025",
+    "/webinar-payment-success",
   ].some((path) => location.pathname.startsWith(path));
 
   return (
@@ -71,6 +75,10 @@ const AppContent = () => {
         <Route
           path="/Credulen-freeMasterClass-Join2025"
           element={<CampaignPage />}
+        />
+        <Route
+          path="/Credulen-Webinar-Register2025"
+          element={<WebinaCampaign />}
         />
 
         <Route path="/Post/:slug" element={<Post />} />
@@ -87,6 +95,11 @@ const AppContent = () => {
         <Route path="/SolutionFormCS/:slug?" element={<SolutionFormCS />} />
         {/* payments */}
         <Route path="/payment-success" element={<PaymentConfirmation />} />
+        {/* webinar payment confirmation */}
+        <Route
+          path="/webinar-payment-success"
+          element={<WebinarPaymentConfirmation />}
+        />
         <Route path="/payment-failed" element={<PaymentConfirmation />} />
         <Route path="/payment/:slug" element={<PaymentPage />} />
         {/* payments */}

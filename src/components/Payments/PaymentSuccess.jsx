@@ -31,7 +31,7 @@ const PaymentSuccess = ({ details }) => {
           <div className="flex justify-between">
             <span className="text-gray-600">Training:</span>
             <span className="font-medium">
-              {details?.selectedSolution || "N/A"}
+              {details?.selectedSolution || details?.webinarTitle || "N/A"}
             </span>
           </div>
           <div className="flex justify-between">
@@ -40,7 +40,9 @@ const PaymentSuccess = ({ details }) => {
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Date:</span>
-            <span className="font-medium">{details?.paymentDate || "N/A"}</span>
+            <span className="font-medium">
+              {details?.paymentDate || details?.transactionDate || "N/A"}
+            </span>
           </div>
         </div>
 
