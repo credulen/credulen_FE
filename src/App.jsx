@@ -56,6 +56,7 @@ import RegisteredEventLists from "./pages/AdminDashBoardPages/RegisteredEventLis
 import FreeMAsterClassList from "./pages/AdminDashBoardPages/FreeMAsterClassList";
 import CommunityUserList from "./pages/AdminDashBoardPages/CommunityUserList";
 import AdminNotificationPage from "./pages/AdminDashBoardPages/AdminNotificationPage";
+import WebinarPaymentList from "./pages/AdminDashBoardPages/WebinarPaymentList";
 
 const AppContent = () => {
   const location = useLocation();
@@ -188,6 +189,10 @@ const AppContent = () => {
             <Route
               path="/DashBoard/Admin/FreeMasterClassregister"
               element={<FreeMAsterClassList />}
+            />
+            <Route
+              path="/DashBoard/Admin/WebinarPaymentList"
+              element={<WebinarPaymentList />}
             />
           </Route>
         </Route>

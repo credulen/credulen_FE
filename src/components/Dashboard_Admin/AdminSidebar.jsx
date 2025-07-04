@@ -335,6 +335,11 @@ const AdminSidebar = () => {
       label: "Free Master Class Register",
     },
     {
+      path: "/DashBoard/Admin/WebinarPaymentList",
+      icon: IoMdNotificationsOutline,
+      label: "Webinar Payment List",
+    },
+    {
       path: "/DashBoard/Admin/NotificationPage",
       icon: IoMdNotificationsOutline,
       label: "Notifications",
