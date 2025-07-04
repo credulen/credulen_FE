@@ -600,34 +600,15 @@ const VideoSection = ({ onEnroll }) => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="relative bg-[#1A1A5C] rounded-2xl overflow-hidden shadow-2xl">
-          <div className="relative aspect-[4/3] sm:aspect-video min-h-[280px] sm:min-h-0">
-            {!isPlaying ? (
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setIsPlaying(true)}
-                className="absolute inset-0 flex items-center justify-center w-20 h-20 bg-[#F4A261] rounded-full shadow-lg hover:bg-[#E2FF02] transition-colors">
-                <Play size={32} className="text-[#0F0B78] ml-1" />
-              </motion.button>
-            ) : (
-              <div
-                style={{ padding: "56.25% 0 0 0", position: "relative" }}
-                className="w-full h-full">
-                <iframe
-                  src="https://player.vimeo.com/video/1096909912?h=8b712333e7&badge=0&autopause=0&player_id=0&app_id=58479"
-                  frameBorder="0"
-                  allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                  }}
-                  title="AI and Blockchain _ Future Trends _ Advantages of Combining Both AI and Blockchain _ Blocktunix"></iframe>
-              </div>
-            )}
+          className="relative bg-[#1A1A5C] rounded-2xl overflow-hidden shadow-2xl w-full sm:w-[90%] md:w-[80%] mx-auto">
+          <div className="relative aspect-video w-full h-[250px] sm:h-[300px] md:h-[350px]">
+            <iframe
+              src="https://www.youtube.com/embed/lLdBCV6tjUw"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="absolute inset-0 w-full h-full rounded-2xl"
+              title="AI and Blockchain | Future Trends | Advantages of Combining Both AI and Blockchain | Blocktunix"></iframe>
           </div>
 
           <div className="absolute bottom-4 right-4 bg-[#0F0B78] text-[#E2FF02] px-3 py-1 rounded-full text-sm">
