@@ -320,6 +320,11 @@ const AdminSidebar = () => {
       label: "Registered Solutions",
     },
     {
+      path: "/DashBoard/Admin/RegisteredConsultingService",
+      icon: IoMdNotificationsOutline,
+      label: "Registered Consulting Service",
+    },
+    {
       path: "/DashBoard/Admin/RegisteredEventList",
       icon: IoMdNotificationsOutline,
       label: "Registered Events",

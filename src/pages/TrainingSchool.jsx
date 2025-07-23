@@ -92,7 +92,7 @@ const QAndA = () => {
     {
       question: "What is the duration of the training programs?",
       answer:
-        "Most programs span 3 to 6 weeks, depending on the course intensity. Each course includes a flexible schedule, allowing you to learn at your own pace with access to materials 24/7.",
+        "Most programs span between 12 to 20 weeks, depending on the course intensity. Each course includes a flexible schedule, allowing you to learn at your own pace with access to materials 24/7.",
     },
     {
       question: "Will I receive a certificate after completing a course?",

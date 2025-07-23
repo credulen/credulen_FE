@@ -9,6 +9,7 @@ import Conferences from "./pages/Conference";
 import Webinar from "./pages/Webinars";
 import TrainingSchool from "./pages/TrainingSchool";
 import ConsultingServices from "./pages/ConsultingServices";
+import BookConsultation from "./pages/BookConsultation";
 import EventVideo from "../src/pages/EventVideo";
 import Contact from "./pages/Contactus";
 import RegisterAdmin from "../src/pages/RegisterAdmin";
@@ -33,8 +34,8 @@ import SolutionFormCS from "./pages/SolutionFormCS";
 import PaymentConfirmation from "./pages/PaymentConfirmation";
 import WebinarPaymentConfirmation from "./pages/WebinarPaymentConfirmation";
 import PaymentPage from "./pages/PaymentPage";
-// Admin
 
+// Admin
 import AdminLayout from "./components/Dashboard_Admin/AdminLayout";
 import AdminDashboard from "./pages/AdminDashBoardPages/AdminDashboard";
 import AdminProfile from "./pages/AdminDashBoardPages/AdminProfile";
@@ -57,6 +58,7 @@ import FreeMAsterClassList from "./pages/AdminDashBoardPages/FreeMAsterClassList
 import CommunityUserList from "./pages/AdminDashBoardPages/CommunityUserList";
 import AdminNotificationPage from "./pages/AdminDashBoardPages/AdminNotificationPage";
 import WebinarPaymentList from "./pages/AdminDashBoardPages/WebinarPaymentList";
+import AdminConsultingServiceFormList from "./pages/AdminDashBoardPages/AdminConsultingServiceFormList";
 
 const AppContent = () => {
   const location = useLocation();
@@ -94,6 +96,10 @@ const AppContent = () => {
         />
         <Route path="/SolutionForm/:slug?" element={<SolutionForm />} />
         <Route path="/SolutionFormCS/:slug?" element={<SolutionFormCS />} />
+        <Route
+          path="/book-consultation/:slug?"
+          element={<BookConsultation />}
+        />
         {/* payments */}
         <Route path="/payment-success" element={<PaymentConfirmation />} />
         {/* webinar payment confirmation */}
@@ -126,6 +132,7 @@ const AppContent = () => {
             />
           </Route>
         </Route>
+
         {/* Protected Admin Dashboard routes */}
         <Route element={<ProtectedRoute requiredRole="admin" />}>
           <Route element={<AdminLayout />}>
@@ -193,6 +200,10 @@ const AppContent = () => {
             <Route
               path="/DashBoard/Admin/WebinarPaymentList"
               element={<WebinarPaymentList />}
+            />
+            <Route
+              path="/DashBoard/Admin/RegisteredConsultingService"
+              element={<AdminConsultingServiceFormList />}
             />
           </Route>
         </Route>
