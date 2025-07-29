@@ -495,7 +495,7 @@ const SolutionFormCS = () => {
   };
 
   const handleWhatsAppContact = () => {
-    const phoneNumber = "+2348136712272";
+    const phoneNumber = "+2349012048912";
     const message = `Hi, I'm interested in the ${solution?.title} consulting service. I'd like to get more information and possibly book a consultation.`;
     const whatsappUrl = `https://wa.me/${phoneNumber.replace(
       "+",

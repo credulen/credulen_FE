@@ -1170,7 +1170,7 @@ const BookConsultation = () => {
             <div className="pt-6 border-t text-center text-sm text-gray-600">
               <p>Need immediate assistance?</p>
               <p>
-                Call us at <span className="font-medium">+2348136712272</span>{" "}
+                Call us at <span className="font-medium">+2349012048912</span>{" "}
                 or email <span className="font-medium">Credulen@gmail.com</span>
               </p>
             </div>

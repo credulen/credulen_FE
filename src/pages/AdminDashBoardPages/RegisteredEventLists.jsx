@@ -34,12 +34,18 @@ const EventTableRow = memo(({ registration }) => (
   <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
     <Table.Cell>{registration.fullName}</Table.Cell>
     <Table.Cell>{registration.email}</Table.Cell>
+    <Table.Cell>{registration.mobileNumber}</Table.Cell>
+    <Table.Cell>{registration.countryOfResidence}</Table.Cell>
+    <Table.Cell>{registration.careerStatus}</Table.Cell>
+    <Table.Cell>{registration.interestAndAim}</Table.Cell>
+    <Table.Cell>
+      {registration.managesImmigrantCommunity ? "Yes" : "No"}
+    </Table.Cell>
     <Table.Cell>{registration.company}</Table.Cell>
-    <Table.Cell>{registration.reason}</Table.Cell>
     <Table.Cell>{registration.eventTitle}</Table.Cell>
     <Table.Cell>{registration.eventCategory}</Table.Cell>
     <Table.Cell>
-      {moment(registration.createdAt).format("MMMM D, HH:mm")}
+      {moment(registration.registrationDate).format("MMMM D, HH:mm")}
     </Table.Cell>
   </Table.Row>
 ));
@@ -224,20 +230,17 @@ export default function RegisteredEventLists() {
         <div className="flex gap-2">
           <Dropdown
             style={{ color: "black" }}
-            label={selectedEvent || "Filter by Event"}
-          >
+            label={selectedEvent || "Filter by Event"}>
             <Dropdown.Item
               onClick={() => handleFilter("")}
-              style={{ color: "black" }}
-            >
+              style={{ color: "black" }}>
               All Events
             </Dropdown.Item>
             {allEvents.map((event) => (
               <Dropdown.Item
                 key={event}
                 onClick={() => handleFilter(event)}
-                style={{ color: "black" }}
-              >
+                style={{ color: "black" }}>
                 {event}
               </Dropdown.Item>
             ))}
@@ -246,8 +249,7 @@ export default function RegisteredEventLists() {
           <span className="mt-2">
             <button
               className="flex gap-2 font-medium hover:text-red-500 hover:bg-transparent cursor-pointer text-btColour p-1 rounded-md text-xs"
-              onClick={() => setShowDeleteModal(true)}
-            >
+              onClick={() => setShowDeleteModal(true)}>
               <HiOutlineTrash className="h-4 w-4" />
               Delete All
             </button>
@@ -262,8 +264,12 @@ export default function RegisteredEventLists() {
               <Table.Head>
                 <Table.HeadCell>Full Name</Table.HeadCell>
                 <Table.HeadCell>Email</Table.HeadCell>
+                <Table.HeadCell>Mobile Number</Table.HeadCell>
+                <Table.HeadCell>Country</Table.HeadCell>
+                <Table.HeadCell>Career Status</Table.HeadCell>
+                <Table.HeadCell>Interest & Aim</Table.HeadCell>
+                <Table.HeadCell>Manages Community</Table.HeadCell>
                 <Table.HeadCell>Company</Table.HeadCell>
-                <Table.HeadCell>Reason</Table.HeadCell>
                 <Table.HeadCell>Event Title</Table.HeadCell>
                 <Table.HeadCell>Event Category</Table.HeadCell>
                 <Table.HeadCell>Registered Date/Time</Table.HeadCell>
@@ -287,8 +293,7 @@ export default function RegisteredEventLists() {
         <button
           onClick={handleShowMore}
           disabled={loading}
-          className="w-full text-teal-500 self-center text-sm py-4 disabled:opacity-50"
-        >
+          className="w-full text-teal-500 self-center text-sm py-4 disabled:opacity-50">
           {loading ? "Loading..." : "Show more"}
         </button>
       )}
@@ -297,8 +302,7 @@ export default function RegisteredEventLists() {
         open={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
+        aria-describedby="alert-dialog-description">
         <DialogTitle id="alert-dialog-title">Please Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
@@ -313,14 +317,12 @@ export default function RegisteredEventLists() {
         <DialogActions>
           <Button
             onClick={() => setShowDeleteModal(false)}
-            className="text-gray-500 hover:text-gray-700"
-          >
+            className="text-gray-500 hover:text-gray-700">
             <IoClose size={24} />
           </Button>
           <Button
             onClick={handleDeleteByEvent}
-            className="text-red-500 hover:text-red-700"
-          >
+            className="text-red-500 hover:text-red-700">
             <AiTwotoneDelete size={24} />
           </Button>
         </DialogActions>
@@ -329,13 +331,11 @@ export default function RegisteredEventLists() {
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-      >
+        onClose={handleCloseSnackbar}>
         <Alert
           onClose={handleCloseSnackbar}
           severity={snackbar.severity}
-          sx={{ width: "100%" }}
-        >
+          sx={{ width: "100%" }}>
           {snackbar.message}
         </Alert>
       </Snackbar>
