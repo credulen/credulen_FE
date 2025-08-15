@@ -13,7 +13,7 @@ import {
 import { Alert, AlertDescription } from "../components/tools/Alert";
 import { AlertCircle } from "lucide-react";
 import { format } from "date-fns";
-import PushUpAdModal from "../components/tools/PushUpAdModal";
+import { FaWhatsapp } from "react-icons/fa";
 
 const EventVideo = () => {
   const { slug } = useParams();
@@ -22,7 +22,6 @@ const EventVideo = () => {
   const [relatedWebinars, setRelatedWebinars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showAdModal, setShowAdModal] = useState(false);
 
   // Memoize backendURL to prevent unnecessary recalculations
   const backendURL = useMemo(() => {
@@ -101,17 +100,11 @@ const EventVideo = () => {
     }
   }, [slug, backendURL, fetchRelatedWebinars]);
 
-  // Effect to fetch event details and trigger modal
+  // Effect to fetch event details
   useEffect(() => {
     if (slug) {
       fetchEventDetails();
     }
-    // Show modal after 2 seconds
-    const timer = setTimeout(() => {
-      setShowAdModal(true);
-      console.log("Timeout triggered, showAdModal set to true");
-    }, 2000);
-    return () => clearTimeout(timer); // Cleanup timer on unmount
   }, [slug, fetchEventDetails]);
 
   // Memoize the YouTube embed URL to prevent unnecessary recalculations
@@ -158,6 +151,9 @@ const EventVideo = () => {
     ),
     [backendURL, formatEventDate, handleWebinarClick]
   );
+
+  const whatsappLink =
+    "https://wa.me/2349012048912?text=Hi%20Credulen%20Team%2C%20I%27m%20interested%20in%20the%20special%20promo%20link%20to%20pay%20for%20the%20Blockchain%20Analytics%20Webinar.%20Please%20send%20me%20the%20details";
 
   if (loading) {
     return (
@@ -235,6 +231,32 @@ const EventVideo = () => {
           <Typography variant="body1" className="mt-6">
             {eventData.description}
           </Typography>
+
+          {/* Special Offer Button */}
+          <Box mt={4} mb={4}>
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative inline-block">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#047481] to-[#198754] rounded-lg blur-sm opacity-15 transition-opacity duration-300"></div>
+              <div className="relative bg-[#047481] to-[#198754] text-white py-3 px-6 rounded-lg hover:from-[#035961] hover:to-[#198754] transition-all duration-300 flex items-center justify-center gap-3 transform group-hover:scale-105">
+                <FaWhatsapp
+                  size={36}
+                  className="transform group-hover:rotate-12 transition-transform duration-300"
+                />
+                <span className="font-bold text-lg">
+                  Get a Special Offer Now
+                </span>
+                <div className="transform group-hover:translate-x-2 transition-transform duration-300">
+                  →
+                </div>
+              </div>
+              <div className="absolute inset-0 rounded-lg overflow-hidden">
+                <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-15 group-hover:animate-ping rounded-lg"></div>
+              </div>
+            </a>
+          </Box>
         </Grid>
 
         {/* Sidebar */}
@@ -261,11 +283,6 @@ const EventVideo = () => {
           </Box>
         </Grid>
       </Grid>
-      {/* PushUpAdModal */}
-      <PushUpAdModal
-        isOpen={showAdModal}
-        onClose={() => setShowAdModal(false)}
-      />
     </Container>
   );
 };

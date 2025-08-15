@@ -808,7 +808,9 @@ import {
   FileText,
   Headphones,
   Globe,
+  MessageCircle,
 } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { SolutionCard } from "../components/SolutionCard";
@@ -816,7 +818,6 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import UsePaginatedSolutions from "../components/tools/usePagination";
-import PushUpAdModal from "../components/tools/PushUpAdModal";
 
 const backendURL =
   import.meta.env.MODE === "production"
@@ -832,7 +833,6 @@ const SolutionForm = () => {
   const [showModal, setShowModal] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showAdModal, setShowAdModal] = useState(false); // State for ad modal
   const { solutions, pagination, handlePageChange } =
     UsePaginatedSolutions("TrainingSchool");
 
@@ -929,6 +929,8 @@ const SolutionForm = () => {
   };
 
   const stripHtmlTags = (content) => content.replace(/<\/?[^>]+(>|$)/g, "");
+  const whatsappLink =
+    "https://wa.me/2349012048912?text=Hi%20Credulen%20Team%2C%20I%27m%20interested%20in%20the%20special%20promo%20link%20to%20pay%20for%20the%20Blockchain%20Analytics%20Webinar.%20Please%20send%20me%20the%20details";
 
   function truncateText(text, maxLength) {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
@@ -1034,6 +1036,32 @@ const SolutionForm = () => {
                 theme="bubble"
                 className="border-none [&_.ql-editor]:text-lg [&_.ql-editor]:leading-relaxed"
               />
+            </div>
+
+            {/* CTA button */}
+            <div className="">
+              <a
+                href={whatsappLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative inline-block">
+                <div className="bg-[#112b2e] hover:bg-[#112b2e]   absolute  inset-0 bg-gradient-to-r from-[#047481] to-[#198754] rounded-xl blur-xs   opacity-15 transition-opacity duration-300"></div>
+                <div className="relative text-[#198754]  py-2 px-3 rounded-xl hover:bg-[#112b2e] transition-all duration-300 flex items-center justify-center gap-3 transform group-hover:scale-105">
+                  <FaWhatsapp
+                    size={60}
+                    className="transform group-hover:rotate-12 transition-transform duration-300 hover:bg-[#112b2e] "
+                  />
+                  <span className="font-bold text-lg underline">
+                    Get a special Offer Now
+                  </span>
+                  <div className="transform group-hover:translate-x-2 transition-transform duration-300">
+                    →
+                  </div>
+                </div>
+                <div className="absolute inset-0 rounded-xl overflow-hidden">
+                  <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-15 group-hover:animate-ping rounded-xl"></div>
+                </div>
+              </a>
             </div>
 
             {/* Enrollment Button */}
@@ -1176,12 +1204,6 @@ const SolutionForm = () => {
           </Alert>
         )}
       </Modal>
-
-      {/* PushUp Ad Modal */}
-      <PushUpAdModal
-        isOpen={showAdModal}
-        onClose={() => setShowAdModal(false)}
-      />
     </div>
   );
 };
