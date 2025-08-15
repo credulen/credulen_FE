@@ -1115,14 +1115,18 @@ const SolutionForm = () => {
                 <p className="text-2xl font-bold text-gray-800">
                   ₦{solution.amount?.toLocaleString() || solution.price}
                 </p>
+
+                <span className="text-lg font-bold">£{solution.GBPrate}</span>
                 {solution.discountPercentage > 0 && (
                   <>
                     <p className="text-sm text-gray-500 line-through">
                       ₦{solution.price?.toLocaleString()}
                     </p>
-                    <p className="text-sm text-green-600 mt-1">
-                      {solution.discountPercentage}% Discount Applied
-                    </p>
+                    {solution.GBPrate && (
+                      <p className="text-sm text-green-600 mt-1">
+                        {solution.discountPercentage}% Discount Applied
+                      </p>
+                    )}
                   </>
                 )}
               </div>
