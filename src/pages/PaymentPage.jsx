@@ -1303,15 +1303,15 @@ const PaymentPage = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Promo Code
                     </label>
-                    <div className="flex gap-2">
+                    <div className="md:flex gap-2">
                       <input
                         type="text"
                         value={voucherCode}
                         onChange={(e) =>
                           setVoucherCode(e.target.value.toUpperCase())
                         }
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors"
-                        placeholder="Enter code (e.g., TECH50)"
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors mid:mb-3"
+                        placeholder="Enter code (e.g., TECH50) "
                         disabled={isApplyingVoucher}
                         aria-label="Promo code"
                       />
