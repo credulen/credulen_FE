@@ -269,7 +269,7 @@ export default function RegisteredEventLists() {
                 <Table.HeadCell>Career Status</Table.HeadCell>
                 <Table.HeadCell>Interest & Aim</Table.HeadCell>
                 <Table.HeadCell>Manages Community</Table.HeadCell>
-                <Table.HeadCell>Company</Table.HeadCell>
+                <Table.HeadCell>Who reffred you</Table.HeadCell>
                 <Table.HeadCell>Event Title</Table.HeadCell>
                 <Table.HeadCell>Event Category</Table.HeadCell>
                 <Table.HeadCell>Registered Date/Time</Table.HeadCell>

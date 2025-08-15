@@ -59,10 +59,23 @@ module.exports = {
       animation: {
         progress: "progress 3s ease-in-out forwards",
       },
+
       keyframes: {
         progress: {
           "0%": { width: "0%" },
           "100%": { width: "100%" },
+        },
+        bounce: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        fadeIn: {
+          from: { opacity: 0, transform: "scale(0.8)" },
+          to: { opacity: 1, transform: "scale(1)" },
+        },
+        fadeInUp: {
+          from: { opacity: 0, transform: "translateY(20px)" },
+          to: { opacity: 1, transform: "translateY(0)" },
         },
       },
     },

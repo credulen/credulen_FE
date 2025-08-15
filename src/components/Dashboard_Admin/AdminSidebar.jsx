@@ -216,17 +216,33 @@
 // };
 
 // export default AdminSidebar;
+
 import React, { useState, useEffect, useRef } from "react";
 import { HiOutlineLogout, HiMenu, HiX } from "react-icons/hi";
-import { VscDashboard } from "react-icons/vsc";
-import { IoPerson } from "react-icons/io5";
-import { FaUserCircle, FaHome } from "react-icons/fa";
-import { FaUsers } from "react-icons/fa";
-import { BiCommentDetail } from "react-icons/bi";
-import { MdEventNote, MdOutlineArticle } from "react-icons/md";
-import { GiPublicSpeaker } from "react-icons/gi";
-import { IoMdNotificationsOutline } from "react-icons/io";
-import { FaTasks } from "react-icons/fa";
+import {
+  MdDashboard,
+  MdArticle,
+  MdEvent,
+  MdSpeakerNotes,
+  MdBuild,
+  MdNotifications,
+  MdPayment,
+} from "react-icons/md";
+import {
+  FaHome,
+  FaUsers,
+  FaUserEdit,
+  FaComments,
+  FaPen,
+  FaMicrophone,
+  FaTicketAlt,
+  FaHandshake,
+  FaCalendarCheck,
+  FaUserFriends,
+  FaGraduationCap,
+  FaGift,
+} from "react-icons/fa";
+import { FaUserCircle } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { logoutUser } from "../../features/auth/authSlice";
@@ -287,66 +303,71 @@ const AdminSidebar = () => {
     { path: "/", icon: FaHome, label: "Home" },
     {
       path: "/DashBoard/Admin_Dashboard",
-      icon: VscDashboard,
+      icon: MdDashboard,
       label: "Dashboard",
     },
-    { path: "/DashBoard/AdminProfile", icon: IoPerson, label: "Profile" },
+    { path: "/DashBoard/AdminProfile", icon: FaUserEdit, label: "Profile" },
     { path: "/DashBoard/Users", icon: FaUsers, label: "Users" },
     {
       path: "/DashBoard/Admin/Comments",
-      icon: BiCommentDetail,
+      icon: FaComments,
       label: "Comments",
     },
     {
       path: "/DashBoard/Admin/Posts",
-      icon: MdOutlineArticle,
+      icon: MdArticle,
       label: "Blog Posts",
     },
-    { path: "/DashBoard/Admin/Events", icon: MdEventNote, label: "Events" },
-    { path: "/DashBoard/Admin/Authors", icon: IoPerson, label: "Authors" },
+    { path: "/DashBoard/Admin/Events", icon: MdEvent, label: "Events" },
+    { path: "/DashBoard/Admin/Authors", icon: FaPen, label: "Authors" },
     {
       path: "/DashBoard/Admin/SpeakerList",
-      icon: GiPublicSpeaker,
+      icon: FaMicrophone,
       label: "Speakers",
     },
     {
       path: "/DashBoard/Admin/Solutions",
-      icon: FaTasks,
+      icon: MdBuild,
       label: "Solutions",
     },
     {
       path: "/DashBoard/Admin/RegisteredSolutionsList",
-      icon: IoMdNotificationsOutline,
+      icon: FaTicketAlt,
       label: "Registered Solutions",
     },
     {
       path: "/DashBoard/Admin/RegisteredConsultingService",
-      icon: IoMdNotificationsOutline,
+      icon: FaHandshake,
       label: "Registered Consulting Service",
     },
     {
       path: "/DashBoard/Admin/RegisteredEventList",
-      icon: IoMdNotificationsOutline,
+      icon: FaCalendarCheck,
       label: "Registered Events",
     },
     {
       path: "/DashBoard/Admin/CommunityUserList",
-      icon: IoMdNotificationsOutline,
+      icon: FaUserFriends,
       label: "Registered Community Users",
     },
     {
       path: "/DashBoard/Admin/FreeMasterClassregister",
-      icon: IoMdNotificationsOutline,
+      icon: FaGraduationCap,
       label: "Free Master Class Register",
     },
     {
       path: "/DashBoard/Admin/WebinarPaymentList",
-      icon: IoMdNotificationsOutline,
+      icon: MdPayment,
       label: "Webinar Payment List",
     },
     {
+      path: "/DashBoard/Admin/AdminVoucherList",
+      icon: FaGift,
+      label: "Vouchers",
+    },
+    {
       path: "/DashBoard/Admin/NotificationPage",
-      icon: IoMdNotificationsOutline,
+      icon: MdNotifications,
       label: "Notifications",
       showBadge: true, // Add flag to show badge for notifications
     },

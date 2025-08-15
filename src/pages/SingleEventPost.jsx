@@ -2508,7 +2508,7 @@ const SingleEventPost = () => {
                 <Grid item xs={12} sm={6}>
                   <Box>
                     <label className="block mb-0.5 text-gray-800 font-semibold text-[0.75rem]">
-                      Company
+                      Who reffered you? (Optional)
                     </label>
                     <input
                       type="text"
@@ -2516,7 +2516,7 @@ const SingleEventPost = () => {
                       value={formData.company}
                       onChange={handleInputChange}
                       className="w-full p-2 text-[0.875rem] border-2 border-gray-200 rounded-xl focus:border-teal-600 focus:outline-none transition-colors bg-white"
-                      placeholder="Your company name"
+                      placeholder="Name or how did you hear about us"
                     />
                   </Box>
                 </Grid>
@@ -2667,7 +2667,7 @@ const SingleEventPost = () => {
                 </Box>
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-teal-600 to-teal-700 text-white py-2 px-4 rounded-xl font-semibold text-sm hover:shadow-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50"
+                  className="w-auto hover:bg-teal-600 bg-teal-700 text-white py-2 px-4 rounded-xl font-semibold text-sm hover:shadow-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50"
                   disabled={subLoading}>
                   {subLoading ? (
                     <>

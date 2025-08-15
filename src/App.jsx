@@ -59,6 +59,8 @@ import CommunityUserList from "./pages/AdminDashBoardPages/CommunityUserList";
 import AdminNotificationPage from "./pages/AdminDashBoardPages/AdminNotificationPage";
 import WebinarPaymentList from "./pages/AdminDashBoardPages/WebinarPaymentList";
 import AdminConsultingServiceFormList from "./pages/AdminDashBoardPages/AdminConsultingServiceFormList";
+import CreateEditVoucher from "./pages/AdminDashBoardPages/CreateEditVoucher";
+import AdminVoucherList from "./pages/AdminDashBoardPages/AdminVoucherList";
 
 const AppContent = () => {
   const location = useLocation();
@@ -204,6 +206,14 @@ const AppContent = () => {
             <Route
               path="/DashBoard/Admin/RegisteredConsultingService"
               element={<AdminConsultingServiceFormList />}
+            />
+            <Route
+              path="/DashBoard/Admin/CreateEditVoucher/:id?"
+              element={<CreateEditVoucher />}
+            />
+            <Route
+              path="/DashBoard/Admin/AdminVoucherList"
+              element={<AdminVoucherList />}
             />
           </Route>
         </Route>
