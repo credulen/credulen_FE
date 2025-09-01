@@ -850,7 +850,7 @@ function DashBoardProfile() {
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
 
   const frontendURL =
-    import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";
+    import.meta.env.VITE_FRONTEND_URL || "https://www.credulen.com";
 
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
