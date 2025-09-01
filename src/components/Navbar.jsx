@@ -7,7 +7,7 @@ export function DropdownItems({ closeDropdown }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const { userInfo } = useSelector((state) => state.auth);
-  console.log(userInfo);
+  // console.log(userInfo);
   const userId = userInfo?._id;
   const dashboardPath =
     userInfo?.role === "admin"
@@ -34,7 +34,6 @@ export function DropdownItems({ closeDropdown }) {
         }
 
         const data = await response.json();
-        console.log(data, "data");
 
         setProfile(data.data);
       } catch (err) {

@@ -119,14 +119,19 @@ export const handleGoogleLogin = async (credential) => {
 
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
-  async ({ email, password, username }, { rejectWithValue }) => {
+  async ({ email, password, username, agentCode }, { rejectWithValue }) => {
     try {
+      // Build URL with agentId query param if agentCode is provided
+      const url = agentCode
+        ? `${backendURL}/api/register?agentId=${encodeURIComponent(agentCode)}`
+        : `${backendURL}/api/register`;
+
       const response = await axios.post(
-        `${backendURL}/api/register`,
-        { email, password, username },
+        url,
+        { email, password, username, agentCode: agentCode || undefined },
         {
           headers: { "Content-Type": "application/json" },
-          withCredentials: true, // Ensure cookies are sent with the request
+          withCredentials: true,
         }
       );
 
@@ -148,7 +153,6 @@ export const registerUser = createAsyncThunk(
     }
   }
 );
-
 export const registerAdmin = createAsyncThunk(
   "auth/registerAdmin",
   async ({ email, password, username }, { rejectWithValue }) => {

@@ -34,6 +34,7 @@ import SolutionFormCS from "./pages/SolutionFormCS";
 import PaymentConfirmation from "./pages/PaymentConfirmation";
 import WebinarPaymentConfirmation from "./pages/WebinarPaymentConfirmation";
 import PaymentPage from "./pages/PaymentPage";
+import AgentReferalLists from "./pages/UsersDashBoardPages/AgentReferalLists";
 
 // Admin
 import AdminLayout from "./components/Dashboard_Admin/AdminLayout";
@@ -61,6 +62,7 @@ import WebinarPaymentList from "./pages/AdminDashBoardPages/WebinarPaymentList";
 import AdminConsultingServiceFormList from "./pages/AdminDashBoardPages/AdminConsultingServiceFormList";
 import CreateEditVoucher from "./pages/AdminDashBoardPages/CreateEditVoucher";
 import AdminVoucherList from "./pages/AdminDashBoardPages/AdminVoucherList";
+import ConvertToAgent from "./pages/AdminDashBoardPages/ConvertToAgent";
 
 const AppContent = () => {
   const location = useLocation();
@@ -128,6 +130,7 @@ const AppContent = () => {
               path="/DashBoard/Activities"
               element={<DashBoardActivities />}
             />
+            <Route path="/DashBoard/referals" element={<AgentReferalLists />} />
             <Route
               path="/DashBoard/Notifications"
               element={<UserNotificationPage />}
@@ -214,6 +217,10 @@ const AppContent = () => {
             <Route
               path="/DashBoard/Admin/AdminVoucherList"
               element={<AdminVoucherList />}
+            />
+            <Route
+              path="/DashBoard/Admin/ConvertToAgent"
+              element={<ConvertToAgent />}
             />
           </Route>
         </Route>

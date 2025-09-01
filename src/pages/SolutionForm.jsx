@@ -844,7 +844,7 @@ const SolutionForm = () => {
     fetchSolutionDetails();
     const timer = setTimeout(() => {
       console.log("Timeout triggered, showAdModal set to true"); // Debug log
-      setShowAdModal(true);
+      // setShowModal(true);
     }, 2000);
     return () => clearTimeout(timer);
   }, [slug]);

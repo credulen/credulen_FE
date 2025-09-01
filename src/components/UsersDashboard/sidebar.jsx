@@ -10,6 +10,7 @@ import { logoutUser } from "../../features/auth/authSlice";
 import { fetchProfileById } from "../../features/Users/userAction";
 import { FaHistory } from "react-icons/fa";
 import { useNotifications } from "../../components/Hooks/UseNotifications";
+import { HiOutlineUserCircle, HiOutlineSearch, HiUsers } from "react-icons/hi";
 
 const backendURL =
   import.meta.env.MODE === "production"
@@ -60,9 +61,41 @@ const Sidebar = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // const sidebarLinks = [
+  //   { path: "/", icon: FaHome, label: "Home" },
+  //   { path: "/DashBoard/profile", icon: IoPerson, label: "Profile" },
+  //   {userInfo?.role === "agent"
+  // ? {
+  //     path: "/DashBoard/referals",
+  //     icon: HiUsers,
+  //     label: "My Referals",
+  //   }
+  // : null},
+
+  //   {
+  //     path: "/DashBoard/Activities",
+  //     icon: FaHistory,
+  //     label: "Activity Log",
+  //   },
+  //   {
+  //     path: "/DashBoard/Notifications",
+  //     icon: IoMdNotificationsOutline,
+  //     label: "Notifications",
+  //     showBadge: true,
+  //   },
+  // ];
   const sidebarLinks = [
     { path: "/", icon: FaHome, label: "Home" },
     { path: "/DashBoard/profile", icon: IoPerson, label: "Profile" },
+    ...(userInfo?.role === "agent"
+      ? [
+          {
+            path: "/DashBoard/referals",
+            icon: HiUsers,
+            label: "My Referals",
+          },
+        ]
+      : []),
     {
       path: "/DashBoard/Activities",
       icon: FaHistory,
@@ -116,7 +149,9 @@ const Sidebar = () => {
         <div className="flex flex-col h-full">
           <div className="p-5">
             <h1 className="text-2xl font-bold mb-1">Credulen</h1>
-            <p className="text-sm text-purple-300 mb-6">Administrator</p>
+            <p className="text-sm text-purple-300 mb-6">
+              {userInfo.role === "agent" ? "Agent DashBoard" : "User DashBoard"}
+            </p>
             {!isSmallScreen && (
               <div className="flex items-center">
                 <span className="mb-2">
