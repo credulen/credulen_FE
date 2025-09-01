@@ -1047,11 +1047,11 @@ function DashBoardProfile() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="bg-white whitespace-normal rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 text-white">
                 <div className="flex flex-col items-center">
                   <div className="relative mb-4">
-                    <div className="w-24 h-24 rounded-full border-4 border-white shadow-lg bg-white">
+                    <div className="w-24 h-24 rounded-full border-4 border-white shadow-lg bg-white overflow-hidden">
                       {imagePreview ? (
                         <img
                           src={imagePreview}
@@ -1081,15 +1081,17 @@ function DashBoardProfile() {
                       </button>
                     )}
                   </div>
-                  <h2 className="text-xl font-semibold text-gray-700 first-letter:uppercase">
+
+                  <h2 className="text-xl font-semibold text-gray-700 first-letter:uppercase break-words max-w-full text-center">
                     {formData.fullName || formData.username}
                   </h2>
-                  <p className="text-indigo-700 text-sm">
+                  <p className="text-indigo-700 text-sm break-all max-w-full text-center">
                     @{formData.username}
                   </p>
+
                   {profile?.data?.role && (
-                    <div className="mt-2 px-3 py-1 bg-gray-600 text-blue-500 bg-opacity-20 rounded-full">
-                      <span className="text-sm font-medium capitalize">
+                    <div className="mt-2 px-3 py-1 bg-gray-600 text-blue-500 bg-opacity-20 rounded-full max-w-full">
+                      <span className="text-sm font-medium capitalize break-words">
                         {profile.data.role}
                       </span>
                     </div>
@@ -1100,38 +1102,47 @@ function DashBoardProfile() {
               <div className="p-6">
                 <div className="space-y-4">
                   <div className="flex items-center text-gray-600">
-                    <Mail className="h-5 w-5 mr-3 text-indigo-500" />
-                    <span className="text-sm">{formData.email}</span>
+                    <Mail className="h-5 w-5 mr-3 text-indigo-500 shrink-0" />
+                    <span className="text-sm break-all max-w-full">
+                      {formData.email}
+                    </span>
                   </div>
+
                   <div className="flex items-center text-gray-600">
-                    <Phone className="h-5 w-5 mr-3 text-indigo-500" />
-                    <span className="text-sm">
+                    <Phone className="h-5 w-5 mr-3 text-indigo-500 shrink-0" />
+                    <span className="text-sm break-words max-w-full">
                       {formData.phoneNumber || "No Phone Number"}
                     </span>
                   </div>
+
                   {formData.agentId && (
                     <div className="flex items-center text-gray-600">
-                      <Badge className="h-5 w-5 mr-3 text-indigo-500" />
-                      <span className="text-sm">
+                      <Badge className="h-5 w-5 mr-3 text-indigo-500 shrink-0" />
+                      <span className="text-sm break-all max-w-full">
                         Agent ID: {formData.agentId}
                       </span>
                     </div>
                   )}
+
                   <div className="flex items-center text-gray-600">
-                    <Shield className="h-5 w-5 mr-3 text-green-500" />
-                    <span className="text-sm">Account Verified</span>
+                    <Shield className="h-5 w-5 mr-3 text-green-500 shrink-0" />
+                    <span className="text-sm break-words">
+                      Account Verified
+                    </span>
                   </div>
                 </div>
 
                 {formData.bio && (
                   <div className="mt-6 pt-6 border-t border-gray-200">
                     <div className="flex items-start">
-                      <FileText className="h-5 w-5 mr-3 text-indigo-500 mt-0.5" />
-                      <div>
+                      <FileText className="h-5 w-5 mr-3 text-indigo-500 mt-0.5 shrink-0" />
+                      <div className="max-w-full">
                         <p className="text-sm font-medium text-gray-700 mb-1">
                           Bio
                         </p>
-                        <p className="text-sm text-gray-600">{formData.bio}</p>
+                        <p className="text-sm text-gray-600 break-words">
+                          {formData.bio}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1157,7 +1168,7 @@ function DashBoardProfile() {
                             fullName: profile?.data?.fullName || "",
                             bio: profile?.data?.bio || "",
                             agentId: profile?.data?.agentId || "",
-                            phoneNumber: profile?.data?.phoneNumber || "", // Changed to lowercase
+                            phoneNumber: profile?.data?.phoneNumber || "",
                           });
                           setSelectedFile(null);
                           setImagePreview(profile?.data?.image || null);
