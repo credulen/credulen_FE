@@ -525,7 +525,7 @@ const Footer = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
-                    className="flex-1 p-2 rounded text-primary-900 placeholder-neutral-400 text-sm border border-primary-700 focus:border-primary-500 focus:ring-2 focus:ring-secondary-500/20"
+                    className="w-auto p-2 rounded text-primary-900 placeholder-neutral-400 text-sm border border-primary-700 focus:border-primary-500 focus:ring-2 focus:ring-secondary-500/20"
                     required
                   />
                   <button
