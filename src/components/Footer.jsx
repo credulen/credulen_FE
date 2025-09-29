@@ -514,23 +514,25 @@ const Footer = () => {
                 className="w-[13rem] h-[55apx] mb-6 filter brightness-0 invert"
               />
 
-              {/* Newsletter Section - Reduced size */}
+              {/* Newsletter Section - Responsive */}
               <div className="mb-6">
                 <h3 className="text-base font-semibold text-white mb-3">
                   Subscribe to our newsletter
                 </h3>
-                <form onSubmit={handleSubmit} className="flex gap-2">
+                <form
+                  onSubmit={handleSubmit}
+                  className="flex flex-col sm:flex-row gap-2 items-start sm:items-stretch">
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
-                    className="w-auto p-2 rounded text-primary-900 placeholder-neutral-400 text-sm border border-primary-700 focus:border-primary-500 focus:ring-2 focus:ring-secondary-500/20"
+                    className="p-2 rounded text-primary-900 placeholder-neutral-400 text-sm border border-primary-700 focus:border-primary-500 focus:ring-2 focus:ring-secondary-500/20 w-auto"
                     required
                   />
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-secondary-500 text-primary-900 rounded hover:bg-secondary-600  ease-out flex items-center justify-center hover:border-2 hover:border-secondary-700 hover:bg-white hover:text-primary-500 hover:font-semibold transition-all duration-300 w-full sm:w-auto focus:ring-4 focus:outline-none focus:ring-secondary-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-secondary-500 text-primary-900 rounded hover:bg-secondary-600 ease-out flex items-center justify-center hover:border-2 hover:border-secondary-700 hover:bg-white hover:text-primary-500 hover:font-semibold transition-all duration-300 w-auto focus:ring-4 focus:outline-none focus:ring-secondary-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isLoading}>
                     {isLoading ? (
                       <Loader className="animate-spin mr-2" size={16} />
