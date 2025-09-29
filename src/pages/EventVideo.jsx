@@ -128,6 +128,16 @@ const EventVideo = () => {
       <div className="w-full flex justify-center">
         <Card
           className="mb-4 cursor-pointer hover:shadow-lg transition-shadow duration-200 w-full sm:max-w-sm md:max-w-md mid:max-w-[20rem]"
+          sx={{
+            backgroundColor: "#FFFFFF",
+            border: "1px solid #E5E7EB",
+            "&:hover": { backgroundColor: "#F7F8FA" },
+            "@media (prefers-color-scheme: dark)": {
+              backgroundColor: "#111827",
+              border: "1px solid #4A6A64",
+              "&:hover": { backgroundColor: "#2D4A44" },
+            },
+          }}
           onClick={() => handleWebinarClick(webinar.slug)}>
           <CardMedia
             component="img"
@@ -139,10 +149,20 @@ const EventVideo = () => {
           <CardContent className="p-3">
             <Typography
               variant="subtitle1"
-              className="font-medium line-clamp-2 mb-1">
+              className="font-medium line-clamp-2 mb-1"
+              sx={{
+                color: "#1F2937",
+                "@media (prefers-color-scheme: dark)": { color: "#D1D5DB" },
+                "&:hover": { color: "#92ac00" },
+              }}>
               {webinar.title}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography
+              variant="caption"
+              sx={{
+                color: "#5E6D7A",
+                "@media (prefers-color-scheme: dark)": { color: "#A0AEC0" },
+              }}>
               {formatEventDate(webinar.date)}
             </Typography>
           </CardContent>
@@ -153,12 +173,12 @@ const EventVideo = () => {
   );
 
   const whatsappLink =
-    "https://wa.me/2349012048912?text=Hi%20Credulen%20Team%2C%20I%27m%20interested%20in%20the%20special%20promo%20link%20to%20pay%20for%20the%20Blockchain%20Analytics%20Webinar.%20Please%20send%20me%20the%20details";
+    "https://api.whatsapp.com/send/?phone=2348085544087&text=Hi+Credulen+Team%2C+I%27m+interested+in+the+special+discount+payment+link+for+%28course+name+here%29.+Please+send+me+the+details&type=phone_number&app_absent=0";
 
   if (loading) {
     return (
-      <Box className="fixed inset-0 flex items-center justify-center bg-white z-50">
-        <CircularProgress size={40} className="text-btColour" />
+      <Box className="fixed inset-0 flex items-center justify-center bg-white dark:bg-neutral-800-dark z-50">
+        <CircularProgress size={40} className="text-primary-900" />
       </Box>
     );
   }
@@ -166,7 +186,9 @@ const EventVideo = () => {
   if (error) {
     return (
       <Container maxWidth="lg" className="mt-8">
-        <Alert variant="destructive">
+        <Alert
+          variant="destructive"
+          className="bg-error-500/10 text-error-500 border-error-500/20">
           <AlertCircle className="h-5 w-5" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
@@ -177,7 +199,9 @@ const EventVideo = () => {
   if (!eventData?.videoUrl) {
     return (
       <Container className="mt-20 h-screen">
-        <Alert variant="warning">
+        <Alert
+          variant="warning"
+          className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
           <AlertCircle className="h-5 w-5" />
           <AlertDescription>
             <span className="p-10 text-lg">
@@ -197,7 +221,7 @@ const EventVideo = () => {
           <Typography
             variant="h4"
             component="h1"
-            className="mb-6 font-semibold text-[#047481]">
+            className="mb-6 font-semibold text-primary-500">
             {eventData.title}
           </Typography>
 
@@ -228,7 +252,13 @@ const EventVideo = () => {
             )}
           </Box>
 
-          <Typography variant="body1" className="mt-6">
+          <Typography
+            variant="body1"
+            className="mt-6"
+            sx={{
+              color: "#1F2937",
+              "@media (prefers-color-scheme: dark)": { color: "#D1D5DB" },
+            }}>
             {eventData.description}
           </Typography>
 
@@ -239,13 +269,13 @@ const EventVideo = () => {
               target="_blank"
               rel="noopener noreferrer"
               className="group relative inline-block">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#047481] to-[#198754] rounded-lg blur-sm opacity-15 transition-opacity duration-300"></div>
-              <div className="relative bg-[#047481] to-[#198754] text-white py-3 px-6 rounded-lg hover:from-[#035961] hover:to-[#198754] transition-all duration-300 flex items-center justify-center gap-3 transform group-hover:scale-105">
+              <div className="absolute inset-0 bg-primary-500 rounded-lg blur-sm opacity-15 transition-opacity duration-300"></div>
+              <div className="relative bg-primary-500 text-white py-3 px-6 rounded-lg hover:bg-secondary-500 transition-all duration-300 flex items-center justify-center gap-3 transform group-hover:scale-105">
                 <FaWhatsapp
                   size={36}
-                  className="transform group-hover:rotate-12 transition-transform duration-300"
+                  className="transform group-hover:rotate-12 transition-transform duration-300 group-hover:text-green-500 text-green-400"
                 />
-                <span className="font-bold text-lg">
+                <span className="font-bold text-lg group-hover:text-secondary-900">
                   Get a Special Offer Now
                 </span>
                 <div className="transform group-hover:translate-x-2 transition-transform duration-300">
@@ -265,7 +295,7 @@ const EventVideo = () => {
             <Typography
               variant="h6"
               component="h2"
-              className="mb-4 font-bold text-gray-800">
+              className="mb-4 font-bold text-neutral-800 dark:text-neutral-700-dark">
               Other Past Webinars
             </Typography>
 
@@ -276,7 +306,12 @@ const EventVideo = () => {
                 ))}
               </Box>
             ) : (
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "#5E6D7A",
+                  "@media (prefers-color-scheme: dark)": { color: "#A0AEC0" },
+                }}>
                 No related webinars found.
               </Typography>
             )}

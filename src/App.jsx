@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { TokenExpirationModal } from "./components/tools/TokenExpiration";
 import Home from "./pages/Home";
@@ -6,6 +6,7 @@ import CampaignPage from "./pages/CampaignPage";
 import WebinaCampaign from "./pages/WebinaCampaign";
 import PasswordResset from "./pages/PasswordResset";
 import Conferences from "./pages/Conference";
+import Podcasts from "./pages/Podcasts";
 import Webinar from "./pages/Webinars";
 import TrainingSchool from "./pages/TrainingSchool";
 import ConsultingServices from "./pages/ConsultingServices";
@@ -73,6 +74,10 @@ const AppContent = () => {
     "/webinar-payment-success",
   ].some((path) => location.pathname.startsWith(path));
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+
   return (
     <>
       {!isDashboardRoute && <Navbar />}
@@ -93,6 +98,7 @@ const AppContent = () => {
         <Route path="/event/:slug" element={<SingleEventPost />} />
         <Route path="/webinars" element={<Webinar />} />
         <Route path="/conferences" element={<Conferences />} />
+        <Route path="/Podcasts" element={<Podcasts />} />
         <Route path="/solutions/training_School" element={<TrainingSchool />} />
         <Route
           path="/solutions/consulting_Services"

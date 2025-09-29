@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { Snackbar } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import Spinner from "../components/tools/Spinner";
-import CredulenLogo from "../assets/CredulenLogo2.png";
+import CredulenLogo from "../assets/CredulenLogo.png";
 
 const backendURL =
   import.meta.env.MODE === "production"
@@ -59,17 +59,17 @@ const PasswordReset = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-primary-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg border border-primary-100">
         <div className="text-center">
           <div className="text-center">
             <img src={CredulenLogo} alt="Credulen Logo" />
 
-            <p className="mt-2  font-bold text-lg text-gray-600">
+            <p className="mt-2 font-bold text-lg text-primary-900">
               Reset Password
             </p>
           </div>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-neutral-600">
             Enter your new password below
           </p>
         </div>
@@ -79,7 +79,7 @@ const PasswordReset = () => {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700">
+                className="block text-sm font-medium text-primary-900">
                 New Password
               </label>
               <input
@@ -89,7 +89,7 @@ const PasswordReset = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your new password"
                 required
-                className="appearance-none block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-btColour focus:border-btColour sm:text-sm"
+                className="appearance-none block w-full px-3 py-3 border border-primary-300 placeholder-primary-500 text-primary-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500/20 focus:border-secondary-500 sm:text-sm hover:border-primary-400 transition-all duration-200"
               />
             </div>
           </div>
@@ -97,7 +97,7 @@ const PasswordReset = () => {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-btColour hover:bg-gradient-to-bl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-btColour transition-all duration-200 ease-in-out">
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-primary-900 bg-secondary-500 hover:bg-secondary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500/20 transition-all duration-200 ease-in-out">
               {loading ? <Spinner /> : "Set New Password"}
             </button>
           </div>

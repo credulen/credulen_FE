@@ -165,7 +165,7 @@ const NotificationBanner = ({ isVisible, setIsVisible }) => {
   return (
     <>
       <div className="fixed top-20 left-0 right-0 z-10 animate-slideDown">
-        <div className="bg-teal-800 text-white px-6">
+        <div className="bg-primary-900 text-white px-6">
           <div className="max-w-7xl mx-auto flex items-center justify-between py-3">
             <div className="flex-1">
               <span className="text-base font-medium animate-pulse">
@@ -177,15 +177,15 @@ const NotificationBanner = ({ isVisible, setIsVisible }) => {
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="bg-white rounded-md pl-4 pr-3 py-1.5 flex items-center">
-                <span className="text-teal-800 font-semibold text-sm">
+                <span className="text-primary-900 font-semibold text-sm">
                   Register Now
                 </span>
-                <IoMdSend className="w-4 h-4 ml-1 text-[#05505c]" />
+                <IoMdSend className="w-4 h-4 ml-1 text-primary-900" />
               </button>
 
               <button
                 onClick={handleClose}
-                className="text-white hover:text-gray-200 transition-colors"
+                className="text-white hover:text-neutral-50 transition-colors"
                 aria-label="Close notification">
                 <X className="w-5 h-5" />
               </button>
@@ -203,8 +203,8 @@ const NotificationBanner = ({ isVisible, setIsVisible }) => {
             <div className="bg-white rounded-xl w-full max-w-lg mx-4 relative shadow-2xl">
               <button
                 onClick={handleModalClose}
-                className="absolut flex justify-end ml-auto right-4 top-8 text-gray-400 hover:text-gray-600 transition-colors">
-                <X className="w-9 h-9 text-btColour hover:text-pink-500" />
+                className="absolute flex justify-end ml-auto right-4 top-8 text-neutral-500 hover:text-neutral-700 transition-colors">
+                <X className="w-9 h-9 text-primary-500 hover:text-secondary-700" />
               </button>
 
               <div className="p-6">
@@ -233,17 +233,17 @@ const NotificationBanner = ({ isVisible, setIsVisible }) => {
                       alt="credulen form header image"
                       className=""
                     />
-                    <div className="absolute -right-2 -top-2 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center text-white text-xs animate-pulse">
+                    <div className="absolute -right-2 -top-2 w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center text-white text-xs animate-pulse">
                       !
                     </div>
                   </div>
 
                   <div className="text-center mb-6">
-                    <h2 className="text-xl font-bold mb-2 text-btColour my-12">
+                    <h2 className="text-xl font-bold mb-2 text-primary-500 my-12">
                       Prepare for a Career in Tech: Get FREE Lifetime Access to
                       Case Studies & Video Tutorials
                     </h2>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-neutral-500 text-sm">
                       Drop your email address to get access
                     </p>
                   </div>
@@ -256,8 +256,8 @@ const NotificationBanner = ({ isVisible, setIsVisible }) => {
                         type="text"
                         name="name"
                         placeholder="Your Name"
-                        className={`w-full p-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 ${
-                          errors.name ? "border-red-500" : "border-gray-300"
+                        className={`w-full p-3 border rounded-lg transition-colors focus:outline-none focus:ring focus:ring-primary-500 ${
+                          errors.name ? "border-red-500" : "border-neutral-200"
                         }`}
                         value={formData.name}
                         onChange={handleInputChange}
@@ -274,8 +274,8 @@ const NotificationBanner = ({ isVisible, setIsVisible }) => {
                         type="email"
                         name="email"
                         placeholder="Email Address"
-                        className={`w-full p-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 ${
-                          errors.email ? "border-red-500" : "border-gray-300"
+                        className={`w-full p-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+                          errors.email ? "border-red-500" : "border-neutral-200"
                         }`}
                         value={formData.email}
                         onChange={handleInputChange}
@@ -288,13 +288,13 @@ const NotificationBanner = ({ isVisible, setIsVisible }) => {
                     </div>
 
                     <div className="relative">
-                      <PhoneIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <PhoneIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" />
                       <input
                         type="tel"
                         name="phone"
                         placeholder="Enter phone number"
-                        className={`w-full p-3 pl-12 border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 ${
-                          errors.phone ? "border-red-500" : "border-gray-300"
+                        className={`w-full p-3 pl-12 border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+                          errors.phone ? "border-red-500" : "border-neutral-200"
                         }`}
                         value={formData.phone}
                         onChange={handleInputChange}
@@ -309,8 +309,10 @@ const NotificationBanner = ({ isVisible, setIsVisible }) => {
                     <div>
                       <select
                         name="enrolled"
-                        className={`w-full p-3 border rounded-lg bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 ${
-                          errors.enrolled ? "border-red-500" : "border-gray-300"
+                        className={`w-full p-3 border rounded-lg bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+                          errors.enrolled
+                            ? "border-red-500"
+                            : "border-neutral-200"
                         }`}
                         value={formData.enrolled}
                         onChange={handleInputChange}>
@@ -334,14 +336,18 @@ const NotificationBanner = ({ isVisible, setIsVisible }) => {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full bg-btColour text-white py-3 rounded-lg font-medium hover:bg-pink-600 transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2">
+                      className="w-full bg-secondary-500 text-primary-900 py-3 rounded-lg font-medium hover:bg-primary-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-secondary-500/30 transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:text-primary-900 disabled:bg-secondary-400 flex items-center justify-center space-x-2 group">
                       {isLoading ? (
                         <>
-                          <Loader className="w-5 h-5 animate-spin" />
-                          <span>Processing...</span>
+                          <Loader className="w-5 h-5 animate-spin text-primary-900 group-hover:text-white group-focus:text-white" />
+                          <span className="text-primary-900 group-hover:text-white group-focus:text-white">
+                            Processing...
+                          </span>
                         </>
                       ) : (
-                        <span>Join our community today!</span>
+                        <span className="text-primary-900 group-hover:text-white group-focus:text-white">
+                          Join our community today!
+                        </span>
                       )}
                     </button>
                   </form>

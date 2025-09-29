@@ -1,372 +1,3 @@
-// import React, { useState, useEffect, useRef } from "react";
-// import { useSelector, useDispatch } from "react-redux";
-// import {
-//   fetchProfileById,
-//   updateProfile,
-//   deleteAccount,
-// } from "../../features/Users/userAction";
-// import { resetSuccess } from "../../features/Users/UserSlice";
-// import { Camera, X, Trash2, Check, Edit, Loader2 } from "lucide-react";
-
-// function AdminProfile() {
-//   const fileInputRef = useRef(null);
-//   const [imagePreview, setImagePreview] = useState(null);
-//   const [selectedFile, setSelectedFile] = useState(null);
-//   const [formData, setFormData] = useState({
-//     username: "",
-//     email: "",
-//     password: "",
-//   });
-//   const [isEditing, setIsEditing] = useState(false);
-//   const [snackbar, setSnackbar] = useState({
-//     open: false,
-//     message: "",
-//     severity: "success",
-//   });
-//   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
-//   const dispatch = useDispatch();
-//   const { userInfo } = useSelector((state) => state.auth);
-//   const { profile, loading, error } = useSelector((state) => state.profiles);
-//   const userId = userInfo?._id;
-
-//   const backendURL =
-//     import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
-
-//   // Load profile data
-//   useEffect(() => {
-//     if (userId) {
-//       dispatch(fetchProfileById(userId));
-//     }
-//   }, [dispatch, userId]);
-
-//   // Update form data when profile changes
-//   useEffect(() => {
-//     if (profile) {
-//       setFormData({
-//         username: profile?.data?.username || "",
-//         email: profile?.data?.email || "",
-//         password: "",
-//       });
-//       if (profile?.data?.image) {
-//         setImagePreview(`${profile.data.image}`);
-//       }
-//     }
-//   }, [profile, backendURL]);
-
-//   const handleFileChange = (e) => {
-//     const file = e.target.files[0];
-//     if (file) {
-//       setSelectedFile(file);
-//       const reader = new FileReader();
-//       reader.onloadend = () => {
-//         setImagePreview(reader.result);
-//       };
-//       reader.readAsDataURL(file);
-//     }
-//   };
-
-//   const handleInputChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData((prev) => ({ ...prev, [name]: value }));
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     if (!userId) return;
-
-//     const updateData = new FormData();
-//     updateData.append("username", formData.username);
-//     updateData.append("email", formData.email);
-
-//     if (formData.password.trim()) {
-//       if (formData.password.length < 6) {
-//         setSnackbar({
-//           open: true,
-//           message: "Password must be at least 6 characters",
-//           severity: "error",
-//         });
-//         return;
-//       }
-//       updateData.append("password", formData.password);
-//     }
-
-//     if (selectedFile) {
-//       updateData.append("image", selectedFile);
-//     }
-
-//     try {
-//       await dispatch(updateProfile({ userId, formData: updateData })).unwrap();
-//       setSnackbar({
-//         open: true,
-//         message: "Profile updated successfully!",
-//         severity: "success",
-//       });
-//       setFormData((prev) => ({ ...prev, password: "" }));
-//       setIsEditing(false);
-//       dispatch(resetSuccess());
-//     } catch (error) {
-//       setSnackbar({
-//         open: true,
-//         message: error.message || "Failed to update profile",
-//         severity: "error",
-//       });
-//     }
-//   };
-
-//   const handleDeleteAccount = async () => {
-//     try {
-//       await dispatch(deleteAccount(userId)).unwrap();
-//       setSnackbar({
-//         open: true,
-//         message: "Account deleted successfully",
-//         severity: "success",
-//       });
-//       setDeleteDialogOpen(false);
-//     } catch (error) {
-//       setSnackbar({
-//         open: true,
-//         message: "Failed to delete account",
-//         severity: "error",
-//       });
-//     }
-//   };
-
-//   const handleSnackbarClose = () => {
-//     setSnackbar((prev) => ({ ...prev, open: false }));
-//   };
-
-//   if (loading) {
-//     return (
-//       <div className="flex justify-center items-center min-h-[80vh]">
-//         <Loader2 className="h-16 w-16 animate-spin" />
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="max-w-4xl mx-auto p-4 md:p-8">
-//       {/* Profile Header */}
-//       <div className="text-center mb-12">
-//         <h1 className="text-3xl font-bold mb-2">My Profile</h1>
-//         <p className="text-gray-600">Manage your account information</p>
-//       </div>
-
-//       {/* Profile Picture Section */}
-//       <div className="flex justify-center mb-12">
-//         <div className="relative">
-//           <div className="w-40 h-40 rounded-full border-4 border-white shadow-lg overflow-hidden">
-//             {imagePreview ? (
-//               <img
-//                 src={imagePreview}
-//                 alt="Profile"
-//                 className="w-full h-full object-cover"
-//               />
-//             ) : (
-//               <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-//                 <span className="text-gray-500">No Image</span>
-//               </div>
-//             )}
-//           </div>
-
-//           <button
-//             type="button"
-//             className="absolute bottom-0 right-0 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors"
-//             onClick={() => fileInputRef.current.click()}>
-//             <Camera className="h-5 w-5" />
-//             <input
-//               hidden
-//               accept="image/*"
-//               type="file"
-//               onChange={handleFileChange}
-//               ref={fileInputRef}
-//             />
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Profile Form */}
-//       <form
-//         onSubmit={handleSubmit}
-//         className="max-w-md mx-auto p-6 rounded-lg shadow-sm bg-white">
-//         <div className="mb-4">
-//           <label
-//             htmlFor="username"
-//             className="block text-sm font-medium text-gray-700 mb-1">
-//             Username
-//           </label>
-//           <div className="relative">
-//             <input
-//               id="username"
-//               name="username"
-//               type="text"
-//               value={formData.username}
-//               onChange={handleInputChange}
-//               required
-//               disabled={!isEditing}
-//               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100"
-//             />
-//             {!isEditing && (
-//               <button
-//                 type="button"
-//                 onClick={() => setIsEditing(true)}
-//                 className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-indigo-600">
-//                 <Edit className="h-5 w-5" />
-//               </button>
-//             )}
-//           </div>
-//         </div>
-
-//         <div className="mb-4">
-//           <label
-//             htmlFor="email"
-//             className="block text-sm font-medium text-gray-700 mb-1">
-//             Email
-//           </label>
-//           <input
-//             id="email"
-//             name="email"
-//             type="email"
-//             value={formData.email}
-//             onChange={handleInputChange}
-//             required
-//             disabled={!isEditing}
-//             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100"
-//           />
-//         </div>
-
-//         {isEditing && (
-//           <div className="mb-6">
-//             <label
-//               htmlFor="password"
-//               className="block text-sm font-medium text-gray-700 mb-1">
-//               New Password
-//             </label>
-//             <input
-//               id="password"
-//               name="password"
-//               type="password"
-//               value={formData.password}
-//               onChange={handleInputChange}
-//               placeholder="Leave blank to keep current"
-//               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-//             />
-//           </div>
-//         )}
-
-//         {isEditing ? (
-//           <div className="flex justify-end gap-3 mt-6">
-//             <button
-//               type="button"
-//               onClick={() => {
-//                 setIsEditing(false);
-//                 setFormData({
-//                   username: profile?.data?.username || "",
-//                   email: profile?.data?.email || "",
-//                   password: "",
-//                 });
-//                 setSelectedFile(null);
-//                 if (profile?.data?.image) {
-//                   setImagePreview(`${profile.data.image}`);
-//                 } else {
-//                   setImagePreview(null);
-//                 }
-//                 console.log(profile?.data?.image);
-//               }}
-//               className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-//               Cancel
-//             </button>
-//             <button
-//               type="submit"
-//               disabled={loading}
-//               className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-70 flex items-center gap-1">
-//               {loading ? (
-//                 <Loader2 className="h-4 w-4 animate-spin" />
-//               ) : (
-//                 <Check className="h-4 w-4" />
-//               )}
-//               Save Changes
-//             </button>
-//           </div>
-//         ) : (
-//           <div className="flex justify-end mt-6">
-//             <button
-//               type="button"
-//               onClick={() => setIsEditing(true)}
-//               className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 flex items-center gap-1">
-//               <Edit className="h-4 w-4" />
-//               Edit Profile
-//             </button>
-//           </div>
-//         )}
-//       </form>
-
-//       {/* Delete Account Section */}
-//       <div className="text-center mt-12">
-//         <button
-//           type="button"
-//           onClick={() => setDeleteDialogOpen(true)}
-//           className="text-red-600 hover:text-red-800 inline-flex items-center gap-1 text-sm font-medium">
-//           <Trash2 className="h-4 w-4" />
-//           Delete My Account
-//         </button>
-//       </div>
-
-//       {/* Delete Confirmation Dialog */}
-//       {deleteDialogOpen && (
-//         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-//           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-//             <div className="flex justify-between items-start mb-4">
-//               <h3 className="text-lg font-medium">Delete Account</h3>
-//               <button
-//                 onClick={() => setDeleteDialogOpen(false)}
-//                 className="text-gray-500 hover:text-gray-700">
-//                 <X className="h-5 w-5" />
-//               </button>
-//             </div>
-//             <p className="text-gray-600 mb-6">
-//               Are you sure you want to delete your account? This action cannot
-//               be undone and all your data will be permanently removed.
-//             </p>
-//             <div className="flex justify-end gap-3">
-//               <button
-//                 onClick={() => setDeleteDialogOpen(false)}
-//                 className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
-//                 Cancel
-//               </button>
-//               <button
-//                 onClick={handleDeleteAccount}
-//                 className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 flex items-center gap-1">
-//                 <Trash2 className="h-4 w-4" />
-//                 Delete Account
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Snackbar for notifications */}
-//       {snackbar.open && (
-//         <div
-//           className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 ${
-//             snackbar.severity === "error"
-//               ? "bg-red-100 border-red-400 text-red-700"
-//               : "bg-green-100 border-green-400 text-green-700"
-//           } px-4 py-3 rounded border max-w-xs w-full shadow-lg`}>
-//           <div className="flex justify-between items-start">
-//             <p className="text-sm">{snackbar.message}</p>
-//             <button onClick={handleSnackbarClose} className="ml-4">
-//               <X className="h-4 w-4" />
-//             </button>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
-// export default AdminProfile;
-
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -393,6 +24,7 @@ import {
   Copy,
   Phone,
 } from "lucide-react";
+import Spinner from "../../components/tools/Spinner";
 
 function AdminProfile() {
   const fileInputRef = useRef(null);
@@ -591,12 +223,9 @@ function AdminProfile() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[80vh] bg-gray-50">
-        <div className="text-center">
-          <Loader2 className="h-16 w-16 animate-spin text-indigo-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading profile...</p>
-        </div>
-      </div>
+      <>
+        <Spinner />
+      </>
     );
   }
 
@@ -604,7 +233,7 @@ function AdminProfile() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-x-auto">
       <div className="max-w-6xl mx-auto p-4 md:p-8">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+          <h1 className="text-4xl font-bold text-primary-500 mb-2">
             Profile Settings
           </h1>
           <p className="text-gray-600">
@@ -615,7 +244,7 @@ function AdminProfile() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-              <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 text-white">
+              <div className="bg-gradient-to-r from-primary-500 to-purple-600 p-6 text-white">
                 <div className="flex flex-col items-center">
                   <div className="relative mb-4">
                     <div className="w-24 h-24 rounded-full border-4 border-white shadow-lg bg-white">
@@ -635,7 +264,7 @@ function AdminProfile() {
                     {isEditing && (
                       <button
                         type="button"
-                        className="absolute -bottom-2 -right-2 bg-indigo-600 text-white p-2 rounded-full shadow-md hover:bg-indigo-700 transition-colors"
+                        className="absolute -bottom-2 -right-2 bg-primary-500 text-white p-2 rounded-full shadow-md hover:bg-indigo-700 transition-colors"
                         onClick={() => fileInputRef.current.click()}>
                         <Camera className="h-4 w-4" />
                         <input
@@ -655,7 +284,7 @@ function AdminProfile() {
                     @{formData.username}
                   </p>
                   {profile?.data?.role && (
-                    <div className="mt-2 px-3 py-1 bg-gray-600 text-blue-500 bg-opacity-20 rounded-full">
+                    <div className="mt-2 px-3 py-1 bg-gray-600 text-primary-500 bg-opacity-20 rounded-full">
                       <span className="text-sm font-medium capitalize">
                         {profile.data.role}
                       </span>
@@ -667,18 +296,18 @@ function AdminProfile() {
               <div className="p-6">
                 <div className="space-y-4">
                   <div className="flex items-center text-gray-600">
-                    <Mail className="h-5 w-5 mr-3 text-indigo-500" />
+                    <Mail className="h-5 w-5 mr-3 text-primary-500" />
                     <span className="text-sm">{formData.email}</span>
                   </div>
                   <div className="flex items-center text-gray-600">
-                    <Phone className="h-5 w-5 mr-3 text-indigo-500" />
+                    <Phone className="h-5 w-5 mr-3 text-primary-500" />
                     <span className="text-sm">
                       {formData.phoneNumber || "No Phone Number"}
                     </span>
                   </div>
                   {formData.agentId && (
                     <div className="flex items-center text-gray-600">
-                      <Badge className="h-5 w-5 mr-3 text-indigo-500" />
+                      <Badge className="h-5 w-5 mr-3 text-primary-500" />
                       <span className="text-sm">
                         Agent ID: {formData.agentId}
                       </span>
@@ -693,7 +322,7 @@ function AdminProfile() {
                 {formData.bio && (
                   <div className="mt-6 pt-6 border-t border-gray-200">
                     <div className="flex items-start">
-                      <FileText className="h-5 w-5 mr-3 text-indigo-500 mt-0.5" />
+                      <FileText className="h-5 w-5 mr-3 text-primary-500 mt-0.5" />
                       <div>
                         <p className="text-sm font-medium text-gray-700 mb-1">
                           Bio
@@ -708,7 +337,7 @@ function AdminProfile() {
                   {!isEditing ? (
                     <Button
                       onClick={() => setIsEditing(true)}
-                      className="w-full bg-indigo-600 hover:bg-indigo-700">
+                      className="w-full bg-primary-500 hover:bg-secondary-600 hover:text-primary-500">
                       <Edit className="h-4 w-4 mr-2" />
                       Edit Profile
                     </Button>
@@ -793,7 +422,7 @@ function AdminProfile() {
                       className="text-sm font-medium text-gray-700 mb-2 block"
                     />
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 focus:text-primary-500 text-gray-400" />
                       <TextInput
                         id="email"
                         name="email"
@@ -916,7 +545,7 @@ function AdminProfile() {
                     <button
                       onClick={handleSubmit}
                       disabled={loading}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center">
+                      className="bg-primary-500 hover:bg-secondary-900 text-white px-8 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center">
                       {loading ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -939,7 +568,7 @@ function AdminProfile() {
             <div className="mt-6 pt-6 border-t bg-white p-5 border-gray-200">
               <div className="mb-4">
                 <div className="flex items-center mb-2">
-                  <Share2 className="h-5 w-5 mr-2 text-indigo-500" />
+                  <Share2 className="h-5 w-5 mr-2 text-primary-500" />
                   <h4 className="text-sm font-medium text-gray-700">
                     Agent Referral
                   </h4>

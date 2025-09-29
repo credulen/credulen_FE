@@ -18,6 +18,7 @@ import { IoClose } from "react-icons/io5";
 import { AiTwotoneDelete } from "react-icons/ai";
 import MuiAlert from "@mui/material/Alert";
 import moment from "moment";
+import Spinner from "../../components/tools/Spinner";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -25,8 +26,8 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 const PostTableRow = React.memo(({ post, backendURL, onDeleteClick }) => {
   return (
-    <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-      <Table.Cell className="py-3">
+    <Table.Row className="bg-white dark:bg-neutral-800">
+      <Table.Cell className="py-3 text-neutral-700 dark:text-neutral-700-dark">
         {moment(post.updatedAt).format("MMMM D")}
       </Table.Cell>
       <Table.Cell>
@@ -42,32 +43,31 @@ const PostTableRow = React.memo(({ post, backendURL, onDeleteClick }) => {
               }}
             />
           ) : (
-            <HiOutlineUserCircle className="w-10 h-10 text-gray-400" />
+            <HiOutlineUserCircle className="w-10 h-10 text-neutral-600 dark:text-neutral-600-dark" />
           )}
         </Link>
       </Table.Cell>
       <Table.Cell>
         <Link
-          className="font-medium text-gray-900 dark:text-white hover:text-btColour"
-          to={`/post/${post.slug}`}
-        >
+          className="font-medium text-neutral-700 dark:text-neutral-700-dark hover:text-primary-500"
+          to={`/post/${post.slug}`}>
           {post.title}
         </Link>
       </Table.Cell>
-      <Table.Cell>{post.category}</Table.Cell>
+      <Table.Cell className="text-neutral-700 dark:text-neutral-700-dark">
+        {post.category}
+      </Table.Cell>
       <Table.Cell>
         <button
           onClick={() => onDeleteClick(post._id)}
-          className="font-medium text-red-500 bg-transparent border border-red-500 cursor-pointer hover:bg-btColour hover:text-white p-1 rounded-md"
-        >
+          className="font-medium text-red-500 bg-transparent border border-red-500 cursor-pointer hover:bg-primary-500 hover:text-white p-1 rounded-md">
           Delete
         </button>
       </Table.Cell>
       <Table.Cell>
         <Link
-          className="font-medium text-white hover:text-btColour hover:bg-transparent hover:border hover:border-btColour bg-btColour p-1 rounded-md transition-all duration-300 px-2"
-          to={`/DashBoard/Admin/CreatePosts/${post._id}`}
-        >
+          className="font-medium text-white hover:text-primary-500 hover:bg-transparent hover:border hover:border-primary-500 bg-primary-500 p-1 rounded-md transition-all duration-300 px-2"
+          to={`/DashBoard/Admin/CreatePosts/${post._id}`}>
           Edit
         </Link>
       </Table.Cell>
@@ -178,41 +178,53 @@ export default function AdminBlogposts() {
 
   const LoadingSpinner = useMemo(
     () => (
-      <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
-        <CircularProgress size={40} className="text-btColour" />
+      <div className="fixed inset-0 flex items-center justify-center bg-primary-50 dark:bg-neutral-800-dark bg-opacity-75 z-50">
+        <CircularProgress size={40} sx={{ color: "#080759" }} />
       </div>
     ),
     []
   );
 
   if (isLoading) {
-    return LoadingSpinner;
+    return <Spinner />;
   }
 
   return (
-    <div className="mx-auto p- mt-5 mid:mt-20">
+    <div className="mx-auto p-2 mt-5 mid:mt-20">
       <div className="mb-4">
         <Link to="/DashBoard/Admin/CreatePosts">
-          <button className="text-btColour border border-btColour p-2 rounded-lg hover:bg-btColour hover:text-white transition-all duration-300 flex items-center gap-2">
+          <button className="text-primary-500 border border-primary-500 p-2 rounded-lg hover:bg-primary-500 hover:text-white transition-all duration-300 flex items-center gap-2">
             <BiMessageSquareAdd size={16} />
             Create Post
           </button>
         </Link>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto shadow-md rounded-lg border border-primary-100">
         {posts.length > 0 ? (
           <>
             <Table hoverable className="shadow-md">
               <Table.Head>
-                <Table.HeadCell className="py-3">Date updated</Table.HeadCell>
-                <Table.HeadCell>Post image</Table.HeadCell>
-                <Table.HeadCell>Post title</Table.HeadCell>
-                <Table.HeadCell>Category</Table.HeadCell>
-                <Table.HeadCell>Delete</Table.HeadCell>
-                <Table.HeadCell>Edit</Table.HeadCell>
+                <Table.HeadCell className="py-3 text-neutral-700 dark:text-neutral-700-dark">
+                  Date updated
+                </Table.HeadCell>
+                <Table.HeadCell className="text-neutral-700 dark:text-neutral-700-dark">
+                  Post image
+                </Table.HeadCell>
+                <Table.HeadCell className="text-neutral-700 dark:text-neutral-700-dark">
+                  Post title
+                </Table.HeadCell>
+                <Table.HeadCell className="text-neutral-700 dark:text-neutral-700-dark">
+                  Category
+                </Table.HeadCell>
+                <Table.HeadCell className="text-neutral-700 dark:text-neutral-700-dark">
+                  Delete
+                </Table.HeadCell>
+                <Table.HeadCell className="text-neutral-700 dark:text-neutral-700-dark">
+                  Edit
+                </Table.HeadCell>
               </Table.Head>
-              <Table.Body className="divide-y">
+              <Table.Body className="divide-y divide-primary-100">
                 {posts.map((post) => (
                   <PostTableRow
                     key={post._id}
@@ -227,14 +239,13 @@ export default function AdminBlogposts() {
             {showMore && (
               <button
                 onClick={handleShowMore}
-                className="w-full text-btColour hover:text-btColour/80 py-4 mt-4 transition-colors duration-300"
-              >
+                className="w-full text-primary-500 hover:text-secondary-500 py-4 mt-4 transition-colors duration-300">
                 Show more
               </button>
             )}
           </>
         ) : (
-          <p className="text-center text-gray-500 py-4">
+          <p className="text-center text-neutral-600 dark:text-neutral-600-dark py-4">
             You have no posts yet!
           </p>
         )}
@@ -244,27 +255,26 @@ export default function AdminBlogposts() {
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}
         aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
+        aria-describedby="alert-dialog-description">
+        <DialogTitle id="alert-dialog-title" sx={{ color: "#080759" }}>
           Are you sure you want to delete this post?
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
+          <DialogContentText
+            id="alert-dialog-description"
+            sx={{ color: "#5E6D7A" }}>
             This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button
             onClick={() => setDeleteOpen(false)}
-            className="text-gray-500 hover:text-gray-700"
-          >
+            sx={{ color: "#5E6D7A", "&:hover": { color: "#3B4A54" } }}>
             <IoClose size={24} />
           </Button>
           <Button
             onClick={handleDeletePost}
-            className="text-red-500 hover:text-red-700"
-          >
+            sx={{ color: "#EF4444", "&:hover": { color: "#B91C1C" } }}>
             <AiTwotoneDelete size={24} />
           </Button>
         </DialogActions>
@@ -274,13 +284,16 @@ export default function AdminBlogposts() {
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
         <Alert
           onClose={handleCloseSnackbar}
           severity={snackbar.severity}
-          sx={{ width: "100%" }}
-        >
+          sx={{
+            width: "100%",
+            backgroundColor:
+              snackbar.severity === "success" ? "#3C6E5D" : "#EF4444",
+            color: "#FFFFFF",
+          }}>
           {snackbar.message}
         </Alert>
       </Snackbar>

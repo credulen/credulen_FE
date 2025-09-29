@@ -1,4 +1,3 @@
-// components/AdminNotificationPage.jsx
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
@@ -14,6 +13,7 @@ import {
 } from "lucide-react";
 import { AlertDescription } from "../../components/tools/Alert";
 import { useNotifications } from "../../components/Hooks/UseNotifications";
+import Spinner from "../../components/tools/Spinner";
 
 const backendURL =
   import.meta.env.MODE === "production"
@@ -24,13 +24,13 @@ const NotificationIcon = ({ type }) => {
   const iconProps = { size: 20, className: "shrink-0" };
   switch (type) {
     case "success":
-      return <CheckCircle {...iconProps} className="text-green-500" />;
+      return <CheckCircle {...iconProps} className="text-secondary-500" />;
     case "error":
-      return <XCircle {...iconProps} className="text-red-500" />;
+      return <XCircle {...iconProps} className="text-primary-500" />;
     case "warning":
       return <AlertTriangle {...iconProps} className="text-yellow-500" />;
     default:
-      return <Info {...iconProps} className="text-blue-500" />;
+      return <Info {...iconProps} className="text-primary-500" />;
   }
 };
 
@@ -97,27 +97,23 @@ const AdminNotificationPage = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-blue-500" />
-      </div>
-    );
+    return <Spinner />;
   }
 
   if (error) {
-    return <div className="text-red-500 text-center p-4">{error}</div>;
+    return <div className="text-primary-500 text-center p-4">{error}</div>;
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6 mt-10 bg-white rounded-lg shadow">
+    <div className="max-w-5xl mx-auto p-6 mt-10 bg-primary-50 rounded-lg shadow">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-3">
-          <Bell className="w-6 h-6 text-blue-500" />
-          <h2 className="text-2xl font-bold text-gray-800">
+          <Bell className="w-6 h-6 text-primary-500" />
+          <h2 className="text-2xl font-bold text-primary-500">
             Admin Notifications
           </h2>
           {unreadCount > 0 && (
-            <span className="bg-red-500 text-white px-2 py-1 rounded-full text-sm">
+            <span className="bg-primary-500 text-white px-2 py-1 rounded-full text-sm">
               {unreadCount}
             </span>
           )}
@@ -125,7 +121,7 @@ const AdminNotificationPage = () => {
         {unreadCount > 0 && (
           <button
             onClick={markAllAsRead}
-            className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-blue-500 rounded hover:bg-blue-600">
+            className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-primary-500 rounded hover:bg-primary-600">
             <Check size={16} />
             Mark All as Read
           </button>
@@ -133,8 +129,8 @@ const AdminNotificationPage = () => {
       </div>
 
       {notifications.length === 0 ? (
-        <div className="text-center text-gray-500 py-12">
-          <Bell size={40} className="mx-auto mb-4 text-gray-400" />
+        <div className="text-center text-primary-500 py-12">
+          <Bell size={40} className="mx-auto mb-4 text-primary-200" />
           <p>No notifications yet</p>
         </div>
       ) : (
@@ -142,38 +138,56 @@ const AdminNotificationPage = () => {
           {notifications.map((notification) => (
             <div
               key={notification._id}
-              className={`flex items-start gap-4 p-4 rounded-lg border ${
-                notification.isRead ? "bg-gray-50" : "bg-blue-50"
-              } hover:shadow-md transition-shadow`}>
+              className={`flex items-start gap-4 p-4 rounded-lg border-l-4 transition-shadow ${
+                notification.isRead
+                  ? "bg-neutral-50 border border-neutral-200 border-l-neutral-500"
+                  : "bg-primary-50 border border-primary-200 border-l-4 border-l-primary-500 shadow-sm"
+              } hover:shadow-md`}>
               <NotificationIcon type={notification.type} />
+
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-800">
+                <h3
+                  className={`font-semibold ${
+                    notification.isRead
+                      ? "text-neutral-900"
+                      : "text-primary-900"
+                  }`}>
                   {notification.title}
                 </h3>
-                <p className="text-gray-600 mt-1">{notification.message}</p>
+                <p
+                  className={`mt-1 ${
+                    notification.isRead
+                      ? "text-neutral-500"
+                      : "text-primary-500"
+                  }`}>
+                  {notification.message}
+                </p>
+
                 <div className="flex items-center gap-4 mt-2">
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-neutral-500">
                     {moment(notification.createdAt).fromNow()}
                   </span>
+
                   {notification.type === "info" && (
-                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                    <span className="text-xs bg-secondary-50 text-secondary-900 px-2 py-1 rounded">
                       Payment Event
                     </span>
                   )}
                 </div>
               </div>
+
               <div className="flex gap-2">
                 {!notification.isRead && (
                   <button
                     onClick={() => markAsRead(notification._id)}
-                    className="p-2 text-blue-500 hover:bg-blue-100 rounded"
+                    className="p-2 text-primary-500 hover:bg-primary-50 rounded"
                     title="Mark as read">
                     <Check size={16} />
                   </button>
                 )}
                 <button
                   onClick={() => handleDeleteClick(notification)}
-                  className="p-2 text-red-500 hover:bg-red-100 rounded"
+                  className="p-2 text-error-500 hover:bg-error-50 rounded"
                   title="Delete">
                   <Trash2 size={16} />
                 </button>
@@ -186,23 +200,24 @@ const AdminNotificationPage = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteAlert && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg max-w-md w-full border border-red-200 bg-red-50">
-            <h3 className="text-lg font-semibold mb-2 text-red-600">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full border border-neutral-200">
+            <h3 className="text-lg font-semibold mb-2 text-error-600">
               Delete Notification
             </h3>
-            <AlertDescription className="text-gray-700">
+            <AlertDescription className="text-neutral-500">
               Are you sure you want to delete this notification? This action
               cannot be undone.
             </AlertDescription>
+
             <div className="mt-4 flex justify-end gap-2">
               <button
                 onClick={closeDeleteAlert}
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium">
+                className="px-4 py-2 rounded bg-neutral-50 hover:bg-neutral-200 text-neutral-900 font-medium">
                 Cancel
               </button>
               <button
                 onClick={confirmDelete}
-                className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white font-medium">
+                className="px-4 py-2 rounded bg-error-500 hover:bg-error-600 text-white font-medium">
                 Delete
               </button>
             </div>

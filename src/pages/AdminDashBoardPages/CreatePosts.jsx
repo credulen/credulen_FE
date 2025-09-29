@@ -348,7 +348,7 @@
 //   );
 // }
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
@@ -399,7 +399,49 @@ export default function CreatePosts() {
   const [authors, setAuthors] = useState([]);
   const [error, setError] = useState(null);
 
-  // Separate data fetching functions for better error handling
+  const quillModules = {
+    toolbar: [
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      [{ font: [] }],
+      [{ size: [] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ color: [] }, { background: [] }],
+      [{ script: "sub" }, { script: "super" }],
+      [{ align: [] }],
+      ["blockquote", "code-block"],
+      [
+        { list: "ordered" },
+        { list: "bullet" },
+        { indent: "-1" },
+        { indent: "+1" },
+      ],
+      ["link", "image", "video"],
+      ["clean"],
+    ],
+  };
+
+  const quillFormats = [
+    "header",
+    "font",
+    "size",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "color",
+    "background",
+    "script",
+    "align",
+    "blockquote",
+    "code-block",
+    "list",
+    "bullet",
+    "indent",
+    "link",
+    "image",
+    "video",
+  ];
+
   const fetchAuthors = async () => {
     try {
       const res = await fetch(`${backendURL}/api/getAllAuthors`);
@@ -424,22 +466,18 @@ export default function CreatePosts() {
     }
   };
 
-  // Combined initialization effect
   useEffect(() => {
     const initializeData = async () => {
       setPageLoading(true);
       setError(null);
 
       try {
-        // First fetch authors
         const fetchedAuthors = await fetchAuthors();
         setAuthors(fetchedAuthors);
 
-        // Then fetch post data if editing
         if (postId) {
           const post = await fetchPost(postId);
 
-          // Validate required fields before setting state
           if (!post.title || !post.category || !post.authorId) {
             console.warn("Post data incomplete:", post);
           }
@@ -452,7 +490,7 @@ export default function CreatePosts() {
           });
 
           if (post.image) {
-            setImagePreview(post?.image);
+            setImagePreview(post.image);
           }
         }
       } catch (error) {
@@ -466,25 +504,23 @@ export default function CreatePosts() {
     initializeData();
   }, [postId]);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
-  const handleQuillChange = (value) => {
+  const handleQuillChange = useCallback((value) => {
     setFormData((prev) => ({ ...prev, content: value }));
-  };
+  }, []);
 
-  const handleFileChange = (e) => {
+  const handleFileChange = useCallback((e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file size (5MB limit)
       if (file.size > 5 * 1024 * 1024) {
         showSnackbar("File size should not exceed 5MB", "error");
         return;
       }
 
-      // Validate file type
       const allowedTypes = [
         "image/jpeg",
         "image/jpg",
@@ -503,12 +539,11 @@ export default function CreatePosts() {
       setSelectedFile(file);
       setImagePreview(URL.createObjectURL(file));
     }
-  };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate form data
     if (
       !formData.title?.trim() ||
       !formData.content?.trim() ||
@@ -522,12 +557,10 @@ export default function CreatePosts() {
     try {
       const postFormData = new FormData();
 
-      // Append all form data
       Object.entries(formData).forEach(([key, value]) => {
         if (value) postFormData.append(key, value.trim());
       });
 
-      // Handle image upload
       if (selectedFile) {
         postFormData.append("image", selectedFile);
       }
@@ -546,14 +579,11 @@ export default function CreatePosts() {
         throw new Error(errorData.message || "Failed to save post");
       }
 
-      const result = await response.json();
-
       showSnackbar(
         postId ? "Post updated successfully" : "Post created successfully",
         "success"
       );
 
-      // Navigate after successful submission
       setTimeout(() => {
         navigate("/DashBoard/Admin/Posts");
       }, 1500);
@@ -565,14 +595,14 @@ export default function CreatePosts() {
     }
   };
 
-  const showSnackbar = (message, severity) => {
+  const showSnackbar = useCallback((message, severity) => {
     setSnackbar({ open: true, message, severity });
-  };
+  }, []);
 
-  const handleCloseSnackbar = (event, reason) => {
+  const handleCloseSnackbar = useCallback((event, reason) => {
     if (reason === "clickaway") return;
     setSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  }, []);
 
   if (pageLoading) {
     return (
@@ -580,144 +610,203 @@ export default function CreatePosts() {
         display="flex"
         justifyContent="center"
         alignItems="center"
-        minHeight="100vh">
-        <CircularProgress />
+        minHeight="100vh"
+        sx={{ backgroundColor: "#F7F8FA" }}>
+        <CircularProgress size={40} sx={{ color: "#080759" }} />
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Box p={3}>
-        <Alert severity="error">{error}</Alert>
+      <Box p={3} sx={{ backgroundColor: "#F7F8FA" }}>
+        <Alert
+          severity="error"
+          sx={{ backgroundColor: "#EF4444", color: "#FFFFFF" }}>
+          {error}
+        </Alert>
       </Box>
     );
   }
 
   return (
-    <>
+    <Box
+      className="p-3 max-w-3xl mx-auto min-h-screen"
+      sx={{
+        backgroundColor: "#F7F8FA",
+        "& .dark": { backgroundColor: "#111827" },
+      }}>
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center text-blue-500 hover:text-blue-700 transition-colors duration-200">
+        className="flex items-center text-primary-500 hover:text-secondary-500 transition-colors duration-200 dark:text-neutral-700-dark dark:hover:text-neutral-600-dark">
         <IoArrowBack className="mr-2" size={24} />
         Back
       </button>
-      <Box className="p-3 max-w-3xl mx-auto min-h-screen">
-        <h1 className="text-center text-3xl my-7 font-semibold">
-          {postId ? "Edit Post" : "Create a Post"}
-        </h1>
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <TextField
-            label="Title"
-            required
-            id="title"
-            name="title"
-            value={formData.title}
+      <h1 className="text-center text-3xl my-7 font-semibold text-primary-900 dark:text-neutral-700-dark">
+        {postId ? "Edit Post" : "Create a Post"}
+      </h1>
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <TextField
+          label="Title"
+          required
+          id="title"
+          name="title"
+          value={formData.title}
+          onChange={handleInputChange}
+          fullWidth
+          error={!formData.title && formData.title !== undefined}
+          helperText={
+            !formData.title && formData.title !== undefined
+              ? "Title is required"
+              : ""
+          }
+          InputLabelProps={{ style: { color: "#3B4A54" } }}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": { borderColor: "#D8E0E8" },
+              "&:hover fieldset": { borderColor: "#1A3C34" },
+              "&.Mui-focused fieldset": { borderColor: "#1A3C34" },
+            },
+          }}
+        />
+
+        <FormControl fullWidth required error={!formData.category}>
+          <InputLabel sx={{ color: "#3B4A54" }}>Category</InputLabel>
+          <Select
+            label="Category"
+            name="category"
+            value={formData.category}
             onChange={handleInputChange}
-            fullWidth
-            error={!formData.title && formData.title !== undefined}
-            helperText={
-              !formData.title && formData.title !== undefined
-                ? "Title is required"
-                : ""
-            }
-          />
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#D8E0E8" },
+                "&:hover fieldset": { borderColor: "#1A3C34" },
+                "&.Mui-focused fieldset": { borderColor: "#1A3C34" },
+              },
+            }}>
+            <MenuItem value="uncategorized">Select a category</MenuItem>
+            <MenuItem value="Web3-&-Blockchain-Education">
+              Web3 & Blockchain Education
+            </MenuItem>
+            <MenuItem value="Web3 & Blockchain Trends">
+              Web3 & Blockchain Trends
+            </MenuItem>
+            <MenuItem value="Big Data & A.I Trends">
+              Big Data & A.I Trends
+            </MenuItem>
+            <MenuItem value="Big Data & A.I Education">
+              Big Data & A.I Education
+            </MenuItem>
+            <MenuItem value="Data in Web3/DeFi">Data in Web3/DeFi</MenuItem>
+          </Select>
+        </FormControl>
 
-          <FormControl fullWidth required error={!formData.category}>
-            <InputLabel>Category</InputLabel>
-            <Select
-              label="Category"
-              name="category"
-              value={formData.category}
-              onChange={handleInputChange}>
-              <MenuItem value="uncategorized">Select a category</MenuItem>
-              <MenuItem value="Web3-&-Blockchain-Education">
-                Web3 & Blockchain Education
+        <FormControl fullWidth required error={!formData.authorId}>
+          <InputLabel sx={{ color: "#3B4A54" }}>Author</InputLabel>
+          <Select
+            label="Author"
+            name="authorId"
+            value={formData.authorId}
+            onChange={handleInputChange}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#D8E0E8" },
+                "&:hover fieldset": { borderColor: "#1A3C34" },
+                "&.Mui-focused fieldset": { borderColor: "#1A3C34" },
+              },
+            }}>
+            {authors.map((author) => (
+              <MenuItem key={author.id} value={author.id}>
+                {author.name}
               </MenuItem>
-              <MenuItem value="Web3 & Blockchain Trends">
-                Web3 & Blockchain Trends
-              </MenuItem>
-              <MenuItem value="Big Data & A.I Trends">
-                Big Data & A.I Trends
-              </MenuItem>
-              <MenuItem value="Big Data & A.I Education">
-                Big Data & A.I Education
-              </MenuItem>
-              <MenuItem value="Data in Web3/DeFi">Data in Web3/DeFi</MenuItem>
-            </Select>
-          </FormControl>
+            ))}
+          </Select>
+        </FormControl>
 
-          <FormControl fullWidth required error={!formData.authorId}>
-            <InputLabel>Author</InputLabel>
-            <Select
-              label="Author"
-              name="authorId"
-              value={formData.authorId}
-              onChange={handleInputChange}>
-              {authors.map((author) => (
-                <MenuItem key={author.id} value={author.id}>
-                  {author.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Box className="flex gap-4 items-center justify-between border-4 border-teal-500 border-dotted p-3">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              ref={fileInputRef}
-              style={{ display: "none" }}
-            />
-            <Button
-              variant="outlined"
-              onClick={() => fileInputRef.current.click()}>
-              Choose File
-            </Button>
-            {imagePreview && (
-              <img
-                src={imagePreview}
-                alt="preview"
-                className="w-[15rem] h-[10rem] object-cover rounded-sm"
-              />
-            )}
-          </Box>
-          <ReactQuill
-            theme="snow"
-            placeholder="Write something..."
-            className="h-72 mb-12"
-            required
-            value={formData.content}
-            onChange={handleQuillChange}
+        <Box className="flex gap-4 items-center justify-between border-4 border-primary-500 border-dotted p-3">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            ref={fileInputRef}
+            style={{ display: "none" }}
           />
           <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={loading}>
-            {loading ? (
-              <CircularProgress size={24} />
-            ) : postId ? (
-              "Update Post"
-            ) : (
-              "Publish Post"
-            )}
+            variant="outlined"
+            onClick={() => fileInputRef.current.click()}
+            sx={{
+              borderColor: "#D8E0E8",
+              color: "#1A3C34",
+              "&:hover": {
+                borderColor: "#1A3C34",
+                backgroundColor: "#F7F8FA",
+              },
+            }}>
+            Choose File
           </Button>
+          {imagePreview && (
+            <img
+              src={imagePreview}
+              alt="preview"
+              className="w-[15rem] h-[10rem] object-cover rounded-sm"
+            />
+          )}
+        </Box>
 
-          <Snackbar
-            open={snackbar.open}
-            autoHideDuration={6000}
+        <ReactQuill
+          theme="snow"
+          placeholder="Write something..."
+          className="h-72 mb-12 text-neutral-600 dark:text-neutral-600-dark"
+          required
+          value={formData.content}
+          onChange={handleQuillChange}
+          modules={quillModules}
+          formats={quillFormats}
+        />
+
+        <Button
+          type="submit"
+          disabled={loading}
+          sx={{
+            backgroundColor: "#080759",
+
+            color: "#FFFFFF",
+            "&:hover": {
+              backgroundColor: "#110b79",
+              color: "#FFFFFF",
+            },
+            "&.Mui-disabled": {
+              backgroundColor: "#E5E7EB",
+              color: "#5E6D7A",
+            },
+          }}>
+          {loading ? (
+            <CircularProgress size={24} sx={{ color: "#080759" }} />
+          ) : postId ? (
+            "Update Post"
+          ) : (
+            "Publish Post"
+          )}
+        </Button>
+
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
+          <Alert
             onClose={handleCloseSnackbar}
-            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
-            <Alert
-              onClose={handleCloseSnackbar}
-              severity={snackbar.severity}
-              sx={{ width: "100%" }}>
-              {snackbar.message}
-            </Alert>
-          </Snackbar>
-        </form>
-      </Box>
-    </>
+            severity={snackbar.severity}
+            sx={{
+              width: "100%",
+              backgroundColor:
+                snackbar.severity === "success" ? "#3C6E5D" : "#EF4444",
+              color: "#FFFFFF",
+            }}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      </form>
+    </Box>
   );
 }

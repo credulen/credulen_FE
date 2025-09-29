@@ -60,6 +60,7 @@ import { formatDistanceToNow } from "date-fns";
 import moment from "moment";
 import { styled } from "@mui/system";
 import "../index.css";
+import Spinner2 from "../components/tools/Spinner2";
 
 const backendURL =
   import.meta.env.MODE === "production"
@@ -104,13 +105,13 @@ export const RelatedPosts = ({ category, currentPostId }) => {
 
   return (
     <Box className="mt-8 w-full">
-      <h3 variant="h5" className="mb-4 font-semibold text-xl text-btColour">
+      <h3 variant="h5" className="mb-4 font-semibold text-2xl text-primary-900">
         Related Posts
       </h3>
 
       <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4 minilg:grid-cols-1">
         {relatedPosts.length === 0 ? (
-          <Typography variant="body2" color="text.secondary" textAlign="center">
+          <Typography variant="body2" color="neutral.500" textAlign="center">
             No related posts available.
           </Typography>
         ) : (
@@ -119,14 +120,12 @@ export const RelatedPosts = ({ category, currentPostId }) => {
               key={post._id}
               className="flex flex-col cursor-pointer transition-all duration-300 ease-in-out 
 
-                       hover:shadow-md hover:border-gray-300"
-              onClick={() => handlePostClick(post.slug)}
-            >
+                       hover:shadow-md hover:border-primary-200"
+              onClick={() => handlePostClick(post.slug)}>
               <CardContent className="flex-grow p-4">
                 <Typography
-                  className="font-semibold mb-2 hover:text-btColour hover:scale-105 transition-all duration-300 ease-in"
-                  variant="h6"
-                >
+                  className="font-semibold mb-2 hover:text-secondary-500 hover:scale-105 transition-all duration-300 ease-in"
+                  variant="h6">
                   {post.title}
                 </Typography>
 
@@ -137,19 +136,18 @@ export const RelatedPosts = ({ category, currentPostId }) => {
                     sx={{ width: 24, height: 24, mr: 1 }} // 3rem size adjustment
                   />
 
-                  <Typography variant="body2" className="text-gray-600">
+                  <Typography variant="body2" className="text-neutral-600">
                     {post.authorId?.name}
                   </Typography>
                 </Box>
 
                 <Typography
                   variant="caption"
-                  className="text-gray-500 mb-2 block"
-                >
+                  className="text-neutral-500 mb-2 block">
                   {moment(post.createdAt).format("MMMM D, YYYY")}
                 </Typography>
 
-                <Box className="flex items-center text-gray-500 mt-1">
+                <Box className="flex items-center text-neutral-500 mt-1">
                   <FavoriteBorder
                     fontSize="small"
                     sx={{ fontSize: 16, mr: 0.3 }}
@@ -186,8 +184,7 @@ const CustomModal = ({ isOpen, onClose, children }) => {
       <div className="bg-white p-6 rounded-lg shadow-lg relative w-full max-w-md">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
-        >
+          className="absolute top-2 right-2 text-neutral-400 hover:text-neutral-600 transition-colors duration-200">
           <X size={24} />
         </button>
         {children}
@@ -199,9 +196,10 @@ const CustomModal = ({ isOpen, onClose, children }) => {
 const Button1 = ({ children, onClick, primary, className, ...props }) => {
   const baseStyle =
     "px-4 py-2 rounded-md font-semibold text-sm transition-colors duration-200";
-  const primaryStyle = "bg-[#198754] hover:bg-[#15704a] text-white";
+  const primaryStyle =
+    "bg-secondary-500 hover:bg-secondary-600 text-primary-900";
   const secondaryStyle =
-    "bg-white border-2 border-[#047481] text-[#047481] hover:bg-[#e6f3f5]";
+    "bg-white border-2 border-primary-700 text-primary-700 hover:bg-primary-50";
 
   return (
     <button
@@ -209,8 +207,7 @@ const Button1 = ({ children, onClick, primary, className, ...props }) => {
       className={`${baseStyle} ${
         primary ? primaryStyle : secondaryStyle
       } ${className}`}
-      {...props}
-    >
+      {...props}>
       {children}
     </button>
   );
@@ -312,8 +309,7 @@ export const ExpandableCommentInput = ({
           borderRadius: "9px",
           m: 1,
           marginBottom: "20px",
-        }}
-      >
+        }}>
         <Avatar
           src={userAvatar ? userAvatar : profile?.picture}
           sx={{ width: 32, height: 32, marginRight: "12px" }}
@@ -326,14 +322,13 @@ export const ExpandableCommentInput = ({
           value={comment}
           onChange={handleCommentChange}
           onFocus={handleExpand}
-          className="flex-grow border border-btColour focus:border-btColour focus:outline-none focus:ring-1 focus:ring-btColour bg-gray-50 bg-opacity-50   rounded-lg p-2"
+          className="flex-grow border border-primary-700 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-secondary-500/20 bg-neutral-50 rounded-lg p-2"
         />
 
         <Button
           onClick={handleSubmit}
           disabled={!comment.trim()}
-          className="ml-2 border-2 p-0 border-btColour text-btColour hover:font-bold"
-        >
+          className="ml-2 border-2 p-0 border-primary-700 text-primary-700 hover:font-bold">
           Post
         </Button>
       </Box>
@@ -345,8 +340,7 @@ export const ExpandableCommentInput = ({
             justifyContent="space-betwee"
             alignItems="center"
             mt={0}
-            ml={5.5}
-          >
+            ml={5.5}>
             <Box>
               <StyledIconButton sx={{ fontSize: "18px", padding: "4px" }}>
                 ⬆️
@@ -364,10 +358,9 @@ export const ExpandableCommentInput = ({
                 alignItems: "center",
                 textTransform: "none",
                 "&:hover": {
-                  backgroundColor: "rgba(0, 0, 0, 0.04)",
+                  backgroundColor: "primary.50",
                 },
-              }}
-            >
+              }}>
               <Smile className="mr-2 h-5 w-5" />
               {/* Emoji */}
             </Button>
@@ -390,10 +383,10 @@ export const ExpandableCommentInput = ({
       )}
 
       <CustomModal isOpen={showLoginModal} onClose={handleCloseModal}>
-        <h2 className="text-2xl font-bold mb-4 text-[#047481]">
+        <h2 className="text-2xl font-bold mb-4 text-primary-500">
           Login Required
         </h2>
-        <p className="mb-6 text-gray-600">
+        <p className="mb-6 text-neutral-600">
           Please log in to leave a comment. Your thoughts are valuable to us!
         </p>
         <div className="flex justify-end space-x-4">
@@ -468,14 +461,9 @@ export default function Post() {
   };
 
   const LoadingSpinner = React.memo(() => (
-    <div className="fixed inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm z-50">
-      <div className="flex flex-col items-center">
-        <CircularProgress size={40} className="text-btColour" />
-        <Typography variant="body2" sx={{ mt: 2, color: "text.secondary" }}>
-          Loading content...
-        </Typography>
-      </div>
-    </div>
+    <>
+      <Spinner2 />
+    </>
   ));
 
   const fetchPost = useCallback(async () => {
@@ -877,13 +865,12 @@ export default function Post() {
   return (
     <div className="min-h-screen">
       {/* Hero Section (keeping the same as before) */}
-      <div className="relativ h-[100vh] w-full ">
+      <div className="relative h-[100vh] w-full ">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: `url(${post.image})`,
-          }}
-        >
+          }}>
           <div className="absolute inset-0 bg-black/50" />
         </div>
 
@@ -891,11 +878,10 @@ export default function Post() {
           <div className="mb-4">
             <Link
               to={`/blog?category=${encodeURIComponent(post.category)}`} // Pass category as a query parameter
-              className="inline-block bg-red-600 text-white text-sm px-4 py-1 rounded-sm hover:bg-red-700 transition-colors"
+              className="inline-block bg-secondary-500 text-primary-900 text-sm px-4 py-1 rounded-sm hover:bg-secondary-600 transition-colors font-semibold"
               style={{
                 opacity: 0.8,
-              }}
-            >
+              }}>
               {post.category}
             </Link>
           </div>
@@ -903,28 +889,24 @@ export default function Post() {
           <h1
             className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 max-w-4xl"
             style={{
-              opacity: 0.3,
-            }}
-          >
+              opacity: 0.9,
+            }}>
             {post.title}
           </h1>
 
-          <div className="flex flex-wrap items-center gap-4 text-sm md:text-base text-gray-300">
+          <div className="flex flex-wrap items-center gap-4 text-sm md:text-base text-neutral-200">
             <div
               style={{
-                opacity: 0.3,
+                opacity: 0.8,
               }}
-              className="flex items-center"
-            >
+              className="flex items-center">
               <a
                 href="#"
-                className="text-white hover:text-gray-300 flex items-center"
-              >
+                className="text-white hover:text-neutral-300 flex items-center">
                 <Avatar
                   src={`${post?.authorId?.image}`}
                   alt={"post image"}
-                  sx={{ width: 30, height: 30 }}
-                >
+                  sx={{ width: 30, height: 30 }}>
                   {/* `${backendURL}${post.authorId.image}` */}
                   {!post?.authorId?.image && <Image />}
                 </Avatar>
@@ -934,19 +916,17 @@ export default function Post() {
 
             <div
               style={{
-                opacity: 0.3,
+                opacity: 0.8,
               }}
-              className="flex items-center"
-            >
+              className="flex items-center">
               <Calendar className="w-4 h-4 mr-2" />
               <span>{moment(post.createdAt).format("MMMM D, YYYY")}</span>
             </div>
             <div
               style={{
-                opacity: 0.3,
+                opacity: 0.8,
               }}
-              className="flex items-center"
-            ></div>
+              className="flex items-center"></div>
           </div>
         </div>
       </div>
@@ -960,8 +940,7 @@ export default function Post() {
                   margin: "auto",
                   pl: { md: 4 },
                   pr: { md: 2 },
-                }}
-              >
+                }}>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <Avatar
                     src={
@@ -976,7 +955,7 @@ export default function Post() {
                   </Typography>
                   <Typography
                     variant="subtitle2"
-                    color="text.secondary"
+                    color="neutral.500"
                     sx={{
                       display: "flex",
                       alignItems: "center",
@@ -984,18 +963,16 @@ export default function Post() {
                         content: "'|'",
                         mx: 1,
                       },
-                    }}
-                  >
+                    }}>
                     {moment(post.createdAt).format("MMMM D, YYYY")}
                   </Typography>
                 </Box>
 
                 <h1
-                  className="text-3xl md:text-4xl lg:text-4xl font-semibold text-[#1e293b] mb-6 max-w-4xl"
+                  className="text-3xl md:text-4xl lg:text-4xl font-semibold text-primary-900 mb-6 max-w-4xl"
                   style={{
                     opacity: 0.9,
-                  }}
-                >
+                  }}>
                   {post.title}
                 </h1>
 
@@ -1007,21 +984,19 @@ export default function Post() {
                     ml: -1,
                     pl: 0,
                     width: "100%",
-                  }}
-                >
+                  }}>
                   <IconButton
                     onClick={handleLike}
                     size="small"
                     sx={{
                       transition:
                         "color 0.3s ease-in-out, transform 0.3s ease-in-out",
-                      color: isLiked ? "#" : "inherit",
+                      color: isLiked ? "secondary.500" : "neutral.500",
                       "&:hover": {
-                        color: "#e57373", // Always use red on hover
+                        color: "secondary.500",
                         transform: "scale(1.2)",
                       },
-                    }}
-                  >
+                    }}>
                     {isLiked ? (
                       <Favorite fontSize="small" />
                     ) : (
@@ -1033,13 +1008,12 @@ export default function Post() {
                       transition:
                         "color 0.3s ease-in-out, transform 0.3s ease-in-out",
                       "&:hover": {
-                        color: isLiked ? "#e57373" : "inherit",
+                        color: isLiked ? "secondary.500" : "neutral.500",
                         transform: "scale(1.1)",
                       },
                       ml: 0,
                     }}
-                    variant="body2"
-                  >
+                    variant="body2">
                     {likesCount} likes
                   </Typography>
                 </Box>
@@ -1059,28 +1033,24 @@ export default function Post() {
                   <IconButton
                     onClick={() => handleShare("twitter")}
                     size="small"
-                    sx={{ mr: 1 }}
-                  >
+                    sx={{ mr: 1 }}>
                     <Twitter fontSize="small" sx={{ color: "#1DA1F2" }} />
                   </IconButton>
                   <IconButton
                     onClick={() => handleShare("facebook")}
                     size="small"
-                    sx={{ mr: 1 }}
-                  >
+                    sx={{ mr: 1 }}>
                     <Facebook fontSize="small" sx={{ color: "#4267B2" }} />
                   </IconButton>
                   <IconButton
                     onClick={() => handleShare("linkedin")}
                     size="small"
-                    sx={{ mr: 1 }}
-                  >
+                    sx={{ mr: 1 }}>
                     <LinkedIn fontSize="small" sx={{ color: "#0077b5" }} />
                   </IconButton>
                   <IconButton
                     onClick={() => handleShare("whatsapp")}
-                    size="small"
-                  >
+                    size="small">
                     <WhatsApp fontSize="small" sx={{ color: "#25D366" }} />
                   </IconButton>
                 </Box>
@@ -1095,15 +1065,13 @@ export default function Post() {
                   userId={userId}
                 />
                 {displayedComments.length > 0 ? (
-                  <Box sx={{ width: "100%", bgcolor: "#f5f5f5", p: 2 }}>
+                  <Box sx={{ width: "100%", bgcolor: "primary.50", p: 2 }}>
                     {displayedComments.map((comment) => (
                       <Box
                         key={comment.id}
-                        sx={{ mb: 2, bgcolor: "white", borderRadius: 1, p: 2 }}
-                      >
+                        sx={{ mb: 2, bgcolor: "white", borderRadius: 1, p: 2 }}>
                         <Box
-                          sx={{ display: "flex", alignItems: "center", mb: 1 }}
-                        >
+                          sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                           <Avatar
                             src={
                               comment?.userId?.image
@@ -1121,22 +1089,19 @@ export default function Post() {
                               alignItems: "center",
                               mb: 1,
                               width: "100%",
-                            }}
-                          >
+                            }}>
                             {/* Text box containing the username and timestamp */}
                             <Box sx={{ display: "flex", flexDirection: "row" }}>
                               <Typography
                                 variant="subtitle2"
-                                sx={{ fontWeight: "light" }}
-                              >
+                                sx={{ fontWeight: "light" }}>
                                 {comment.userId?.username || "Anonymous"}
                               </Typography>
 
                               <Typography
                                 variant="caption"
                                 sx={{ marginLeft: 1, marginTop: 0.1 }}
-                                color="text.secondary"
-                              >
+                                color="neutral.500">
                                 <span className="mx-1 ">-</span>
                                 {formatDistanceToNow(
                                   new Date(comment.createdAt),
@@ -1156,8 +1121,7 @@ export default function Post() {
                                   size="small"
                                   onClick={(event) =>
                                     handleMenuOpen(event, comment._id)
-                                  }
-                                >
+                                  }>
                                   <MoreVert />
                                 </IconButton>
                               )}
@@ -1179,21 +1143,19 @@ export default function Post() {
                             />
                             <Box sx={{ display: "flex" }}>
                               <Button
-                                className="text-btColour  hover:font-bold"
+                                className="text-secondary-500  hover:font-bold"
                                 onClick={() =>
                                   handleCommentEdit(
                                     comment._id,
                                     editedCommentContent
                                   )
                                 }
-                                sx={{ mr: 1 }}
-                              >
+                                sx={{ mr: 1 }}>
                                 Save
                               </Button>
                               <Button
-                                className="text-btColour  hover:font-bold"
-                                onClick={handleCancelEdit}
-                              >
+                                className="text-secondary-500  hover:font-bold"
+                                onClick={handleCancelEdit}>
                                 Cancel
                               </Button>
                             </Box>
@@ -1207,9 +1169,8 @@ export default function Post() {
                               width: "100%",
                               fontSize: "0.9rem", // Apply font size
                               lineHeight: "1.6", // Apply line height
-                              color: "#201f1f", // Apply color if needed
-                            }}
-                          >
+                              color: "primary.900", // Apply color if needed
+                            }}>
                             {comment.content}
                           </Typography>
                         )}
@@ -1222,21 +1183,19 @@ export default function Post() {
                             ml: -1,
                             pl: 0,
                             width: "100%",
-                          }}
-                        >
+                          }}>
                           <IconButton
                             onClick={() => handleCommentLike(comment._id)}
                             size="small"
                             sx={{
                               transition:
                                 "color 0.3s ease-in-out, transform 0.3s ease-in-out",
-                              color: isLiked ? "#" : "inherit",
+                              color: isLiked ? "secondary.500" : "neutral.500",
                               "&:hover": {
-                                color: "#e57373", // Always use red on hover
+                                color: "secondary.500",
                                 transform: "scale(1.2)",
                               },
-                            }}
-                          >
+                            }}>
                             {isLiked ? (
                               <Favorite fontSize="small" />
                             ) : (
@@ -1248,13 +1207,14 @@ export default function Post() {
                               transition:
                                 "color 0.3s ease-in-out, transform 0.3s ease-in-out",
                               "&:hover": {
-                                color: isLiked ? "#e57373" : "inherit",
+                                color: isLiked
+                                  ? "secondary.500"
+                                  : "neutral.500",
                                 transform: "scale(1.1)",
                               },
                               ml: 0,
                             }}
-                            variant="body2"
-                          >
+                            variant="body2">
                             {comment.likes.length} likes
                           </Typography>
                         </Box>
@@ -1264,8 +1224,7 @@ export default function Post() {
                 ) : (
                   <Typography
                     variant="body2"
-                    sx={{ mt: 2, textAlign: "center" }}
-                  >
+                    sx={{ mt: 2, textAlign: "center" }}>
                     No comments yet. Be the first to comment!
                   </Typography>
                 )}
@@ -1276,16 +1235,15 @@ export default function Post() {
                       disabled={loading}
                       className={`
   px-2 py-1 text-xs
-  bg-gradient-to-r from-[#047481] to-[#198754] 
+  bg-gradient-to-r from-primary-900 to-secondary-500 
   text-transparent bg-clip-text
-  hover:bg-gradient-to-r hover:from-[#198754] hover:to-[#047481]
+  hover:bg-gradient-to-r hover:from-secondary-500 hover:to-primary-900
   rounded-md 
   transition-all duration-300 ease-in-out
   transform hover:-translate-y-0.5 hover:shadow-lg
-  focus:outline-none focus:ring-2 focus:ring-[#047481] focus:ring-opacity-50
+  focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-opacity-50
   disabled:opacity-50 disabled:cursor-not-allowed
-`}
-                    >
+`}>
                       {loading ? "Loading..." : "Show More"}
                     </button>
                   </Box>
@@ -1293,20 +1251,17 @@ export default function Post() {
                 <Menu
                   anchorEl={anchorEl}
                   open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                >
+                  onClose={handleMenuClose}>
                   <MenuItem
                     onClick={() =>
                       handleEditClick(
                         comments.find((c) => c._id === selectedCommentId)
                       )
-                    }
-                  >
+                    }>
                     <Edit fontSize="small" sx={{ mr: 1 }} /> Edit
                   </MenuItem>
                   <MenuItem
-                    onClick={() => handleDeleteClick(selectedCommentId)}
-                  >
+                    onClick={() => handleDeleteClick(selectedCommentId)}>
                     <Delete fontSize="small" sx={{ mr: 1 }} /> Delete
                   </MenuItem>
                 </Menu>
@@ -1323,8 +1278,7 @@ export default function Post() {
                     top: 20,
                     maxHeight: { md: "calc(100vh - 40px)" },
                     padding: { lg: "20px" },
-                  }}
-                >
+                  }}>
                   <RelatedPosts
                     category={post.category}
                     currentPostId={post._id}
@@ -1345,15 +1299,13 @@ export default function Post() {
           <Button
             onClick={handleDeleteCancel}
             startIcon={<Close />}
-            color="secondary"
-          >
+            color="secondary">
             Cancel
           </Button>
           <Button
             onClick={handleDeleteConfirm}
             startIcon={<Delete />}
-            color="error"
-          >
+            color="error">
             Delete
           </Button>
         </DialogActions>
@@ -1363,13 +1315,11 @@ export default function Post() {
         open={snackbarOpen}
         autoHideDuration={4000}
         onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
         <Alert
           onClose={handleSnackbarClose}
           severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-        >
+          sx={{ width: "100%" }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>

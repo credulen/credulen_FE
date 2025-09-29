@@ -10,7 +10,7 @@ import {
 } from "../features/auth/authSlice";
 import { Alert, Snackbar } from "@mui/material";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-import CredulenLogo from "../assets/CredulenLogo2.png";
+import CredulenLogo from "../assets/CredulenLogo.png";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { handleGoogleLogin } from "../features/auth/authActions";
 
@@ -161,11 +161,11 @@ const Login = () => {
 
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 mt-10">
-        <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
+      <div className="min-h-screen flex items-center justify-center bg-primary-50 py-12 px-4 sm:px-6 lg:px-8 mt-10">
+        <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg border border-primary-100">
           <div className="text-center">
             <img src={CredulenLogo} alt="Credulen Logo " className="" />
-            <p className="mt-2 font-bold text-lg text-gray-600">
+            <p className="mt-2 font-bold text-lg text-primary-900">
               Sign in to your account
             </p>
           </div>
@@ -179,7 +179,7 @@ const Login = () => {
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Mail className="h-5 w-5 text-gray-400" />
+                      <Mail className="h-5 w-5 text-primary-500" />
                     </div>
                     <input
                       {...register("email", {
@@ -192,7 +192,7 @@ const Login = () => {
                       id="email"
                       type="email"
                       autoComplete="email"
-                      className="appearance-none relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-btColour focus:border-btColour focus:z-10 sm:text-sm"
+                      className="appearance-none relative block w-full px-3 py-3 pl-10 border border-primary-300 placeholder-primary-500 text-primary-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500/20 focus:border-secondary-500 focus:z-10 sm:text-sm hover:border-primary-400 transition-all duration-200"
                       placeholder="Email address"
                     />
                   </div>
@@ -209,7 +209,7 @@ const Login = () => {
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-gray-400" />
+                      <Lock className="h-5 w-5 text-primary-500" />
                     </div>
                     <input
                       {...register("password", {
@@ -222,7 +222,7 @@ const Login = () => {
                       id="password"
                       type={showPassword ? "text" : "password"}
                       autoComplete="current-password"
-                      className="appearance-none relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-btColour focus:border-btColour focus:z-10 sm:text-sm"
+                      className="appearance-none relative block w-full px-3 py-3 pl-10 border border-primary-300 placeholder-primary-500 text-primary-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500/20 focus:border-secondary-500 focus:z-10 sm:text-sm hover:border-primary-400 transition-all duration-200"
                       placeholder="Password"
                     />
                     <button
@@ -230,9 +230,9 @@ const Login = () => {
                       className="absolute inset-y-0 right-0 pr-3 flex items-center"
                       onClick={() => setShowPassword(!showPassword)}>
                       {showPassword ? (
-                        <EyeOff className="h-5 w-5 text-gray-400" />
+                        <EyeOff className="h-5 w-5 text-primary-500" />
                       ) : (
-                        <Eye className="h-5 w-5 text-gray-400" />
+                        <Eye className="h-5 w-5 text-primary-500" />
                       )}
                     </button>
                   </div>
@@ -248,26 +248,26 @@ const Login = () => {
                 <div className="text-sm">
                   <Link
                     to="/signup"
-                    className="font-medium text-btColour hover:text-blue-500">
+                    className="font-medium text-primary-500 hover:text-secondary-600">
                     Don't have an account?
                   </Link>
                 </div>
                 <div className="text-sm">
                   <Link
                     to="/ForgotPassword"
-                    className="font-medium text-btColour hover:text-blue-500">
+                    className="font-medium text-primary-500 hover:text-secondary-600">
                     Forgot your password?
                   </Link>
                 </div>
               </div>
 
-              <div>
+              <div className="group">
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-btColour hover:bg-gradient-to-bl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-btColour transition-all duration-200 ease-in-out">
+                  className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-500 hover:bg-secondary-500 hover:text-primary-500 hover:font-semibold  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500/20 transition-all duration-200 ease-in-out disabled:opacity-70 transform hover:scale-[1.02] shadow-lg hover:shadow-xl">
                   {isLoading ? (
-                    <div className="w-5 h-5 border-t-2 border-white rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-t-2 hover:border-primary-900 group:hover:text-primary-900 border-red-50  rounded-full animate-spin" />
                   ) : (
                     "Sign in"
                   )}
@@ -275,7 +275,7 @@ const Login = () => {
               </div>
 
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
+                <span className="px-2 bg-white text-neutral-500">
                   Or continue with
                 </span>
               </div>
@@ -294,7 +294,7 @@ const Login = () => {
                 </div>
                 {isGoogleLoading && (
                   <div className="flex justify-center mt-4">
-                    <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-secondary-500 border-t-transparent rounded-full animate-spin" />
                   </div>
                 )}
               </div>
@@ -343,7 +343,7 @@ const OtpVerification = ({ onSubmit }) => {
       <div>
         <label
           htmlFor="otp"
-          className="block text-sm font-medium text-gray-700">
+          className="block text-sm font-medium text-primary-900">
           Enter OTP
         </label>
         <div className="mt-1">
@@ -351,7 +351,7 @@ const OtpVerification = ({ onSubmit }) => {
             type="text"
             id="otp"
             maxLength={6}
-            className="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-btColour focus:border-btColour sm:text-sm"
+            className="appearance-none block w-full px-3 py-3 border border-primary-300 placeholder-primary-500 text-primary-900 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-secondary-500/20 focus:border-secondary-500 sm:text-sm hover:border-primary-400 transition-all duration-200"
             placeholder="Enter 6-digit OTP"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
@@ -363,7 +363,7 @@ const OtpVerification = ({ onSubmit }) => {
       <div>
         <button
           type="submit"
-          className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-btColour hover:bg-gradient-to-bl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-btColour transition-all duration-200 ease-in-out">
+          className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-primary-900 bg-secondary-500 hover:bg-secondary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500/20 transition-all duration-200 ease-in-out">
           Verify OTP
         </button>
       </div>

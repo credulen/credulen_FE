@@ -13,6 +13,7 @@ import MuiAlert from "@mui/material/Alert";
 import { CircularProgress } from "@mui/material";
 import SwitchNav from "../../components/tools/SwitchNav";
 import { NotificationBanner } from "../../components/NavNotificationBanner";
+import Spinner from "../../components/tools/Spinner";
 
 const backendURL =
   import.meta.env.MODE === "production"
@@ -24,13 +25,13 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 const LoadingSpinner = () => (
-  <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
-    <CircularProgress size={40} className="text-btColour" />
-  </div>
+  <>
+    <Spinner />
+  </>
 );
 
 const CommunityRegistrationRow = ({ registration, onDelete }) => (
-  <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+  <Table.Row className="bg-primary-50 text-dark dark:bg-primary-50 dark:border-primary-200-dark">
     <Table.Cell>{registration.name}</Table.Cell>
     <Table.Cell>{registration.email}</Table.Cell>
     <Table.Cell>{registration.phone}</Table.Cell>
@@ -41,7 +42,7 @@ const CommunityRegistrationRow = ({ registration, onDelete }) => (
     <Table.Cell>
       <button
         onClick={() => onDelete(registration._id)}
-        className="font-medium text-red-500 bg-transparent border border-red-500 cursor-pointer hover:bg-btColour hover:text-white p-1 rounded-md">
+        className="font-medium text-error-500 bg-transparent border border-error-500 cursor-pointer hover:bg-primary-500 hover:text-white p-1 rounded-md">
         Delete
       </button>
     </Table.Cell>
@@ -49,7 +50,7 @@ const CommunityRegistrationRow = ({ registration, onDelete }) => (
 );
 
 const CommunityUserList = () => {
-  const [registrations, setRegistrations] = useState([]);
+  const [allRegistrations, setAllRegistrations] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedRegistrationId, setSelectedRegistrationId] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -59,6 +60,9 @@ const CommunityUserList = () => {
     message: "",
     severity: "success",
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 10;
 
   const fetchBannerStatus = useCallback(async () => {
     try {
@@ -88,7 +92,10 @@ const CommunityUserList = () => {
         throw new Error(data.message || "Failed to fetch registrations");
       }
 
-      setRegistrations(data.data);
+      setAllRegistrations(data.data || []);
+      setTotalPages(
+        Math.ceil((data.total || data.data.length) / itemsPerPage) || 1
+      );
     } catch (error) {
       console.error("Error fetching registrations:", error);
       setSnackbar({
@@ -180,47 +187,65 @@ const CommunityUserList = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   }, []);
 
+  const handlePageChange = (newPage) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  // Slice registrations for current page
+  const paginatedRegistrations = allRegistrations.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   if (loading) {
     return <LoadingSpinner />;
   }
 
   return (
-    <div className="flex flex-col w-full h-full mid:mt-20">
+    <div className="flex flex-col w-full h-full mid:mt-20 bg-primary-50 dark:bg-primary-50">
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 p-3">
-        <h1 className="text-2xl font-semibold">
+        <h1 className="text-2xl font-semibold text-primary-500">
           Registered Community Members/Courses
         </h1>
       </div>
 
-      {/* {bannerVisible && (
-        <NotificationBanner
-          isVisible={bannerVisible}
-          setIsVisible={setBannerVisible}
-        />
-      )} */}
-
-      <div className="flex items-center mb-4">
+      <div className="flex items-center mb-4 ml-2">
         <SwitchNav
           checked={bannerVisible}
-          onChange={(e) => handleBannerToggle(e.target.checked)}>
+          onChange={(e) => handleBannerToggle(e.target.checked)}
+          className="text-primary-500">
           {bannerVisible ? "Hide Banner" : "Show Banner"}
         </SwitchNav>
       </div>
 
       <div className="flex-grow overflow-x-auto">
         <div className="h-full overflow-y-auto">
-          {registrations.length > 0 ? (
+          {paginatedRegistrations.length > 0 ? (
             <Table hoverable className="shadow-md">
-              <Table.Head>
-                <Table.HeadCell>Name</Table.HeadCell>
-                <Table.HeadCell>Email</Table.HeadCell>
-                <Table.HeadCell>Phone</Table.HeadCell>
-                <Table.HeadCell>Ever Enrolled?</Table.HeadCell>
-                <Table.HeadCell>Registered Date/Time</Table.HeadCell>
-                <Table.HeadCell>Action</Table.HeadCell>
+              <Table.Head className="bg-primary-50">
+                <Table.HeadCell className="text-primary-500">
+                  Name
+                </Table.HeadCell>
+                <Table.HeadCell className="text-primary-500">
+                  Email
+                </Table.HeadCell>
+                <Table.HeadCell className="text-primary-500">
+                  Phone
+                </Table.HeadCell>
+                <Table.HeadCell className="text-primary-500">
+                  Ever Enrolled?
+                </Table.HeadCell>
+                <Table.HeadCell className="text-primary-500">
+                  Registered Date/Time
+                </Table.HeadCell>
+                <Table.HeadCell className="text-primary-500">
+                  Action
+                </Table.HeadCell>
               </Table.Head>
-              <Table.Body className="divide-y">
-                {registrations.map((registration) => (
+              <Table.Body className="divide-y divide-primary-100">
+                {paginatedRegistrations.map((registration) => (
                   <CommunityRegistrationRow
                     key={registration._id}
                     registration={registration}
@@ -233,22 +258,46 @@ const CommunityUserList = () => {
               </Table.Body>
             </Table>
           ) : (
-            <p className="text-center py-4">
+            <p className="text-center py-4 text-primary-500">
               No community registrations found!
             </p>
           )}
         </div>
       </div>
 
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-4 py-3 bg-primary-50 border-t border-primary-100">
+          <span className="text-sm text-primary-500">
+            Page {currentPage} of {totalPages}
+          </span>
+          <div className="flex space-x-2">
+            <Button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="text-primary-500 bg-transparent border border-primary-500 hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed">
+              Previous
+            </Button>
+            <Button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="text-primary-500 bg-transparent border border-primary-500 hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed">
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
+
       <Dialog
         open={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description">
-        <DialogTitle id="alert-dialog-title">Please Confirm Delete</DialogTitle>
+        <DialogTitle id="alert-dialog-title" className="text-primary-500">
+          Please Confirm Delete
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+            <p className="text-base leading-relaxed text-primary-500">
               Are you sure you want to delete this users information?
             </p>
           </DialogContentText>
@@ -256,12 +305,12 @@ const CommunityUserList = () => {
         <DialogActions>
           <Button
             onClick={() => setShowDeleteModal(false)}
-            className="text-gray-500 hover:text-gray-700">
+            className="text-blue-500 hover:text-primary-700">
             <IoClose size={24} />
           </Button>
           <Button
             onClick={handleDeleteConfirm}
-            className="text-red-500 hover:text-red-700">
+            className="text-error-500 hover:text-primary-700">
             <AiTwotoneDelete size={24} />
           </Button>
         </DialogActions>
@@ -273,8 +322,13 @@ const CommunityUserList = () => {
         onClose={handleCloseSnackbar}>
         <Alert
           onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          sx={{ width: "100%" }}>
+          severity={snackbar.severity === "success" ? "success" : "error"}
+          sx={{
+            width: "100%",
+            backgroundColor:
+              snackbar.severity === "success" ? "#f9fafb" : "#f9fafb",
+            color: snackbar.severity === "success" ? "#3C6E5D" : "#EF4444",
+          }}>
           {snackbar.message}
         </Alert>
       </Snackbar>

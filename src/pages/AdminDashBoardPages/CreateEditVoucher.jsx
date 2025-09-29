@@ -12,6 +12,7 @@
 //   FormControl,
 //   FormControlLabel,
 //   Checkbox,
+//   Chip,
 // } from "@mui/material";
 // import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 // import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -44,6 +45,7 @@
 //     minCartAmount: 0,
 //     forNewUsers: false,
 //   });
+//   const [newEmail, setNewEmail] = useState(""); // Temporary state for new email input
 //   const [loading, setLoading] = useState(false);
 //   const [snackbar, setSnackbar] = useState({
 //     open: false,
@@ -87,20 +89,47 @@
 
 //   const handleArrayInputChange = (e) => {
 //     const { name, value } = e.target;
-//     // Split by comma, trim whitespace, and filter out empty entries
-//     const inputValue = value || ""; // Ensure value is a string
-//     const arrayValue = inputValue
-//       .split(",")
-//       .map((item) => item.trim())
-//       .filter((item) => item.length > 0); // Filter out empty strings
 //     setFormData({
 //       ...formData,
-//       [name]: arrayValue,
+//       [name]: value
+//         .split(",")
+//         .map((item) => item.trim())
+//         .filter(Boolean),
 //     });
 //   };
 
 //   const handleDateChange = (date) => {
 //     setFormData({ ...formData, expiryDate: date });
+//   };
+
+//   const handleNewEmailChange = (e) => {
+//     setNewEmail(e.target.value);
+//   };
+
+//   const addEmail = () => {
+//     const email = newEmail.trim();
+//     if (
+//       email &&
+//       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) &&
+//       !formData.applicableEmails.includes(email.toLowerCase())
+//     ) {
+//       setFormData({
+//         ...formData,
+//         applicableEmails: [...formData.applicableEmails, email.toLowerCase()],
+//       });
+//       setNewEmail(""); // Clear input after adding
+//     } else {
+//       showSnackbar("Please enter a valid and unique email", "error");
+//     }
+//   };
+
+//   const removeEmail = (emailToRemove) => {
+//     setFormData({
+//       ...formData,
+//       applicableEmails: formData.applicableEmails.filter(
+//         (email) => email !== emailToRemove
+//       ),
+//     });
 //   };
 
 //   const handleSubmit = async (e) => {
@@ -116,9 +145,7 @@
 //         ...formData,
 //         expiryDate: formData.expiryDate.toDate(), // Convert dayjs to Date
 //         applicableItems: formData.applicableItems,
-//         applicableEmails: formData.applicableEmails.map((email) =>
-//           email.toLowerCase()
-//         ), // Normalize emails
+//         applicableEmails: formData.applicableEmails, // Already an array
 //       };
 
 //       let response;
@@ -164,11 +191,6 @@
 
 //   const handleBackClick = () => {
 //     navigate(-1);
-//   };
-
-//   // Helper function to convert array to comma-separated string for display
-//   const arrayToCommaString = (array) => {
-//     return array ? array.join(", ") : "";
 //   };
 
 //   return (
@@ -241,20 +263,39 @@
 //           <TextField
 //             label="Applicable Items (comma-separated Solution IDs, empty for all)"
 //             name="applicableItems"
-//             value={arrayToCommaString(formData.applicableItems)}
+//             value={formData.applicableItems.join(", ")}
 //             onChange={handleArrayInputChange}
 //             fullWidth
 //           />
-//           <TextField
-//             label="Applicable Emails (comma-separated, empty for all)"
-//             name="applicableEmails"
-//             value={arrayToCommaString(formData.applicableEmails)}
-//             onChange={handleArrayInputChange}
-//             fullWidth
-//             helperText="Only these emails can use this voucher (leave empty for all)"
-//             // Add inputProps to allow commas
-//             inputProps={{ allowComma: true }} // Custom prop (see note below)
-//           />
+//           <Box>
+//             <TextField
+//               label="Add Applicable Email"
+//               value={newEmail}
+//               onChange={handleNewEmailChange}
+//               onKeyPress={(e) => e.key === "Enter" && addEmail()} // Add on Enter key
+//               fullWidth
+//               helperText="Press Enter or click Add to include an email"
+//             />
+//             <Button
+//               variant="outlined"
+//               onClick={addEmail}
+//               style={{ marginTop: "8px" }}
+//               disabled={
+//                 !newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)
+//               }>
+//               Add Email
+//             </Button>
+//             <Box sx={{ mt: 2 }}>
+//               {formData.applicableEmails.map((email, index) => (
+//                 <Chip
+//                   key={index}
+//                   label={email}
+//                   onDelete={() => removeEmail(email)}
+//                   style={{ margin: "4px" }}
+//                 />
+//               ))}
+//             </Box>
+//           </Box>
 //           <TextField
 //             label="Minimum Cart Amount (₦)"
 //             type="number"
@@ -295,7 +336,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  Button,
   TextField,
   Select,
   MenuItem,
@@ -319,12 +359,13 @@ const backendURL =
   import.meta.env.MODE === "production"
     ? import.meta.env.VITE_BACKEND_URL
     : "http://localhost:3001";
+
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
 export default function CreateEditVoucher() {
-  const { id } = useParams(); // For edit mode
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -334,12 +375,12 @@ export default function CreateEditVoucher() {
     expiryDate: null,
     usageLimit: 0,
     oncePerUser: false,
-    applicableItems: [], // Array of solution IDs
-    applicableEmails: [], // Array of email strings
+    applicableItems: [],
+    applicableEmails: [],
     minCartAmount: 0,
     forNewUsers: false,
   });
-  const [newEmail, setNewEmail] = useState(""); // Temporary state for new email input
+  const [newEmail, setNewEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -349,7 +390,6 @@ export default function CreateEditVoucher() {
 
   useEffect(() => {
     if (id) {
-      // Fetch voucher by ID
       fetch(`${backendURL}/api/getVoucherById/${id}`)
         .then((res) => res.json())
         .then((data) => {
@@ -360,8 +400,8 @@ export default function CreateEditVoucher() {
             expiryDate: dayjs(data.expiryDate),
             usageLimit: data.usageLimit,
             oncePerUser: data.oncePerUser,
-            applicableItems: data.applicableItems.map((item) => item._id), // Array of IDs
-            applicableEmails: data.applicableEmails || [], // Array of emails
+            applicableItems: data.applicableItems.map((item) => item._id),
+            applicableEmails: data.applicableEmails || [],
             minCartAmount: data.minCartAmount,
             forNewUsers: data.forNewUsers,
           });
@@ -411,7 +451,7 @@ export default function CreateEditVoucher() {
         ...formData,
         applicableEmails: [...formData.applicableEmails, email.toLowerCase()],
       });
-      setNewEmail(""); // Clear input after adding
+      setNewEmail("");
     } else {
       showSnackbar("Please enter a valid and unique email", "error");
     }
@@ -437,9 +477,9 @@ export default function CreateEditVoucher() {
     try {
       const payload = {
         ...formData,
-        expiryDate: formData.expiryDate.toDate(), // Convert dayjs to Date
+        expiryDate: formData.expiryDate.toDate(),
         applicableItems: formData.applicableItems,
-        applicableEmails: formData.applicableEmails, // Already an array
+        applicableEmails: formData.applicableEmails,
       };
 
       let response;
@@ -489,16 +529,19 @@ export default function CreateEditVoucher() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
+      {/* Back Button */}
       <button
         onClick={handleBackClick}
-        className="flex items-center text-blue-500 hover:text-blue-700 transition-colors duration-200">
+        className="flex items-center text-primary-500 hover:text-primary-900 transition-colors duration-200">
         <IoArrowBack className="mr-2" size={24} />
         Back
       </button>
+
       <Box className="p-3 max-w-3xl mx-auto min-h-screen">
-        <h1 className="text-center text-3xl my-7 font-semibold">
+        <h1 className="text-center text-3xl my-7 font-semibold text-primary-500">
           {id ? "Edit Voucher" : "Create Voucher"}
         </h1>
+
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <TextField
             label="Voucher Code (e.g., TECH50)"
@@ -508,6 +551,7 @@ export default function CreateEditVoucher() {
             onChange={handleInputChange}
             fullWidth
           />
+
           <FormControl fullWidth>
             <InputLabel>Discount Type</InputLabel>
             <Select
@@ -519,6 +563,7 @@ export default function CreateEditVoucher() {
               <MenuItem value="fixed">Fixed Amount (₦)</MenuItem>
             </Select>
           </FormControl>
+
           <TextField
             label="Discount Value (e.g., 50 for 50% or 2000 for ₦2000)"
             required
@@ -528,6 +573,7 @@ export default function CreateEditVoucher() {
             onChange={handleInputChange}
             fullWidth
           />
+
           <DatePicker
             label="Expiry Date"
             value={formData.expiryDate}
@@ -536,6 +582,7 @@ export default function CreateEditVoucher() {
               <TextField {...params} required fullWidth />
             )}
           />
+
           <TextField
             label="Usage Limit (0 for unlimited)"
             type="number"
@@ -544,6 +591,7 @@ export default function CreateEditVoucher() {
             onChange={handleInputChange}
             fullWidth
           />
+
           <FormControlLabel
             control={
               <Checkbox
@@ -554,6 +602,7 @@ export default function CreateEditVoucher() {
             }
             label="Once per user?"
           />
+
           <TextField
             label="Applicable Items (comma-separated Solution IDs, empty for all)"
             name="applicableItems"
@@ -561,24 +610,26 @@ export default function CreateEditVoucher() {
             onChange={handleArrayInputChange}
             fullWidth
           />
+
           <Box>
             <TextField
               label="Add Applicable Email"
               value={newEmail}
               onChange={handleNewEmailChange}
-              onKeyPress={(e) => e.key === "Enter" && addEmail()} // Add on Enter key
+              onKeyPress={(e) => e.key === "Enter" && addEmail()}
               fullWidth
               helperText="Press Enter or click Add to include an email"
             />
-            <Button
-              variant="outlined"
+            <button
+              type="button"
               onClick={addEmail}
-              style={{ marginTop: "8px" }}
               disabled={
                 !newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)
-              }>
+              }
+              className="mt-2 px-4 py-2 rounded-md border border-primary-500 text-primary-500 hover:bg-primary-50 disabled:opacity-50">
               Add Email
-            </Button>
+            </button>
+
             <Box sx={{ mt: 2 }}>
               {formData.applicableEmails.map((email, index) => (
                 <Chip
@@ -590,6 +641,7 @@ export default function CreateEditVoucher() {
               ))}
             </Box>
           </Box>
+
           <TextField
             label="Minimum Cart Amount (₦)"
             type="number"
@@ -598,20 +650,22 @@ export default function CreateEditVoucher() {
             onChange={handleInputChange}
             fullWidth
           />
-          <Button
+
+          {/* Submit Button */}
+          <button
             type="submit"
-            variant="contained"
-            color="primary"
-            disabled={loading}>
+            disabled={loading}
+            className="bg-primary-500 hover:bg-primary-900 text-white font-medium py-2 px-4 rounded-md transition disabled:opacity-50">
             {loading ? (
-              <CircularProgress size={24} />
+              <CircularProgress size={24} className="text-white" />
             ) : id ? (
               "Update Voucher"
             ) : (
               "Create Voucher"
             )}
-          </Button>
+          </button>
         </form>
+
         <Snackbar
           open={snackbar.open}
           autoHideDuration={6000}

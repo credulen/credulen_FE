@@ -9,6 +9,7 @@
 //   ArrowLeft,
 //   Sparkles,
 //   Gift,
+//   Badge,
 // } from "lucide-react";
 // import { fetchProfileById } from "../features/Users/userAction";
 // import { useDispatch, useSelector } from "react-redux";
@@ -35,12 +36,10 @@
 //     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 //       <div className="bg-white rounded-2xl p-6 max-w-sm w-full relative shadow-2xl transform transition-all duration-300 ease-out">
 //         <div className="text-center">
-//           {/* Animated Success Icon with Sparkles */}
 //           <div className="relative mb-6">
 //             <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-green-600 rounded-full mx-auto flex items-center justify-center animate-bounce-slow">
 //               <CheckCircle className="w-10 h-10 text-white" />
 //             </div>
-//             {/* Floating Sparkles */}
 //             <Sparkles className="absolute -top-2 -left-2 w-6 h-6 text-yellow-400 animate-ping" />
 //             <Sparkles
 //               className="absolute -bottom-2 -right-2 w-4 h-4 text-blue-400 animate-ping"
@@ -51,21 +50,15 @@
 //               style={{ animationDelay: "1s" }}
 //             />
 //           </div>
-
-//           {/* Success Message */}
 //           <h3 className="text-2xl font-bold text-gray-800 mb-2">
 //             Voucher Applied!
 //           </h3>
 //           <p className="text-lg text-green-600 font-semibold mb-4">
 //             You're saving big! 🎉
 //           </p>
-
-//           {/* Animated Progress Bar */}
 //           <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
 //             <div className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full animate-progress-bar"></div>
 //           </div>
-
-//           {/* Gift Icon */}
 //           <div className="animate-bounce-slow">
 //             <Gift className="w-8 h-8 text-teal-600 mx-auto" />
 //           </div>
@@ -78,7 +71,15 @@
 // const PaymentPage = () => {
 //   const { state } = useLocation();
 //   const navigate = useNavigate();
+//   const dispatch = useDispatch();
+//   const { userInfo } = useSelector((state) => state.auth);
+//   const {
+//     profile,
+//     loading: profileLoading,
+//     error: profileError,
+//   } = useSelector((state) => state.profiles);
 //   const { solution } = state || {};
+
 //   const [formData, setFormData] = useState({
 //     firstName: "",
 //     lastName: "",
@@ -88,6 +89,7 @@
 //     jobTitle: "",
 //     selectedSolution: solution?.title || "",
 //     solutionType: solution?.category || "TrainingSchools",
+//     agentCode: "", // New field for non-logged-in users
 //   });
 //   const [isLoading, setIsLoading] = useState(false);
 //   const [alertInfo, setAlertInfo] = useState(null);
@@ -99,14 +101,19 @@
 //   const [finalAmount, setFinalAmount] = useState(
 //     solution?.amount || solution?.price || 0
 //   );
-//   const dispatch = useDispatch();
-//   const { userInfo } = useSelector((state) => state.auth);
-//   const { profile, loading, error } = useSelector((state) => state.profiles);
-//   const AgentID = profile.data?.referredBy?.agentId;
-//   console.log(AgentID);
-//   const userId = userInfo?._id;
 //   const [voucherSavings, setVoucherSavings] = useState(0);
 //   const [voucherDiscountPercentage, setVoucherDiscountPercentage] = useState(0);
+
+//   // Fetch agentId for logged-in users
+//   // const agentId = profile?.data?.agentId;
+//   const agentId = profile?.data?.referredBy?.agentId || profile?.data?.agentId;
+//   console.log(profile?.data?.referredBy?.agentId);
+//   console.log(profile?.data?.agentId);
+//   useEffect(() => {
+//     if (userInfo?._id) {
+//       dispatch(fetchProfileById(userInfo._id));
+//     }
+//   }, [dispatch, userInfo]);
 
 //   useEffect(() => {
 //     if (!solution) {
@@ -117,10 +124,16 @@
 //   }, [solution, navigate]);
 
 //   useEffect(() => {
-//     if (userId) {
-//       dispatch(fetchProfileById(userId));
+//     if (profileError) {
+//       setAlertInfo({
+//         message: "Failed to fetch profile. Please try again.",
+//         variant: "destructive",
+//         icon: AlertCircle,
+//       });
+//       setShowModal(true);
+//       setTimeout(() => setShowModal(false), 3000);
 //     }
-//   }, [dispatch, userId]);
+//   }, [profileError]);
 
 //   const handleInputChange = (e) => {
 //     const { name, value } = e.target;
@@ -213,11 +226,12 @@
 //       !formData.firstName ||
 //       !formData.lastName ||
 //       !formData.email ||
-//       !formData.phoneNumber
+//       !formData.phoneNumber ||
+//       (!userInfo && !formData.agentId)
 //     ) {
 //       setAlertInfo({
 //         message:
-//           "Please fill in all required fields before proceeding to payment.",
+//           "Please fill in all required fields, including Agent ID if not logged in.",
 //         variant: "destructive",
 //         icon: AlertCircle,
 //       });
@@ -247,7 +261,10 @@
 //         voucherCode,
 //         amount: amountInKobo,
 //         callback_url: `${window.location.origin}/payment-success`,
+//         agentCode: userInfo ? agentId : formData.agentId.toUpperCase(), // Use profile agentId or form input
 //       };
+
+//       console.log("Payment payload:", payload); // Debug log
 
 //       const response = await fetch(
 //         `${backendURL}/api/initiate-paystack-payment`,
@@ -332,8 +349,9 @@
 //                     name="firstName"
 //                     value={formData.firstName}
 //                     onChange={handleInputChange}
-//                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors"
+//                     className="w-full px-4 py-3 border placeholder:text-gray-400 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors"
 //                     required
+//                     placeholder="First Name"
 //                     aria-required="true"
 //                   />
 //                 </div>
@@ -346,8 +364,9 @@
 //                     name="lastName"
 //                     value={formData.lastName}
 //                     onChange={handleInputChange}
-//                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors"
+//                     className="w-full px-4 py-3 border placeholder:text-gray-400 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors"
 //                     required
+//                     placeholder="Last Name"
 //                     aria-required="true"
 //                   />
 //                 </div>
@@ -361,8 +380,9 @@
 //                   name="email"
 //                   value={formData.email}
 //                   onChange={handleInputChange}
-//                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors"
+//                   className="w-full px-4 py-3 border placeholder:text-gray-400 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors"
 //                   required
+//                   placeholder="Your Email Address"
 //                   aria-required="true"
 //                 />
 //               </div>
@@ -375,12 +395,46 @@
 //                   name="phoneNumber"
 //                   value={formData.phoneNumber}
 //                   onChange={handleInputChange}
-//                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors"
+//                   className="w-full px-4 py-3 border placeholder:text-gray-400 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors"
 //                   placeholder="+234 123 456 7890"
 //                   required
 //                   aria-required="true"
 //                 />
 //               </div>
+//               {/* Agent ID Input for Non-Logged-In Users */}
+//               {!agentId && (
+//                 <div>
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">
+//                     Referral Code <span className="">(Optional)</span>
+//                   </label>
+//                   <div className="relative">
+//                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+//                       <Badge className="h-5 w-5 text-gray-400" />
+//                     </div>
+//                     <input
+//                       type="text"
+//                       name="agentId"
+//                       value={formData.agentId}
+//                       onChange={handleInputChange}
+//                       className="w-full pl-10 px-4 py-3 border placeholder:text-gray-400 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors"
+//                       placeholder="Enter Referral Code (e.g., MYREF25)"
+//                       required
+//                       aria-required="true"
+//                     />
+//                   </div>
+//                 </div>
+//               )}
+//               {/* Display Agent ID for Logged-In Users */}
+//               {agentId && (
+//                 <div>
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">
+//                     Referred By
+//                   </label>
+//                   <p className="text-sm text-gray-600">
+//                     Agent code: <code className="font-mono">{agentId}</code>
+//                   </p>
+//                 </div>
+//               )}
 //               <div>
 //                 <label className="block text-sm font-medium text-gray-700 mb-2">
 //                   Employment Status (Optional)
@@ -434,7 +488,6 @@
 //                   </div>
 //                 </div>
 //                 <div className="border-t pt-4">
-//                   {/* Original Price and Solution Discount */}
 //                   {solution.discountPercentage > 0 && (
 //                     <>
 //                       <div className="flex justify-between items-center mb-2">
@@ -451,7 +504,6 @@
 //                       </div>
 //                     </>
 //                   )}
-//                   {/* Voucher Code Input */}
 //                   <div className="mt-4">
 //                     <label className="block text-sm font-medium text-gray-700 mb-2">
 //                       Promo Code
@@ -464,7 +516,7 @@
 //                           setVoucherCode(e.target.value.toUpperCase())
 //                         }
 //                         className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors mid:mb-3"
-//                         placeholder="Enter code (e.g., TECH50) "
+//                         placeholder="Enter code (e.g., TECH50)"
 //                         disabled={isApplyingVoucher}
 //                         aria-label="Promo code"
 //                       />
@@ -492,7 +544,6 @@
 //                       )}
 //                     </div>
 //                   </div>
-//                   {/* Savings Display with Discount Percentages */}
 //                   {voucherSavings > 0 && (
 //                     <div className="flex justify-between items-center mb-2 mt-6 animate-slide-in">
 //                       <span className="text-gray-600">Voucher Savings:</span>
@@ -505,7 +556,6 @@
 //                       </span>
 //                     </div>
 //                   )}
-//                   {/* Total with Combined Discount Percentage */}
 //                   <div className="flex justify-between items-center text-lg font-semibold mt-6">
 //                     <span className="text-gray-800">Total:</span>
 //                     <span className="text-teal-600">
@@ -524,9 +574,9 @@
 //                   type="button"
 //                   onClick={handlePayment}
 //                   className="w-full bg-teal-600 text-white py-3 rounded-lg hover:bg-teal-700 transition-all duration-300 flex items-center justify-center disabled:opacity-50"
-//                   disabled={isLoading}
+//                   disabled={isLoading || profileLoading}
 //                   aria-label={`Pay ₦${finalAmount.toLocaleString()}`}>
-//                   {isLoading ? (
+//                   {isLoading || profileLoading ? (
 //                     <>
 //                       <Loader className="animate-spin mr-2" size={20} />
 //                       Processing...
@@ -544,13 +594,11 @@
 //         </div>
 //       </div>
 
-//       {/* Animated Success Modal for Voucher */}
 //       <AnimatedSuccess
 //         isVisible={showVoucherSuccess}
 //         onComplete={() => setShowVoucherSuccess(false)}
 //       />
 
-//       {/* Regular Alert Modal for Errors */}
 //       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
 //         {alertInfo && (
 //           <Alert variant={alertInfo?.variant} className="m-0">
@@ -630,33 +678,33 @@ const AnimatedSuccess = ({ isVisible, onComplete }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl p-6 max-w-sm w-full relative shadow-2xl transform transition-all duration-300 ease-out">
+      <div className="bg-white rounded-2xl p-6 max-w-sm w-full relative shadow-2xl transform transition-all duration-300 ease-out border border-primary-100">
         <div className="text-center">
           <div className="relative mb-6">
-            <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-green-600 rounded-full mx-auto flex items-center justify-center animate-bounce-slow">
-              <CheckCircle className="w-10 h-10 text-white" />
+            <div className="w-20 h-20 bg-secondary-500 rounded-full mx-auto flex items-center justify-center animate-bounce-slow">
+              <CheckCircle className="w-10 h-10 text-primary-900" />
             </div>
-            <Sparkles className="absolute -top-2 -left-2 w-6 h-6 text-yellow-400 animate-ping" />
+            <Sparkles className="absolute -top-2 -left-2 w-6 h-6 text-red-800 animate-ping" />
             <Sparkles
-              className="absolute -bottom-2 -right-2 w-4 h-4 text-blue-400 animate-ping"
+              className="absolute -bottom-2 -right-2 w-4 h-4 text-red-700 animate-ping"
               style={{ animationDelay: "0.5s" }}
             />
             <Sparkles
-              className="absolute top-2 -right-4 w-5 h-5 text-purple-400 animate-ping"
+              className="absolute top-2 -right-4 w-5 h-5 text-red-800 animate-ping"
               style={{ animationDelay: "1s" }}
             />
           </div>
-          <h3 className="text-2xl font-bold text-gray-800 mb-2">
+          <h3 className="text-2xl font-bold text-primary-900 mb-2">
             Voucher Applied!
           </h3>
-          <p className="text-lg text-green-600 font-semibold mb-4">
+          <p className="text-lg text-primary-500 font-semibold mb-4">
             You're saving big! 🎉
           </p>
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-            <div className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full animate-progress-bar"></div>
+          <div className="w-full bg-primary-100 rounded-full h-2 mb-4">
+            <div className="bg-secondary-500 h-2 rounded-full animate-progress-bar"></div>
           </div>
           <div className="animate-bounce-slow">
-            <Gift className="w-8 h-8 text-teal-600 mx-auto" />
+            <Gift className="w-8 h-8 text-pink-500 mx-auto" />
           </div>
         </div>
       </div>
@@ -822,12 +870,10 @@ const PaymentPage = () => {
       !formData.firstName ||
       !formData.lastName ||
       !formData.email ||
-      !formData.phoneNumber ||
-      (!userInfo && !formData.agentId)
+      !formData.phoneNumber
     ) {
       setAlertInfo({
-        message:
-          "Please fill in all required fields, including Agent ID if not logged in.",
+        message: "Please fill in all required fields.",
         variant: "destructive",
         icon: AlertCircle,
       });
@@ -857,7 +903,7 @@ const PaymentPage = () => {
         voucherCode,
         amount: amountInKobo,
         callback_url: `${window.location.origin}/payment-success`,
-        agentCode: userInfo ? agentId : formData.agentId.toUpperCase(), // Use profile agentId or form input
+        agentCode: userInfo ? agentId : formData?.agentId?.toUpperCase(), // Use profile agentId or form input
       };
 
       console.log("Payment payload:", payload); // Debug log
@@ -913,31 +959,31 @@ const PaymentPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-teal-50 py-6 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-primary-50 py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header with Back Button */}
         <div className="flex items-center justify-between mb-6">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center text-teal-600 hover:text-teal-700 transition-colors duration-200"
+            className="flex items-center text-primary-600 hover:text-primary-700 transition-colors duration-200"
             aria-label="Back to Course">
             <ArrowLeft className="w-5 h-5 mr-2" />
             Back to Course
           </button>
-          <h1 className="text-3xl font-bold text-gray-800">Checkout</h1>
+          <h1 className="text-3xl font-bold text-primary-900">Checkout</h1>
         </div>
 
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Form Section */}
-          <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+          <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-primary-100">
+            <h2 className="text-2xl font-semibold text-primary-900 mb-6">
               Billing Information
             </h2>
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-primary-900 mb-2">
                     First Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -945,14 +991,14 @@ const PaymentPage = () => {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border placeholder:text-gray-400 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors"
+                    className="w-full px-4 py-3 border placeholder:text-primary-500 border-primary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors hover:border-primary-400"
                     required
                     placeholder="First Name"
                     aria-required="true"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-primary-900 mb-2">
                     Last Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -960,7 +1006,7 @@ const PaymentPage = () => {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border placeholder:text-gray-400 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors"
+                    className="w-full px-4 py-3 border placeholder:text-primary-500 border-primary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors hover:border-primary-400"
                     required
                     placeholder="Last Name"
                     aria-required="true"
@@ -968,7 +1014,7 @@ const PaymentPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-primary-900 mb-2">
                   Email Address <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -976,14 +1022,14 @@ const PaymentPage = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border placeholder:text-gray-400 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors"
+                  className="w-full px-4 py-3 border placeholder:text-primary-500 border-primary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors hover:border-primary-400"
                   required
                   placeholder="Your Email Address"
                   aria-required="true"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-primary-900 mb-2">
                   Phone Number <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -991,7 +1037,7 @@ const PaymentPage = () => {
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border placeholder:text-gray-400 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors"
+                  className="w-full px-4 py-3 border placeholder:text-primary-500 border-primary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors hover:border-primary-400"
                   placeholder="+234 123 456 7890"
                   required
                   aria-required="true"
@@ -1000,21 +1046,20 @@ const PaymentPage = () => {
               {/* Agent ID Input for Non-Logged-In Users */}
               {!agentId && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-primary-900 mb-2">
                     Referral Code <span className="">(Optional)</span>
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Badge className="h-5 w-5 text-gray-400" />
+                      <Badge className="h-5 w-5 text-primary-500" />
                     </div>
                     <input
                       type="text"
                       name="agentId"
                       value={formData.agentId}
                       onChange={handleInputChange}
-                      className="w-full pl-10 px-4 py-3 border placeholder:text-gray-400 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors"
+                      className="w-full pl-10 px-4 py-3 border placeholder:text-primary-500 border-primary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors hover:border-primary-400 mid:mb-3"
                       placeholder="Enter Referral Code (e.g., MYREF25)"
-                      required
                       aria-required="true"
                     />
                   </div>
@@ -1023,23 +1068,26 @@ const PaymentPage = () => {
               {/* Display Agent ID for Logged-In Users */}
               {agentId && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-primary-900 mb-2">
                     Referred By
                   </label>
-                  <p className="text-sm text-gray-600">
-                    Agent code: <code className="font-mono">{agentId}</code>
+                  <p className="text-sm text-neutral-600">
+                    Agent code:{" "}
+                    <code className="font-mono text-primary-900">
+                      {agentId}
+                    </code>
                   </p>
                 </div>
               )}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-primary-900 mb-2">
                   Employment Status (Optional)
                 </label>
                 <select
                   name="employmentStatus"
                   value={formData.employmentStatus}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors">
+                  className="w-full px-4 py-3 border border-primary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors hover:border-primary-400">
                   <option value="">Select your status</option>
                   <option value="employed">Employed</option>
                   <option value="unemployed">Unemployed</option>
@@ -1048,7 +1096,7 @@ const PaymentPage = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-primary-900 mb-2">
                   Job Title (Optional)
                 </label>
                 <input
@@ -1056,7 +1104,7 @@ const PaymentPage = () => {
                   name="jobTitle"
                   value={formData.jobTitle}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors"
+                  className="w-full px-4 py-3 border border-primary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors hover:border-primary-400"
                   placeholder="e.g., Software Engineer"
                 />
               </div>
@@ -1065,8 +1113,8 @@ const PaymentPage = () => {
 
           {/* Order Summary Section */}
           <div className="lg:col-span-1">
-            <div className="bg-white p-6 rounded-xl shadow-lg sticky top-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            <div className="bg-white p-6 rounded-xl shadow-lg sticky top-6 border border-primary-100">
+              <h2 className="text-xl font-semibold text-primary-900 mb-4">
                 Order Summary
               </h2>
               <div className="space-y-4">
@@ -1074,34 +1122,40 @@ const PaymentPage = () => {
                   <img
                     src={solution.image}
                     alt={solution.title}
-                    className="w-16 h-16 object-cover rounded-lg"
+                    className="w-16 h-16 object-cover rounded-lg border border-primary-100"
                   />
                   <div>
-                    <h3 className="text-lg font-medium text-gray-700">
+                    <h3 className="text-lg font-medium text-primary-900">
                       {solution.title}
                     </h3>
-                    <p className="text-sm text-gray-500">{solution.category}</p>
+                    <p className="text-sm text-neutral-600">
+                      {solution.category}
+                    </p>
                   </div>
                 </div>
-                <div className="border-t pt-4">
+                <div className="border-t pt-4 border-primary-200">
                   {solution.discountPercentage > 0 && (
                     <>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-600">Original Price:</span>
-                        <span className="text-gray-500 line-through">
+                        <span className="text-neutral-600">
+                          Original Price:
+                        </span>
+                        <span className="text-neutral-500 line-through">
                           ₦{solution.price?.toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-600">Course Discount:</span>
-                        <span className="text-green-600">
+                        <span className="text-neutral-600">
+                          Course Discount:
+                        </span>
+                        <span className="text-primary-500">
                           {solution.discountPercentage}% Off
                         </span>
                       </div>
                     </>
                   )}
                   <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-primary-900 mb-2">
                       Promo Code
                     </label>
                     <div className="md:flex gap-2">
@@ -1111,7 +1165,7 @@ const PaymentPage = () => {
                         onChange={(e) =>
                           setVoucherCode(e.target.value.toUpperCase())
                         }
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors mid:mb-3"
+                        className="flex-1 px-4 py-2 border border-primary-300 placeholder:text-primary-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors mid:mb-3"
                         placeholder="Enter code (e.g., TECH50)"
                         disabled={isApplyingVoucher}
                         aria-label="Promo code"
@@ -1119,7 +1173,7 @@ const PaymentPage = () => {
                       {voucherCode && voucherSavings > 0 ? (
                         <button
                           onClick={handleRemoveVoucher}
-                          className="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 transition-all duration-200 flex items-center"
+                          className="bg-primary-100 text-primary-600 px-4 py-2 rounded-lg hover:bg-primary-200 transition-all duration-200 flex items-center"
                           aria-label="Remove promo code">
                           <X size={20} />
                         </button>
@@ -1127,7 +1181,7 @@ const PaymentPage = () => {
                         <button
                           onClick={handleApplyVoucher}
                           disabled={isApplyingVoucher}
-                          className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-all duration-200 flex items-center"
+                          className="bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-secondary-600 hover:text-primary-500 transition-all duration-200 flex items-center font-semibold"
                           aria-label="Apply promo code">
                           {isApplyingVoucher ? (
                             <Loader className="animate-spin mr-2" size={20} />
@@ -1142,8 +1196,8 @@ const PaymentPage = () => {
                   </div>
                   {voucherSavings > 0 && (
                     <div className="flex justify-between items-center mb-2 mt-6 animate-slide-in">
-                      <span className="text-gray-600">Voucher Savings:</span>
-                      <span className="text-green-600 font-medium">
+                      <span className="text-neutral-600">Voucher Savings:</span>
+                      <span className="text-secondary-900 font-medium">
                         ₦{voucherSavings.toLocaleString()} Off (
                         {voucherDiscountPercentage > 0
                           ? `${voucherDiscountPercentage}%`
@@ -1153,8 +1207,8 @@ const PaymentPage = () => {
                     </div>
                   )}
                   <div className="flex justify-between items-center text-lg font-semibold mt-6">
-                    <span className="text-gray-800">Total:</span>
-                    <span className="text-teal-600">
+                    <span className="text-primary-900">Total:</span>
+                    <span className="text-primary-600">
                       ₦{finalAmount.toLocaleString()} (
                       {solution.discountPercentage > 0 || voucherSavings > 0
                         ? `${Math.round(
@@ -1169,7 +1223,7 @@ const PaymentPage = () => {
                 <button
                   type="button"
                   onClick={handlePayment}
-                  className="w-full bg-teal-600 text-white py-3 rounded-lg hover:bg-teal-700 transition-all duration-300 flex items-center justify-center disabled:opacity-50"
+                  className="w-full bg-primary-500 text-white py-3 rounded-lg hover:bg-secondary-600 hover:text-primary-500  transition-all duration-300 flex items-center justify-center disabled:opacity-50 font-semibold"
                   disabled={isLoading || profileLoading}
                   aria-label={`Pay ₦${finalAmount.toLocaleString()}`}>
                   {isLoading || profileLoading ? (
@@ -1181,7 +1235,7 @@ const PaymentPage = () => {
                     `Pay ₦${finalAmount.toLocaleString()}`
                   )}
                 </button>
-                <p className="text-xs text-gray-500 text-center mt-2">
+                <p className="text-xs text-neutral-500 text-center mt-2">
                   Secure payment via Paystack
                 </p>
               </div>
@@ -1224,10 +1278,10 @@ const Modal = ({ isOpen, onClose, children }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-4 max-w-sm w-full relative animate-fade-in">
+      <div className="bg-white rounded-lg p-4 max-w-sm w-full relative animate-fade-in border border-primary-100">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+          className="absolute top-2 right-2 text-neutral-500 hover:text-neutral-700"
           aria-label="Close">
           <X size={20} />
         </button>

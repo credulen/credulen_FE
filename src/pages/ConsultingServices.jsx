@@ -4,6 +4,7 @@ import UsePaginatedSolutions from "../components/tools/usePagination";
 import { SolutionConsultingCard } from "../components/SolutionCard";
 import Pagination from "../components/tools/pagination";
 import { ChevronDown, ChevronUp, Star, Book, Users, Award } from "lucide-react";
+import Spinner2 from "../components/tools/Spinner2";
 
 const ConsultingQAndA = () => {
   const [openQuestion, setOpenQuestion] = useState(null);
@@ -15,7 +16,7 @@ const ConsultingQAndA = () => {
   const qaData = [
     {
       question:
-        "What types of organizations benefit from Credulen’s consulting services?",
+        "What types of organizations benefit from Credulen's consulting services?",
       answer:
         "Our consulting services are tailored for businesses of all sizes, from startups to large enterprises, across industries like finance, healthcare, and technology. We specialize in helping organizations leverage data, blockchain, and AI to drive innovation and growth.",
     },
@@ -31,38 +32,38 @@ const ConsultingQAndA = () => {
     },
     {
       question:
-        "What outcomes can I expect from Credulen’s consulting services?",
+        "What outcomes can I expect from Credulen's consulting services?",
       answer:
         "Our goal is to deliver measurable value, including improved operational efficiency, enhanced decision-making through data insights, and a stronger competitive edge. We focus on sustainable, long-term growth for your organization.",
     },
   ];
 
   return (
-    <div className="py-16 bg-blue-50 rounded-xl">
+    <div className="py-16 bg-primary-50 rounded-xl">
       <div className="max-w-4xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-blue-800 mb-10 text-center">
+        <h2 className="text-3xl font-bold text-primary-900 mb-10 text-center">
           Frequently Asked Questions
         </h2>
         <div className="space-y-4">
           {qaData.map((qa, index) => (
             <div
               key={index}
-              className="border border-blue-200 rounded-lg bg-white transition-all duration-300">
+              className="border border-primary-200 rounded-lg bg-white transition-all duration-300">
               <button
                 onClick={() => toggleQuestion(index)}
-                className="w-full px-6 py-4 flex justify-between items-center text-left focus:outline-none hover:bg-blue-100 transition-colors">
-                <h3 className="text-lg font-semibold text-blue-800">
+                className="w-full px-6 py-4 flex justify-between items-center text-left focus:outline-none hover:bg-primary-50 transition-colors">
+                <h3 className="text-lg font-semibold text-primary-900">
                   {qa.question}
                 </h3>
                 {openQuestion === index ? (
-                  <ChevronUp className="w-5 h-5 text-blue-600" />
+                  <ChevronUp className="w-5 h-5 text-secondary-500" />
                 ) : (
-                  <ChevronDown className="w-5 h-5 text-blue-600" />
+                  <ChevronDown className="w-5 h-5 text-secondary-500" />
                 )}
               </button>
               {openQuestion === index && (
-                <div className="px-6 py-4 border-t border-blue-200">
-                  <p className="text-gray-600">{qa.answer}</p>
+                <div className="px-6 py-4 border-t border-primary-200">
+                  <p className="text-neutral-600">{qa.answer}</p>
                 </div>
               )}
             </div>
@@ -103,19 +104,21 @@ const ConsultingWhyChooseCredulen = () => {
   ];
 
   return (
-    <div className="py-16 bg-gray-10 rounded-xl text-lime-950 ">
+    <div className="py-16 bg-primary-50 rounded-xl text-primary-900 ">
       <div className="max-w-6xl mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-12 text-center">
-          Why Choose Credulen Courses?
+        <h2 className="text-3xl font-bold mb-12 text-center text-primary-900">
+          Why Choose Credulen Consulting?
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {whyChooseData.map((item, index) => (
             <div
               key={index}
-              className="bg-white/10 backdrop-blur-md rounded-lg p-6 text-center transform hover:scale-105 transition-transform duration-300">
-              <item.icon className="w-12 h-12 mx-auto mb-4 text-blue-400" />
-              <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-              <p className="text-sm text-lime-950">{item.description}</p>
+              className="bg-white/80 backdrop-blur-md rounded-lg p-6 text-center transform hover:scale-105 transition-transform duration-300 border border-primary-100/50">
+              <item.icon className="w-12 h-12 mx-auto mb-4 text-secondary-500" />
+              <h3 className="text-lg font-semibold mb-2 text-primary-900">
+                {item.title}
+              </h3>
+              <p className="text-sm text-neutral-600">{item.description}</p>
             </div>
           ))}
         </div>
@@ -130,17 +133,13 @@ const ConsultingServices = () => {
     UsePaginatedSolutions("ConsultingService");
 
   if (isLoading) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
-        <CircularProgress size={40} className="text-btColour" />
-      </div>
-    );
+    return <Spinner2 />;
   }
 
   if (error) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-12 text-center">
-        <div className="bg-red-50 p-6 rounded-lg">
+        <div className="bg-red-50 p-6 rounded-lg border border-red-200">
           <h2 className="text-xl font-semibold text-red-700 mb-2">Error</h2>
           <p className="text-red-600">{error}</p>
         </div>
@@ -149,17 +148,17 @@ const ConsultingServices = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen bg-primary-50 py-12 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
 
         {/* Consulting Services Section */}
         <div className="pb-16">
-          <h2 className="text-2xl md:text-3xl font-bold">
+          <h2 className="text-2xl md:text-3xl font-bold text-primary-900">
             Consulting Services
           </h2>
-          <p className="mb-10">
-            <span className="font-medium mr-1">
+          <p className="mb-10 text-neutral-700">
+            <span className="font-medium text-primary-900 mr-1">
               Data, Blockchain & AI Integration and Strategy:
             </span>
             We offer expert consulting to help organizations integrate data,
@@ -167,7 +166,7 @@ const ConsultingServices = () => {
             ensures that your technology investments drive maximum value
             creation and business growth.
           </p>
-          <h2 className="text-2xl font-semibold text-gray-800 mt-16 mb-5">
+          <h2 className="text-2xl font-semibold text-primary-900 mt-16 mb-5">
             Explore Our Consulting Programs
           </h2>
 
@@ -177,7 +176,7 @@ const ConsultingServices = () => {
                 <SolutionConsultingCard key={event._id} event={event} />
               ))
             ) : (
-              <p className="text-gray-600 col-span-full text-center">
+              <p className="text-neutral-600 col-span-full text-center">
                 No consulting service solutions available.
               </p>
             )}

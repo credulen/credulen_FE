@@ -40,14 +40,15 @@
 //     lastName: "",
 //     country: "",
 //     companyName: "",
-//     industry: "",
+//     companyIndustry: "",
 //     companySize: "",
 //     jobTitle: "",
 //     selectedSolution: slug || "",
 //     phoneNumber: "",
-//     message: "",
+//     employmentStatus: "",
 //     preferredDate: "",
 //     preferredTime: "",
+//     message: "",
 //   });
 
 //   // Loading and alert states
@@ -62,7 +63,14 @@
 //   const [loadingServices, setLoadingServices] = useState(true);
 
 //   // Company size options
-//   const companySizes = ["2-7", "8-20", "21-50", "50-150", "150 & above"];
+//   const companySizes = [
+//     "1-10",
+//     "11-50",
+//     "51-200",
+//     "201-500",
+//     "501-1000",
+//     "1000+",
+//   ];
 
 //   // Industry options
 //   const industries = [
@@ -81,6 +89,14 @@
 //     "Non-profit",
 //     "Government",
 //     "Other",
+//   ];
+
+//   // Employment status options
+//   const employmentStatuses = [
+//     "Employed",
+//     "Self-employed",
+//     "Unemployed",
+//     "Student",
 //   ];
 
 //   // Time slots
@@ -140,11 +156,12 @@
 //       "lastName",
 //       "country",
 //       "companyName",
-//       "industry",
+//       "companyIndustry",
 //       "companySize",
 //       "jobTitle",
 //       "selectedSolution",
 //       "phoneNumber",
+//       "employmentStatus",
 //     ];
 
 //     for (let field of requiredFields) {
@@ -182,32 +199,38 @@
 
 //     setIsLoading(true);
 //     try {
-//       const response = await fetch(`${backendURL}/api/book-consultation`, {
+//       const response = await fetch(`${backendURL}/api/registerForSolution`, {
 //         method: "POST",
 //         headers: {
 //           "Content-Type": "application/json",
 //         },
-//         body: JSON.stringify(formData),
+//         body: JSON.stringify({
+//           ...formData,
+//           solutionType: "consulting service", // Set explicitly for this form
+//           slug: formData.selectedSolution, // Ensure slug matches selected solution
+//         }),
 //       });
 
-//       if (!response.ok) throw new Error("Failed to book consultation");
+//       if (!response.ok) throw new Error("Failed to register for solution");
 
+//       const result = await response.json();
 //       setAlertInfo({
 //         message:
-//           "Consultation booked successfully! We'll contact you within 24 hours.",
+//           result.message ||
+//           "Solution registered successfully! We'll contact you within 24 hours.",
 //         variant: "default",
 //         icon: CheckCircle,
 //       });
 
 //       // Reset form after successful submission
 //       setTimeout(() => {
-//         navigate("/consulting");
+//         navigate("/solutions/consulting_Services");
 //       }, 3000);
 //     } catch (error) {
-//       console.error("Error booking consultation:", error);
+//       console.error("Error registering for solution:", error);
 //       setAlertInfo({
 //         message:
-//           "Failed to book consultation. Please try again or contact us directly.",
+//           "Failed to register for solution. Please try again or contact us directly.",
 //         variant: "destructive",
 //         icon: AlertCircle,
 //       });
@@ -242,11 +265,11 @@
 
 //           <div className="text-center">
 //             <h1 className="text-3xl font-bold text-gray-800 mb-2">
-//               Book Your Consultation
+//               Register for Your Solution
 //             </h1>
 //             <p className="text-gray-600 max-w-2xl mx-auto">
 //               Select one of our solutions to get started. We will reach out to
-//               you shortly to schedule your personalized consultation session.
+//               you shortly to schedule your personalized session.
 //             </p>
 //           </div>
 //         </div>
@@ -370,8 +393,8 @@
 //                   Industry *
 //                 </label>
 //                 <select
-//                   name="industry"
-//                   value={formData.industry}
+//                   name="companyIndustry"
+//                   value={formData.companyIndustry}
 //                   onChange={handleInputChange}
 //                   className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
 //                   required>
@@ -405,21 +428,42 @@
 //               </div>
 //             </div>
 
-//             {/* Job Title */}
-//             <div>
-//               <label className="block text-sm font-medium text-gray-700 mb-2">
-//                 <Briefcase className="inline w-4 h-4 mr-2" />
-//                 Your Job Title *
-//               </label>
-//               <input
-//                 type="text"
-//                 name="jobTitle"
-//                 value={formData.jobTitle}
-//                 onChange={handleInputChange}
-//                 className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
-//                 placeholder="e.g., CEO, Marketing Manager, Business Owner"
-//                 required
-//               />
+//             {/* Job Title and Employment Status */}
+//             <div className="grid md:grid-cols-2 gap-6">
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">
+//                   <Briefcase className="inline w-4 h-4 mr-2" />
+//                   Your Job Title *
+//                 </label>
+//                 <input
+//                   type="text"
+//                   name="jobTitle"
+//                   value={formData.jobTitle}
+//                   onChange={handleInputChange}
+//                   className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+//                   placeholder="e.g., CEO, Marketing Manager, Business Owner"
+//                   required
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">
+//                   <User className="inline w-4 h-4 mr-2" />
+//                   Employment Status *
+//                 </label>
+//                 <select
+//                   name="employmentStatus"
+//                   value={formData.employmentStatus}
+//                   onChange={handleInputChange}
+//                   className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+//                   required>
+//                   <option value="">Select employment status</option>
+//                   {employmentStatuses.map((status) => (
+//                     <option key={status} value={status}>
+//                       {status}
+//                     </option>
+//                   ))}
+//                 </select>
+//               </div>
 //             </div>
 
 //             {/* Solution Selection */}
@@ -470,7 +514,7 @@
 //               <div>
 //                 <label className="block text-sm font-medium text-gray-700 mb-2">
 //                   <Calendar className="inline w-4 h-4 mr-2" />
-//                   Preferred Date(Optional)
+//                   Preferred Date (Optional)
 //                 </label>
 //                 <input
 //                   type="date"
@@ -484,7 +528,7 @@
 //               <div>
 //                 <label className="block text-sm font-medium text-gray-700 mb-2">
 //                   <Clock className="inline w-4 h-4 mr-2" />
-//                   Preferred Time(Optional)
+//                   Preferred Time (Optional)
 //                 </label>
 //                 <select
 //                   name="preferredTime"
@@ -525,12 +569,12 @@
 //                 {isLoading ? (
 //                   <>
 //                     <Loader className="animate-spin" size={20} />
-//                     Booking Consultation
+//                     Registering Solution
 //                   </>
 //                 ) : (
 //                   <>
 //                     <Calendar className="w-5 h-5" />
-//                     Book Consultation
+//                     Register Solution
 //                   </>
 //                 )}
 //               </button>
@@ -540,7 +584,7 @@
 //             <div className="pt-6 border-t text-center text-sm text-gray-600">
 //               <p>Need immediate assistance?</p>
 //               <p>
-//                 Call us at <span className="font-medium">+2348136712272</span>{" "}
+//                 Call us at <span className="font-medium">+2349012048912</span>{" "}
 //                 or email <span className="font-medium">Credulen@gmail.com</span>
 //               </p>
 //             </div>
@@ -838,22 +882,22 @@ const BookConsultation = () => {
   }, [alertInfo]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-blue-50 to-indigo-100 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-secondary-50 to-primary-100 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header Section */}
         <div className="mb-8">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-teal-600 hover:text-teal-700 mb-4 transition-colors">
+            className="flex items-center gap-2 text-primary-500 hover:text-secondary-500 mb-4 transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Back
           </button>
 
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            <h1 className="text-3xl font-bold text-primary-900 mb-2">
               Register for Your Solution
             </h1>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-neutral-600 max-w-2xl mx-auto">
               Select one of our solutions to get started. We will reach out to
               you shortly to schedule your personalized session.
             </p>
@@ -861,13 +905,13 @@ const BookConsultation = () => {
         </div>
 
         {/* Main Form */}
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-teal-600 to-blue-600 p-6 text-white text-center">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-primary-100">
+          <div className="bg-gradient-to-r from-primary-500 to-secondary-500 p-6 text-white text-center">
             <h2 className="text-xl font-semibold mb-2">
-              Select One of our solutions to get started. We will reach out to
+              Select one of our solutions to get started. We will reach out to
               you shortly
             </h2>
-            <div className="flex items-center justify-center gap-2 text-teal-800">
+            <div className="flex items-center justify-center gap-2 text-primary-100">
               <Clock className="w-4 h-4" />
               <span className="text-sm">Response within 24 hours</span>
             </div>
@@ -876,8 +920,8 @@ const BookConsultation = () => {
           <form onSubmit={handleSubmit} className="p-8 space-y-6">
             {/* Email Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <Mail className="inline w-4 h-4 mr-2" />
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                <Mail className="inline w-4 h-4 mr-2 text-primary-500" />
                 Email Address *
               </label>
               <input
@@ -885,7 +929,7 @@ const BookConsultation = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-primary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 placeholder="your.email@company.com"
                 required
               />
@@ -894,8 +938,8 @@ const BookConsultation = () => {
             {/* Name Fields */}
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <User className="inline w-4 h-4 mr-2" />
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  <User className="inline w-4 h-4 mr-2 text-primary-500" />
                   First Name *
                 </label>
                 <input
@@ -903,14 +947,14 @@ const BookConsultation = () => {
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-primary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                   placeholder="John"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <User className="inline w-4 h-4 mr-2" />
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  <User className="inline w-4 h-4 mr-2 text-primary-500" />
                   Last Name *
                 </label>
                 <input
@@ -918,7 +962,7 @@ const BookConsultation = () => {
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-primary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                   placeholder="Doe"
                   required
                 />
@@ -927,15 +971,15 @@ const BookConsultation = () => {
 
             {/* Country Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <Globe className="inline w-4 h-4 mr-2" />
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                <Globe className="inline w-4 h-4 mr-2 text-primary-500" />
                 Country *
               </label>
               <select
                 name="country"
                 value={formData.country}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-primary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 required
                 disabled={loadingCountries}>
                 <option value="">
@@ -953,13 +997,13 @@ const BookConsultation = () => {
 
             {/* Company Information */}
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
+              <h3 className="text-lg font-semibold text-primary-900 border-b border-primary-200 pb-2">
                 Company Information
               </h3>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Building className="inline w-4 h-4 mr-2" />
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  <Building className="inline w-4 h-4 mr-2 text-primary-500" />
                   Company or Business Name *
                 </label>
                 <input
@@ -967,22 +1011,22 @@ const BookConsultation = () => {
                   name="companyName"
                   value={formData.companyName}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-primary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                   placeholder="Your Company or Business Name"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Briefcase className="inline w-4 h-4 mr-2" />
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  <Briefcase className="inline w-4 h-4 mr-2 text-primary-500" />
                   Industry *
                 </label>
                 <select
                   name="companyIndustry"
                   value={formData.companyIndustry}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-primary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                   required>
                   <option value="">Select your industry</option>
                   {industries.map((industry) => (
@@ -994,15 +1038,15 @@ const BookConsultation = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Users className="inline w-4 h-4 mr-2" />
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  <Users className="inline w-4 h-4 mr-2 text-primary-500" />
                   Company Size *
                 </label>
                 <select
                   name="companySize"
                   value={formData.companySize}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-primary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                   required>
                   <option value="">Select company size</option>
                   {companySizes.map((size) => (
@@ -1017,8 +1061,8 @@ const BookConsultation = () => {
             {/* Job Title and Employment Status */}
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Briefcase className="inline w-4 h-4 mr-2" />
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  <Briefcase className="inline w-4 h-4 mr-2 text-primary-500" />
                   Your Job Title *
                 </label>
                 <input
@@ -1026,21 +1070,21 @@ const BookConsultation = () => {
                   name="jobTitle"
                   value={formData.jobTitle}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-primary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                   placeholder="e.g., CEO, Marketing Manager, Business Owner"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <User className="inline w-4 h-4 mr-2" />
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  <User className="inline w-4 h-4 mr-2 text-primary-500" />
                   Employment Status *
                 </label>
                 <select
                   name="employmentStatus"
                   value={formData.employmentStatus}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-primary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                   required>
                   <option value="">Select employment status</option>
                   {employmentStatuses.map((status) => (
@@ -1054,15 +1098,15 @@ const BookConsultation = () => {
 
             {/* Solution Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <MessageSquare className="inline w-4 h-4 mr-2" />
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                <MessageSquare className="inline w-4 h-4 mr-2 text-primary-500" />
                 Select Solution *
               </label>
               <select
                 name="selectedSolution"
                 value={formData.selectedSolution}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-primary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 required
                 disabled={loadingServices}>
                 <option value="">
@@ -1080,8 +1124,8 @@ const BookConsultation = () => {
 
             {/* Phone Number */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <Phone className="inline w-4 h-4 mr-2" />
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                <Phone className="inline w-4 h-4 mr-2 text-primary-500" />
                 Phone Number *
               </label>
               <input
@@ -1089,7 +1133,7 @@ const BookConsultation = () => {
                 name="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-primary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 placeholder="+1234567890"
                 required
               />
@@ -1098,8 +1142,8 @@ const BookConsultation = () => {
             {/* Preferred Date and Time */}
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Calendar className="inline w-4 h-4 mr-2" />
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  <Calendar className="inline w-4 h-4 mr-2 text-primary-500" />
                   Preferred Date (Optional)
                 </label>
                 <input
@@ -1108,19 +1152,19 @@ const BookConsultation = () => {
                   value={formData.preferredDate}
                   onChange={handleInputChange}
                   min={new Date().toISOString().split("T")[0]}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-primary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Clock className="inline w-4 h-4 mr-2" />
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  <Clock className="inline w-4 h-4 mr-2 text-primary-500" />
                   Preferred Time (Optional)
                 </label>
                 <select
                   name="preferredTime"
                   value={formData.preferredTime}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all">
+                  className="w-full px-4 py-3 rounded-xl border border-primary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
                   <option value="">Select preferred time</option>
                   {timeSlots.map((time) => (
                     <option key={time} value={time}>
@@ -1133,7 +1177,7 @@ const BookConsultation = () => {
 
             {/* Additional Message */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
                 Additional Message (Optional)
               </label>
               <textarea
@@ -1141,7 +1185,7 @@ const BookConsultation = () => {
                 value={formData.message}
                 onChange={handleInputChange}
                 rows={4}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-3 rounded-xl border border-primary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all resize-none"
                 placeholder="Tell us more about your business challenges or specific requirements..."
               />
             </div>
@@ -1151,15 +1195,18 @@ const BookConsultation = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-teal-600 text-white py-4 px-8 rounded-xl font-semibold hover:from-teal-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2">
+                className=" group w-auto mx-auto lg:w-[50%] bg-secondary-500 text-primary-900 py-4 px-8 rounded-xl font-semibold hover:bg-primary-500 hover:text-white transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2">
                 {isLoading ? (
                   <>
-                    <Loader className="animate-spin" size={20} />
+                    <Loader
+                      className="animate-spin text-primary-900"
+                      size={20}
+                    />
                     Registering Solution
                   </>
                 ) : (
                   <>
-                    <Calendar className="w-5 h-5" />
+                    <Calendar className="w-5 h-5 group-hover:text-white text-primary-900" />
                     Register Solution
                   </>
                 )}
@@ -1167,11 +1214,17 @@ const BookConsultation = () => {
             </div>
 
             {/* Contact Info */}
-            <div className="pt-6 border-t text-center text-sm text-gray-600">
+            <div className="pt-6 border-t border-primary-200 text-center text-sm text-neutral-600">
               <p>Need immediate assistance?</p>
               <p>
-                Call us at <span className="font-medium">+2349012048912</span>{" "}
-                or email <span className="font-medium">Credulen@gmail.com</span>
+                Call us at{" "}
+                <span className="font-medium text-primary-900">
+                  +2349012048912
+                </span>{" "}
+                or email{" "}
+                <span className="font-medium text-primary-900">
+                  Credulen@gmail.com
+                </span>
               </p>
             </div>
           </form>
@@ -1200,10 +1253,10 @@ const Modal = ({ isOpen, onClose, children }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-4 max-w-sm w-full relative">
+      <div className="bg-white rounded-lg p-4 max-w-sm w-full relative border border-primary-100">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+          className="absolute top-2 right-2 text-neutral-500 hover:text-neutral-700"
           aria-label="Close">
           <X size={20} />
         </button>

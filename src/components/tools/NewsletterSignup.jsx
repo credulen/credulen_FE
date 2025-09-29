@@ -1,3 +1,165 @@
+// import React, { useState, useEffect } from "react";
+// import { Bell, CheckCircle, AlertCircle, X, Loader } from "lucide-react";
+// import { Alert, AlertDescription } from "./Alert";
+
+// const backendURL =
+//   import.meta.env.MODE === "production"
+//     ? import.meta.env.VITE_BACKEND_URL
+//     : "http://localhost:3001";
+
+// const Modal = ({ isOpen, onClose, children }) => {
+//   if (!isOpen) return null;
+
+//   return (
+//     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+//       <div className="bg-white rounded-lg p-4 w-full max-w-md relative">
+//         <button
+//           onClick={onClose}
+//           className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+//           aria-label="Close">
+//           <X size={20} />
+//         </button>
+//         {children}
+//       </div>
+//     </div>
+//   );
+// };
+
+// const NewsletterSignup = () => {
+//   const [email, setEmail] = useState("");
+//   const [alertInfo, setAlertInfo] = useState(null);
+//   const [showModal, setShowModal] = useState(false);
+//   const [isLoading, setIsLoading] = useState(false);
+
+//   useEffect(() => {
+//     if (alertInfo) {
+//       setShowModal(true);
+//       const timer = setTimeout(() => {
+//         setShowModal(false);
+//         setAlertInfo(null);
+//       }, 5000);
+//       return () => clearTimeout(timer);
+//     }
+//   }, [alertInfo]);
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setIsLoading(true);
+//     try {
+//       const response = await fetch(`${backendURL}/api/newsletter-signup`, {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ email }),
+//       });
+//       const data = await response.json();
+//       if (response.ok) {
+//         setAlertInfo({
+//           message: "Subscription successful!",
+//           variant: "success",
+//           icon: CheckCircle,
+//         });
+//         setEmail("");
+//       } else {
+//         setAlertInfo({
+//           message: data.message || "An error occurred. Please try again.",
+//           variant: data.message.includes("already subscribed")
+//             ? "warning"
+//             : "destructive",
+//           icon: AlertCircle,
+//         });
+//         setEmail("");
+//       }
+//     } catch (error) {
+//       setAlertInfo({
+//         message: "An error occurred. Please try again.",
+//         variant: "destructive",
+//         icon: AlertCircle,
+//       });
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   return (
+//     <div className="bg-sky-100 p-4 sm:p-6 md:p-8 rounded-lg max-w-2xl mx-auto relative overflow-hidden">
+//       <style jsx>{`
+//         @keyframes continuousRing {
+//           0%,
+//           100% {
+//             transform: rotate(0);
+//           }
+//           5%,
+//           15%,
+//           25% {
+//             transform: rotate(15deg);
+//           }
+//           10%,
+//           20%,
+//           30% {
+//             transform: rotate(-15deg);
+//           }
+//           35% {
+//             transform: rotate(0);
+//           }
+//         }
+//         .ringing {
+//           animation: continuousRing 2s ease-in-out infinite;
+//           transform-origin: top center;
+//         }
+//       `}</style>
+//       <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-teal-600 mb-4 uppercase">
+//         Sign up for our newsletter!
+//       </h3>
+//       <p className="text-teal-700 mb-4 text-sm sm:text-base">
+//         Join Our Newsletter for the latest updates and exclusive content.
+//       </p>
+//       <form
+//         onSubmit={handleSubmit}
+//         className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+//         <input
+//           autoComplete="email"
+//           type="email"
+//           value={email}
+//           onChange={(e) => setEmail(e.target.value)}
+//           placeholder="Enter your email"
+//           className="flex-grow p-2 border border-teal-500 rounded placeholder-slate-400 text-sm sm:text-base w-full"
+//           required
+//           disabled={isLoading}
+//         />
+//         <button
+//           type="submit"
+//           className="bg-teal-600 text-white px-4 py-2 rounded hover:font-medium transition-colors flex items-center justify-center hover:border-2 hover:border-teal-700 hover:bg-white hover:text-teal-700 duration-300 w-full sm:w-auto"
+//           disabled={isLoading}>
+//           {isLoading ? (
+//             <>
+//               <Loader className="animate-spin mr-2" size={20} />
+//               Subscribing...
+//             </>
+//           ) : (
+//             "Subscribe"
+//           )}
+//         </button>
+//       </form>
+//       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+//         {alertInfo && (
+//           <Alert variant={alertInfo.variant} className="m-0">
+//             <div className="flex items-center gap-2">
+//               {alertInfo.icon && (
+//                 <alertInfo.icon className="h-5 w-5 flex-shrink-0" />
+//               )}
+//               <AlertDescription>{alertInfo.message}</AlertDescription>
+//             </div>
+//           </Alert>
+//         )}
+//       </Modal>
+//       <div className="absolute top-2 right-2 sm:top-4 sm:right-4">
+//         <Bell size={24} className="text-gray-700 ringing" />
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default NewsletterSignup;
 import React, { useState, useEffect } from "react";
 import { Bell, CheckCircle, AlertCircle, X, Loader } from "lucide-react";
 import { Alert, AlertDescription } from "./Alert";
@@ -15,7 +177,7 @@ const Modal = ({ isOpen, onClose, children }) => {
       <div className="bg-white rounded-lg p-4 w-full max-w-md relative">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+          className="absolute top-2 right-2 text-neutral-500 hover:text-neutral-700"
           aria-label="Close">
           <X size={20} />
         </button>
@@ -81,7 +243,7 @@ const NewsletterSignup = () => {
   };
 
   return (
-    <div className="bg-sky-100 p-4 sm:p-6 md:p-8 rounded-lg max-w-2xl mx-auto relative overflow-hidden">
+    <div className="bg-primary-50 p-4 sm:p-6 md:p-8 rounded-lg max-w-2xl mx-auto relative overflow-hidden">
       <style jsx>{`
         @keyframes continuousRing {
           0%,
@@ -107,10 +269,10 @@ const NewsletterSignup = () => {
           transform-origin: top center;
         }
       `}</style>
-      <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-teal-600 mb-4 uppercase">
+      <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary-900 mb-4 uppercase">
         Sign up for our newsletter!
       </h3>
-      <p className="text-teal-700 mb-4 text-sm sm:text-base">
+      <p className="text-neutral-600 mb-4 text-sm sm:text-base">
         Join Our Newsletter for the latest updates and exclusive content.
       </p>
       <form
@@ -122,13 +284,13 @@ const NewsletterSignup = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email"
-          className="flex-grow p-2 border border-teal-500 rounded placeholder-slate-400 text-sm sm:text-base w-full"
+          className="flex-grow p-2 border border-primary-500 rounded placeholder-neutral-400 text-sm sm:text-base w-full focus:border-primary-600 focus:ring-2 focus:ring-primary-500/20"
           required
           disabled={isLoading}
         />
         <button
           type="submit"
-          className="bg-teal-600 text-white px-4 py-2 rounded hover:font-medium transition-colors flex items-center justify-center hover:border-2 hover:border-teal-700 hover:bg-white hover:text-teal-700 duration-300 w-full sm:w-auto"
+          className="bg-primary-900 text-white px-4 py-2 rounded hover:bg-primary-800 transition-colors flex items-center justify-center hover:border-2 hover:border-primary-700 hover:bg-secondary-500   hover:text-primary-900 hover:font-semibold hover:border-primary-500 duration-300 w-full sm:w-auto focus:ring-4 focus:outline-none focus:ring-primary-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={isLoading}>
           {isLoading ? (
             <>
@@ -153,7 +315,7 @@ const NewsletterSignup = () => {
         )}
       </Modal>
       <div className="absolute top-2 right-2 sm:top-4 sm:right-4">
-        <Bell size={24} className="text-gray-700 ringing" />
+        <Bell size={24} className="text-primary-600 ringing" />
       </div>
     </div>
   );

@@ -82,16 +82,24 @@ export default function ConvertToAgent() {
   }, []);
 
   if (!userInfo || userInfo.role !== "admin") {
-    return <p className="text-center mt-10">Admin access required</p>;
+    return (
+      <p className="text-center mt-10 text-primary-500">
+        Admin access required
+      </p>
+    );
   }
 
   return (
-    <div className="mx-auto p-4 max-w-md mt-10">
-      <h2 className="text-2xl font-bold mb-6 text-center">
+    <div className="mx-auto p-4 max-w-md mt-10 bg-primary-50">
+      <h2 className="text-2xl font-bold mb-6 text-center text-primary-500">
         Convert User to Agent
       </h2>
       <div className="mb-4">
-        <Label htmlFor="email" value="User Email" className="mb-2 block" />
+        <Label
+          htmlFor="email"
+          value="User Email"
+          className="mb-2 block text-primary-500"
+        />
         <TextInput
           id="email"
           type="email"
@@ -100,12 +108,15 @@ export default function ConvertToAgent() {
           onChange={handleEmailChange}
           disabled={isLoading}
           required
+          color="primary" // Using Flowbite's color prop
+          className="text-primary-500" // Custom text color for input
         />
       </div>
       <Button
         onClick={handleConvert}
         disabled={isLoading}
-        className="w-full bg-blue-500 hover:bg-blue-600">
+        color="primary" // Using Flowbite's color prop
+        className="w-full bg-primary-500 hover:bg-primary-600 text-white">
         {isLoading ? (
           <CircularProgress size={24} className="text-white" />
         ) : (
@@ -114,19 +125,23 @@ export default function ConvertToAgent() {
       </Button>
 
       {result && (
-        <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-          <h3 className="text-lg font-semibold">Conversion Result</h3>
+        <div className="mt-6 p-4 bg-primary-100 rounded-lg">
+          <h3 className="text-lg font-semibold text-primary-500">
+            Conversion Result
+          </h3>
           <p>
-            <strong>Username:</strong> {result.username}
+            <strong className="text-primary-500">Username:</strong>{" "}
+            {result.username}
           </p>
           <p>
-            <strong>Email:</strong> {result.email}
+            <strong className="text-primary-500">Email:</strong> {result.email}
           </p>
           <p>
-            <strong>Role:</strong> {result.role}
+            <strong className="text-primary-500">Role:</strong> {result.role}
           </p>
           <p>
-            <strong>Agent ID:</strong> {result.agentId}
+            <strong className="text-primary-500">Agent ID:</strong>{" "}
+            {result.agentId}
           </p>
         </div>
       )}
@@ -139,7 +154,12 @@ export default function ConvertToAgent() {
         <Alert
           onClose={handleCloseSnackbar}
           severity={snackbar.severity}
-          sx={{ width: "100%" }}>
+          sx={{
+            width: "100%",
+            backgroundColor:
+              snackbar.severity === "success" ? "#110b79" : "#ef4444",
+            color: snackbar.severity === "success" ? "#ffff" : "#ffff",
+          }}>
           {snackbar.message}
         </Alert>
       </Snackbar>

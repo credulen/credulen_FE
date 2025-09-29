@@ -1,43 +1,25 @@
-import React, { useEffect, useState, useCallback, memo } from "react";
+import React, { useEffect, useState, useCallback, memo, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { Table, Button, Dropdown } from "flowbite-react";
-import { BiMessageSquareAdd } from "react-icons/bi";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 import { IoClose } from "react-icons/io5";
-import { AiTwotoneDelete } from "react-icons/ai";
-import { CircularProgress } from "@mui/material";
+import { AiTwotoneDelete, AiOutlineDown } from "react-icons/ai";
+import { BiMessageSquareAdd } from "react-icons/bi";
 import moment from "moment";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
+import Spinner from "../../components/tools/Spinner";
 
 const backendURL =
   import.meta.env.MODE === "production"
     ? import.meta.env.VITE_BACKEND_URL
     : "http://localhost:3001";
 
-const Alert = memo(
-  React.forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-  })
-);
-
-const LoadingSpinner = memo(() => (
-  <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
-    <CircularProgress size={40} className="text-btColour" />
-  </div>
-));
-
 const SolutionTableRow = memo(({ solution, onDeleteClick }) => (
-  <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-    <Table.Cell>{moment(solution.updatedAt).format("MMMM D")}</Table.Cell>
-    <Table.Cell>
+  <tr className="bg-white dark:bg-neutral-800-dark border-b border-primary-100 dark:border-primary-200-dark">
+    <td className="px-4 py-3 text-neutral-700 dark:text-neutral-700-dark">
+      {moment(solution.updatedAt).format("MMMM D")}
+    </td>
+    <td className="px-4 py-3">
       <Link to={`/solution/${solution.slug}`}>
-        <div className="w-10 h-10 overflow-hidden rounded-full flex items-center justify-center bg-gray-500">
+        <div className="w-10 h-10 overflow-hidden rounded-full flex items-center justify-center bg-neutral-200 dark:bg-neutral-600-dark">
           <img
             src={`${solution.image}`}
             alt={solution.title}
@@ -50,35 +32,34 @@ const SolutionTableRow = memo(({ solution, onDeleteClick }) => (
           />
         </div>
       </Link>
-    </Table.Cell>
-    <Table.Cell>
+    </td>
+    <td className="px-4 py-3">
       <Link
-        className="font-medium text-gray-900 dark:text-white"
-        to={`/solution/${solution.slug}`}
-      >
+        className="font-medium text-neutral-700 dark:text-neutral-700-dark hover:text-primary-500 dark:hover:text-primary-500"
+        to={`/solution/${solution.slug}`}>
         {solution.title.length > 50
           ? `${solution.title.substring(0, 50)}...`
           : solution.title}
       </Link>
-    </Table.Cell>
-    <Table.Cell>{solution.category}</Table.Cell>
-    <Table.Cell>
-      <span
+    </td>
+    <td className="px-4 py-3 text-neutral-700 dark:text-neutral-700-dark">
+      {solution.category}
+    </td>
+    <td className="px-4 py-3">
+      <button
         onClick={() => onDeleteClick(solution._id)}
-        className="font-medium text-red-500 bg-transparent border border-red-500 cursor-pointer hover:bg-btColour hover:text-white p-1 rounded-md"
-      >
-        Delete
-      </span>
-    </Table.Cell>
-    <Table.Cell>
+        className="font-medium text-error-500 border border-error-500 rounded-md px-2 py-1 hover:bg-error-500 hover:text-white transition-colors duration-200">
+        <AiTwotoneDelete size={20} />
+      </button>
+    </td>
+    <td className="px-4 py-3">
       <Link
-        className="font-medium text-white hover:text-btColour hover:bg-transparent hover:border hover:border-btColour bg-btColour p-1 rounded-md transition-all duration-300 px-2"
-        to={`/DashBoard/Admin/CreateSolutions/${solution.slug}`}
-      >
-        <span>Edit</span>
+        className="font-medium bg-primary-500 text-white rounded-md px-2 py-1 hover:bg-secondary-500 transition-colors duration-200"
+        to={`/DashBoard/Admin/CreateSolutions/${solution.slug}`}>
+        Edit
       </Link>
-    </Table.Cell>
-  </Table.Row>
+    </td>
+  </tr>
 ));
 
 export default function AdminSolutionList() {
@@ -91,11 +72,13 @@ export default function AdminSolutionList() {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
-  const [snackbar, setSnackbar] = useState({
+  const [toast, setToast] = useState({
     open: false,
     message: "",
     severity: "success",
   });
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const PAGE_SIZE = 9;
 
@@ -113,10 +96,14 @@ export default function AdminSolutionList() {
           queryParams.append("category", selectedCategory);
         }
 
+        console.log("Fetching solutions with query:", queryParams.toString());
+
         const res = await fetch(
           `${backendURL}/api/getAllSolutionLists?${queryParams.toString()}`
         );
         const data = await res.json();
+
+        console.log("API response:", data);
 
         if (res.ok) {
           setSolutions((prev) =>
@@ -129,7 +116,7 @@ export default function AdminSolutionList() {
         }
       } catch (error) {
         console.error("Error fetching solutions:", error);
-        setSnackbar({
+        setToast({
           open: true,
           message: error.message,
           severity: "error",
@@ -145,6 +132,25 @@ export default function AdminSolutionList() {
     fetchSolutions();
   }, [fetchSolutions, userInfo, selectedCategory]);
 
+  useEffect(() => {
+    if (toast.open) {
+      const timer = setTimeout(() => {
+        setToast((prev) => ({ ...prev, open: false }));
+      }, 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast.open]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleShowMore = useCallback(() => {
     if (!loading && hasMore) {
       fetchSolutions(solutions.length);
@@ -155,6 +161,7 @@ export default function AdminSolutionList() {
     setSelectedCategory(category);
     setSolutions([]); // Reset solutions when changing filter
     setHasMore(true); // Reset pagination state
+    setDropdownOpen(false); // Close dropdown on selection
   }, []);
 
   const openDeleteModal = useCallback((solutionId) => {
@@ -180,7 +187,7 @@ export default function AdminSolutionList() {
           prev.filter((solution) => solution._id !== solutionIdToDelete)
         );
         setTotalCount((prev) => prev - 1);
-        setSnackbar({
+        setToast({
           open: true,
           message: "Solution deleted successfully",
           severity: "success",
@@ -191,7 +198,7 @@ export default function AdminSolutionList() {
       }
     } catch (error) {
       console.error("Error deleting solution:", error);
-      setSnackbar({
+      setToast({
         open: true,
         message: error.message,
         severity: "error",
@@ -199,65 +206,86 @@ export default function AdminSolutionList() {
     }
   }, [solutionIdToDelete, closeDeleteModal]);
 
-  const handleCloseSnackbar = useCallback((event, reason) => {
+  const handleCloseToast = useCallback((event, reason) => {
     if (reason === "clickaway") return;
-    setSnackbar((prev) => ({ ...prev, open: false }));
+    setToast((prev) => ({ ...prev, open: false }));
   }, []);
 
-  if (initialLoading) return <LoadingSpinner />;
+  if (initialLoading) {
+    return (
+      <>
+        <Spinner />
+      </>
+    );
+  }
 
   return (
-    <>
-      <div className="my-5 ml-3 mid:mt-20 flex justify-between items-center">
+    <div className="p-4 sm:p-6">
+      <div className="flex justify-between items-center mb-6">
         <Link to="/DashBoard/Admin/CreateSolutions">
-          <button className="text-btColour border border-btColour p-1 rounded-lg hover:font-semibold">
-            <span className="flex whitespace-nowrap">
-              <BiMessageSquareAdd className="mr-2 mt-1" size={16} />
-              Create Solution
-            </span>
+          <button className="flex items-center text-primary-500 border border-primary-500 rounded-md px-4 py-2 hover:bg-primary-50 hover:border-primary-500 dark:hover:bg-primary-50-dark dark:hover:border-primary-500 transition-colors duration-200">
+            <BiMessageSquareAdd className="mr-2" size={16} />
+            Create Solution
           </button>
         </Link>
-
-        <div className="mr-3">
-          <Dropdown
-            style={{ color: "black" }}
-            label={selectedCategory || "Filter by Category"}
-          >
-            <Dropdown.Item
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="flex items-center text-neutral-700 dark:text-neutral-700-dark border border-primary-100 dark:border-primary-200-dark rounded-md px-4 py-2 hover:bg-primary-50 dark:hover:bg-primary-50-dark transition-colors duration-200"
+            aria-label="Filter by category">
+            {selectedCategory || "Filter by Category"}
+            <AiOutlineDown className="ml-2" size={16} />
+          </button>
+          <ul
+            className={`absolute z-10 mt-2 w-48 bg-white dark:bg-neutral-800-dark border border-primary-100 dark:border-primary-200-dark rounded-md shadow-lg ${
+              dropdownOpen ? "block" : "hidden"
+            }`}>
+            <li
               onClick={() => handleCategoryFilter("")}
-              style={{ color: "black" }}
-            >
+              className="px-4 py-2 text-neutral-700 dark:text-neutral-700-dark hover:bg-primary-50 dark:hover:bg-primary-50-dark cursor-pointer">
               All Categories
-            </Dropdown.Item>
-            <Dropdown.Item
+            </li>
+            <li
               onClick={() => handleCategoryFilter("TrainingSchool")}
-              style={{ color: "black" }}
-            >
+              className="px-4 py-2 text-neutral-700 dark:text-neutral-700-dark hover:bg-primary-50 dark:hover:bg-primary-50-dark cursor-pointer">
               Training School
-            </Dropdown.Item>
-            <Dropdown.Item
+            </li>
+            <li
               onClick={() => handleCategoryFilter("ConsultingService")}
-              style={{ color: "black" }}
-            >
+              className="px-4 py-2 text-neutral-700 dark:text-neutral-700-dark hover:bg-primary-50 dark:hover:bg-primary-50-dark cursor-pointer">
               Consulting Service
-            </Dropdown.Item>
-          </Dropdown>
+            </li>
+          </ul>
         </div>
       </div>
 
-      <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
+      <div className="overflow-x-auto">
         {solutions.length > 0 ? (
           <>
-            <Table hoverable className="shadow-md">
-              <Table.Head>
-                <Table.HeadCell>Date updated</Table.HeadCell>
-                <Table.HeadCell>Solution image</Table.HeadCell>
-                <Table.HeadCell>Solution title</Table.HeadCell>
-                <Table.HeadCell>Category</Table.HeadCell>
-                <Table.HeadCell>Delete</Table.HeadCell>
-                <Table.HeadCell>Edit</Table.HeadCell>
-              </Table.Head>
-              <Table.Body className="divide-y">
+            <table className="w-full border-collapse shadow-sm">
+              <thead>
+                <tr className="bg-primary-50 dark:bg-primary-50-dark text-neutral-700 dark:text-neutral-700-dark">
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    Date updated
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    Solution image
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    Solution title
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    Category
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    Delete
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium">
+                    Edit
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-primary-100 dark:divide-primary-200-dark">
                 {solutions.map((solution) => (
                   <SolutionTableRow
                     key={solution._id}
@@ -265,68 +293,86 @@ export default function AdminSolutionList() {
                     onDeleteClick={openDeleteModal}
                   />
                 ))}
-              </Table.Body>
-            </Table>
+              </tbody>
+            </table>
 
             {hasMore && (
               <button
                 onClick={handleShowMore}
                 disabled={loading}
-                className="w-full text-teal-500 self-center text-sm py-7 disabled:opacity-50"
-              >
-                {loading ? "Loading..." : "Show more"}
+                className="w-full text-primary-500 hover:text-secondary-500 text-sm py-7 disabled:text-neutral-600 transition-colors duration-200">
+                {loading ? (
+                  <svg
+                    className="animate-spin h-5 w-5 text-primary-900 mx-auto"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  "Show more"
+                )}
               </button>
             )}
           </>
         ) : (
-          <p>You have no solutions yet!</p>
+          <p className="text-neutral-600 dark:text-neutral-600-dark text-center py-4">
+            You have no solutions yet!
+          </p>
         )}
 
-        <Dialog
-          open={isDeleteModalOpen}
-          onClose={closeDeleteModal}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">
-            Are you sure you want to delete this solution?
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              This action cannot be undone. All associated data with this
-              solution will be affected.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={closeDeleteModal}>
-              <IoClose
-                size={24}
-                className="text-red-500 border-red-500 rounded-sm transition ease-in-out duration-200 transform hover:scale-125 hover:text-red-600"
-              />
-            </Button>
-            <Button onClick={handleDeleteSolution}>
-              <AiTwotoneDelete
-                size={24}
-                className="text-red-500 border-red-500 rounded-sm transition ease-in-out duration-200 transform hover:scale-125 hover:text-red-600"
-              />
-            </Button>
-          </DialogActions>
-        </Dialog>
+        {isDeleteModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-neutral-800-dark p-6 rounded-lg shadow-lg max-w-sm w-full">
+              <h3 className="text-lg font-bold text-primary-900 mb-4">
+                Confirm Delete
+              </h3>
+              <p className="text-neutral-600 dark:text-neutral-600-dark mb-6">
+                Are you sure you want to delete this solution? This action
+                cannot be undone.
+              </p>
+              <div className="flex justify-end gap-4">
+                <button
+                  onClick={closeDeleteModal}
+                  className="px-4 py-2 text-neutral-600 hover:text-neutral-700 dark:text-neutral-600-dark dark:hover:text-neutral-700-dark transition-colors duration-200">
+                  <IoClose size={24} />
+                </button>
+                <button
+                  onClick={handleDeleteSolution}
+                  className="px-4 py-2 text-error-500 hover:text-error-600 transition-colors duration-200">
+                  <AiTwotoneDelete size={24} />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={6000}
-          onClose={handleCloseSnackbar}
-        >
-          <Alert
-            onClose={handleCloseSnackbar}
-            severity={snackbar.severity}
-            sx={{ width: "100%" }}
-          >
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
+        {toast.open && (
+          <div
+            className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-3 rounded-lg shadow-md flex items-center gap-2 max-w-sm w-full transition-opacity duration-300 ${
+              toast.severity === "success"
+                ? "bg-green-500 text-white"
+                : "bg-error-500 text-white"
+            }`}>
+            <span className="flex-1 text-sm">{toast.message}</span>
+            <button
+              onClick={handleCloseToast}
+              className="text-white hover:text-neutral-200">
+              <IoClose size={20} />
+            </button>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }

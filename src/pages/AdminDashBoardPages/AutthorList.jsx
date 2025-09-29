@@ -14,6 +14,7 @@ import { BiMessageSquareAdd } from "react-icons/bi";
 import { HiOutlineUserCircle } from "react-icons/hi";
 import { CircularProgress } from "@mui/material";
 import { useSnackbar } from "../../components/tools/SnackBarProvider";
+import Spinner from "../../components/tools/Spinner";
 
 const backendURL =
   import.meta.env.MODE === "production"
@@ -21,14 +22,16 @@ const backendURL =
     : "http://localhost:3001";
 
 const LoadingSpinner = memo(() => (
-  <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
-    <CircularProgress size={40} className="text-btColour" />
-  </div>
+  <>
+    <Spinner />
+  </>
 ));
 
 const AuthorTableRow = memo(({ author, onDeleteClick }) => (
-  <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-    <Table.Cell>{author.name}</Table.Cell>
+  <Table.Row className="bg-white dark:bg-neutral-800">
+    <Table.Cell className="text-neutral-700 dark:text-neutral-700-dark">
+      {author.name}
+    </Table.Cell>
     <Table.Cell>
       {author.image ? (
         <img
@@ -42,28 +45,28 @@ const AuthorTableRow = memo(({ author, onDeleteClick }) => (
           }}
         />
       ) : (
-        <HiOutlineUserCircle className="w-10 h-10 text-gray-400" />
+        <HiOutlineUserCircle className="w-10 h-10 text-neutral-600 dark:text-neutral-600-dark" />
       )}
     </Table.Cell>
-    <Table.Cell>
-      {author.bio.length > 50
+    <Table.Cell className="text-neutral-700 dark:text-neutral-700-dark">
+      {author?.bio?.length > 50
         ? `${author.bio.substring(0, 50)}...`
         : author.bio}
     </Table.Cell>
-    <Table.Cell>{author.email}</Table.Cell>
+    <Table.Cell className="text-neutral-700 dark:text-neutral-700-dark">
+      {author.email}
+    </Table.Cell>
     <Table.Cell>
       <span
         onClick={() => onDeleteClick(author._id)}
-        className="font-medium text-red-500 bg-transparent border border-red-500 cursor-pointer hover:bg-btColour hover:text-white p-1 rounded-md"
-      >
+        className="font-medium text-DashBoard/Admin/SpeakerList-500 bg-transparent border border-error-500 cursor-pointer hover:bg-primary-500 hover:text-white p-1 rounded-md">
         Delete
       </span>
     </Table.Cell>
     <Table.Cell>
       <Link
-        className="font-medium text-white hover:text-btColour hover:bg-transparent hover:border hover:border-btColour bg-btColour p-1 rounded-md transition-all duration-300 px-2"
-        to={`/DashBoard/Admin/CreateAuthor/${author._id}`}
-      >
+        className="font-medium text-white bg-primary-500 hover:text-primary-500 hover:bg-transparent hover:border hover:border-primary-500 p-1 rounded-md transition-all duration-300 px-2"
+        to={`/DashBoard/Admin/CreateAuthor/${author._id}`}>
         <span>Edit</span>
       </Link>
     </Table.Cell>
@@ -99,7 +102,7 @@ export default function AuthorList() {
         setShowMore(data.length === 9);
       } catch (error) {
         console.error("Error fetching authors:", error);
-        showSnackbar(error.message || "Failed to fetch authors");
+        showSnackbar(error.message || "Failed to fetch authors", "error");
       } finally {
         startIndex === 0 ? setInitialLoading(false) : setLoading(false);
       }
@@ -134,21 +137,21 @@ export default function AuthorList() {
         { method: "DELETE" }
       );
 
-      const data = await res.json();
-
       if (!res.ok) {
-        throw new Error(data.message || "Failed to delete author");
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to delete author");
       }
 
       setAuthors((prev) =>
         prev.filter((author) => author._id !== authorIdToDelete)
       );
-      showSnackbar("Author deleted successfully");
+      showSnackbar("Author deleted successfully", "success");
       closeDeleteModal();
     } catch (error) {
       console.error("Error deleting author:", error);
       showSnackbar(
-        error.message || "An error occurred while deleting the author"
+        error.message || "An error occurred while deleting the author",
+        "error"
       );
     }
   }, [authorIdToDelete, closeDeleteModal, showSnackbar]);
@@ -161,28 +164,38 @@ export default function AuthorList() {
     <>
       <div className="my-5 ml-3 mid:mt-20">
         <Link to="/DashBoard/Admin/CreateAuthor">
-          <button className="text-btColour border border-btColour p-1 rounded-lg hover:font-semibold">
-            <span className="flex whitespace-nowrap">
-              <BiMessageSquareAdd className="mr-2 mt-1" size={16} />
-              Create Author
-            </span>
+          <button className="text-primary-500 border border-primary-500 p-1 rounded-lg hover:bg-primary-500 hover:text-white hover:font-semibold transition-all duration-300 flex items-center gap-2">
+            <BiMessageSquareAdd size={16} />
+            Create Author
           </button>
         </Link>
       </div>
 
-      <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
+      <div className="table-auto overflow-x-auto md:mx-auto p-3 shadow-md rounded-lg border border-primary-100">
         {authors?.length > 0 ? (
           <>
             <Table hoverable className="shadow-md">
               <Table.Head>
-                <Table.HeadCell>Name </Table.HeadCell>
-                <Table.HeadCell>Image</Table.HeadCell>
-                <Table.HeadCell>Bio</Table.HeadCell>
-                <Table.HeadCell>Email</Table.HeadCell>
-                <Table.HeadCell>Delete</Table.HeadCell>
-                <Table.HeadCell>Edit</Table.HeadCell>
+                <Table.HeadCell className="text-neutral-700 dark:text-neutral-700-dark">
+                  Name
+                </Table.HeadCell>
+                <Table.HeadCell className="text-neutral-700 dark:text-neutral-700-dark">
+                  Image
+                </Table.HeadCell>
+                <Table.HeadCell className="text-neutral-700 dark:text-neutral-700-dark">
+                  Bio
+                </Table.HeadCell>
+                <Table.HeadCell className="text-neutral-700 dark:text-neutral-700-dark">
+                  Email
+                </Table.HeadCell>
+                <Table.HeadCell className="text-neutral-700 dark:text-neutral-700-dark">
+                  Delete
+                </Table.HeadCell>
+                <Table.HeadCell className="text-neutral-700 dark:text-neutral-700-dark">
+                  Edit
+                </Table.HeadCell>
               </Table.Head>
-              <Table.Body className="divide-y">
+              <Table.Body className="divide-y divide-primary-100">
                 {authors.map((author) => (
                   <AuthorTableRow
                     key={author._id}
@@ -197,43 +210,43 @@ export default function AuthorList() {
               <button
                 onClick={handleShowMore}
                 disabled={loading}
-                className="w-full text-teal-500 self-center text-sm py-7 disabled:opacity-50"
-              >
+                className="w-full text-primary-500 hover:text-secondary-500 self-center text-sm py-7 disabled:bg-neutral-200 disabled:text-neutral-600 transition-colors duration-300">
                 {loading ? "Loading..." : "Show more"}
               </button>
             )}
           </>
         ) : (
-          <p>No authors found!</p>
+          <p className="text-center text-neutral-600 dark:text-neutral-600-dark py-4">
+            No authors found!
+          </p>
         )}
 
         <Dialog
           open={isDeleteModalOpen}
           onClose={closeDeleteModal}
           aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">
+          aria-describedby="alert-dialog-description">
+          <DialogTitle id="alert-dialog-title" sx={{ color: "#080759" }}>
             Are you sure you want to delete this author?
           </DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description">
+            <DialogContentText
+              id="alert-dialog-description"
+              sx={{ color: "#5E6D7A" }}>
               This action cannot be undone. All posts associated with this
               author will be affected.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={closeDeleteModal} color="primary">
-              <IoClose
-                size={24}
-                className="text-red-500 border-red-500 rounded-sm transition ease-in-out duration-200 transform hover:scale-125 hover:text-red-600"
-              />
+            <Button
+              onClick={closeDeleteModal}
+              sx={{ color: "#5E6D7A", "&:hover": { color: "#3B4A54" } }}>
+              <IoClose size={24} />
             </Button>
-            <Button onClick={handleDeleteAuthor} color="primary">
-              <AiTwotoneDelete
-                size={24}
-                className="text-red-500 border-red-500 rounded-sm transition ease-in-out duration-200 transform hover:scale-125 hover:text-red-600"
-              />
+            <Button
+              onClick={handleDeleteAuthor}
+              sx={{ color: "#EF4444", "&:hover": { color: "#B91C1C" } }}>
+              <AiTwotoneDelete size={24} />
             </Button>
           </DialogActions>
         </Dialog>

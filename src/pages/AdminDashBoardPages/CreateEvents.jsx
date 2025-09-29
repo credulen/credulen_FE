@@ -46,6 +46,8 @@ export default function CreateEvents() {
     date: new Date(),
     venue: "",
     eventType: "conference",
+    category: "",
+    subCategory: "other",
     videoUrl: "",
     speakers: [],
     image: null,
@@ -66,7 +68,6 @@ export default function CreateEvents() {
   });
   const [speakers, setSpeakers] = useState([]);
 
-  // Move showSnackbar inside component and memoize it
   const showSnackbar = useCallback((message, severity = "success") => {
     setSnackbar({
       open: true,
@@ -75,18 +76,76 @@ export default function CreateEvents() {
     });
   }, []);
 
-  // Memoize event types
+  const quillModules = {
+    toolbar: [
+      [{ header: [1, 2, 3, 4, 5, 6, false] }], // headings
+      [{ font: [] }], // fonts
+      [{ size: [] }], // font sizes
+      ["bold", "italic", "underline", "strike"], // text styles
+      [{ color: [] }, { background: [] }], // text and background color
+      [{ script: "sub" }, { script: "super" }], // sub/superscript
+      [{ align: [] }], // alignments
+      ["blockquote", "code-block"], // block styles
+      [
+        { list: "ordered" },
+        { list: "bullet" },
+        { indent: "-1" },
+        { indent: "+1" },
+      ], // lists
+      ["link", "image", "video"], // media
+      ["clean"], // remove formatting
+    ],
+  };
+
+  const quillFormats = [
+    "header",
+    "font",
+    "size",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "color",
+    "background",
+    "script",
+    "align",
+    "blockquote",
+    "code-block",
+    "list",
+    "bullet",
+    "indent",
+    "link",
+    "image",
+    "video",
+  ];
+
   const eventTypes = useMemo(
     () => [
-      { value: "webinar", label: "Webinar" },
       { value: "conference", label: "Conference" },
+      { value: "webinar", label: "Webinar" },
+      { value: "podcast", label: "Podcast" },
+      { value: "workshop", label: "Workshop" },
+      { value: "seminar", label: "Seminar" },
     ],
     []
   );
 
-  // Memoize whether to show meeting fields
+  const subCategories = useMemo(
+    () => [
+      { value: "General", label: "General" },
+      { value: "Executive (B2B)", label: "Executive (B2B)" },
+
+      { value: "others", label: "others" },
+    ],
+    []
+  );
+
   const showMeetingFields = useMemo(() => {
     return ["webinar", "conference"].includes(formData.eventType);
+  }, [formData.eventType]);
+
+  const showSubCategoryField = useMemo(() => {
+    return formData.eventType === "podcast";
   }, [formData.eventType]);
 
   const handleInputChange = useCallback((e) => {
@@ -97,6 +156,7 @@ export default function CreateEvents() {
         ...prevData,
         eventType: value,
         venue: value === "webinar" ? "Online" : "",
+        subCategory: value === "podcast" ? "podcast" : "other",
       }));
     } else {
       setFormData((prevData) => ({
@@ -135,7 +195,6 @@ export default function CreateEvents() {
     }
   }, []);
 
-  // Fetch data effects
   useEffect(() => {
     const fetchSpeakers = async () => {
       try {
@@ -163,6 +222,8 @@ export default function CreateEvents() {
               date: event.date ? new Date(event.date) : new Date(),
               venue: event.venue || "",
               eventType: event.eventType || "conference",
+              category: event.category || "",
+              subCategory: event.subCategory || "other",
               speakers: event.speakers?.map((speaker) => speaker._id) || [],
               image: event.image || null,
               meetingId: event.meetingId || "",
@@ -194,15 +255,19 @@ export default function CreateEvents() {
       return;
     }
 
-    // Additional validation for webinar/conference
-    if (formData.eventType == "webinar") {
+    if (formData.eventType === "webinar") {
       if (!formData.meetingLink || !formData.duration) {
         showSnackbar(
-          "Meeting link and duration are required for online events",
+          "Meeting link and duration are required for webinars",
           "error"
         );
         return;
       }
+    }
+
+    if (formData.eventType === "podcast" && !formData.subCategory) {
+      showSnackbar("Subcategory is required for podcasts", "error");
+      return;
     }
 
     setLoading(true);
@@ -243,7 +308,6 @@ export default function CreateEvents() {
         "success"
       );
 
-      // Wait for snackbar to be visible before navigating
       await new Promise((resolve) => setTimeout(resolve, 1000));
       navigate("/DashBoard/Admin/Events");
     } catch (error) {
@@ -266,18 +330,16 @@ export default function CreateEvents() {
       <Box className="p-3 max-w-3xl mx-auto min-h-screen">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center text-blue-500 hover:text-blue-700 transition-colors duration-200"
-        >
+          className="flex items-center text-primary-500 hover:text-secondary-500 transition-colors duration-200">
           <IoArrowBack className="mr-2" size={24} />
           Back
         </button>
 
-        <h1 className="text-center text-3xl my-7 font-semibold">
+        <h1 className="text-center text-3xl my-7 font-semibold text-primary-900">
           {slug ? "Edit Event" : "Create an Event"}
         </h1>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          {/* Form fields remain the same */}
           <TextField
             label="Title"
             required
@@ -286,13 +348,14 @@ export default function CreateEvents() {
             value={formData.title}
             onChange={handleInputChange}
             fullWidth
-          />
-
-          <DateTimePicker
-            label="Date and Time"
-            value={formData.date}
-            onChange={handleDateChange}
-            renderInput={(params) => <TextField {...params} fullWidth />}
+            InputLabelProps={{ style: { color: "#3B4A54" } }} // neutral-700
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#D8E0E8" }, // primary-200
+                "&:hover fieldset": { borderColor: "#1A3C34" }, // primary-500
+                "&.Mui-focused fieldset": { borderColor: "#1A3C34" }, // primary-500
+              },
+            }}
           />
 
           <TextField
@@ -304,13 +367,46 @@ export default function CreateEvents() {
             onChange={handleInputChange}
             fullWidth
             required
-          >
+            InputLabelProps={{ style: { color: "#3B4A54" } }} // neutral-700
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#D8E0E8" }, // primary-200
+                "&:hover fieldset": { borderColor: "#1A3C34" }, // primary-500
+                "&.Mui-focused fieldset": { borderColor: "#1A3C34" }, // primary-500
+              },
+            }}>
             {eventTypes.map((type) => (
               <MenuItem key={type.value} value={type.value}>
                 {type.label}
               </MenuItem>
             ))}
           </TextField>
+
+          {showSubCategoryField && (
+            <TextField
+              select
+              label="Subcategory"
+              id="subCategory"
+              name="subCategory"
+              value={formData.subCategory}
+              onChange={handleInputChange}
+              fullWidth
+              required
+              InputLabelProps={{ style: { color: "#3B4A54" } }} // neutral-700
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#D8E0E8" }, // primary-200
+                  "&:hover fieldset": { borderColor: "#1A3C34" }, // primary-500
+                  "&.Mui-focused fieldset": { borderColor: "#1A3C34" }, // primary-500
+                },
+              }}>
+              {subCategories.map((sub) => (
+                <MenuItem key={sub.value} value={sub.value}>
+                  {sub.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          )}
 
           {formData.eventType === "conference" && (
             <TextField
@@ -320,6 +416,14 @@ export default function CreateEvents() {
               value={formData.venue}
               onChange={handleInputChange}
               fullWidth
+              InputLabelProps={{ style: { color: "#3B4A54" } }} // neutral-700
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#D8E0E8" }, // primary-200
+                  "&:hover fieldset": { borderColor: "#1A3C34" }, // primary-500
+                  "&.Mui-focused fieldset": { borderColor: "#1A3C34" }, // primary-500
+                },
+              }}
             />
           )}
 
@@ -331,6 +435,14 @@ export default function CreateEvents() {
               value={formData.videoUrl}
               onChange={handleInputChange}
               fullWidth
+              InputLabelProps={{ style: { color: "#3B4A54" } }} // neutral-700
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#D8E0E8" }, // primary-200
+                  "&:hover fieldset": { borderColor: "#1A3C34" }, // primary-500
+                  "&.Mui-focused fieldset": { borderColor: "#1A3C34" }, // primary-500
+                },
+              }}
             />
           )}
 
@@ -341,8 +453,15 @@ export default function CreateEvents() {
             value={formData.passcode}
             onChange={handleInputChange}
             fullWidth
+            InputLabelProps={{ style: { color: "#3B4A54" } }} // neutral-700
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "#D8E0E8" }, // primary-200
+                "&:hover fieldset": { borderColor: "#1A3C34" }, // primary-500
+                "&.Mui-focused fieldset": { borderColor: "#1A3C34" }, // primary-500
+              },
+            }}
           />
-
           {formData.eventType === "webinar" && (
             <Box className="flex flex-col gap-4">
               <TextField
@@ -352,8 +471,15 @@ export default function CreateEvents() {
                 value={formData.meetingId}
                 onChange={handleInputChange}
                 fullWidth
+                InputLabelProps={{ style: { color: "#3B4A54" } }} // neutral-700
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#D8E0E8" }, // primary-200
+                    "&:hover fieldset": { borderColor: "#1A3C34" }, // primary-500
+                    "&.Mui-focused fieldset": { borderColor: "#1A3C34" }, // primary-500
+                  },
+                }}
               />
-
               <TextField
                 label="Duration (minutes)"
                 id="duration"
@@ -364,8 +490,15 @@ export default function CreateEvents() {
                 onChange={handleInputChange}
                 fullWidth
                 required
+                InputLabelProps={{ style: { color: "#3B4A54" } }} // neutral-700
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#D8E0E8" }, // primary-200
+                    "&:hover fieldset": { borderColor: "#1A3C34" }, // primary-500
+                    "&.Mui-focused fieldset": { borderColor: "#1A3C34" }, // primary-500
+                  },
+                }}
               />
-
               <TextField
                 label="Meeting Link"
                 id="meetingLink"
@@ -374,12 +507,24 @@ export default function CreateEvents() {
                 onChange={handleInputChange}
                 fullWidth
                 required
+                InputLabelProps={{ style: { color: "#3B4A54" } }} // neutral-700
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#D8E0E8" }, // primary-200
+                    "&:hover fieldset": { borderColor: "#1A3C34" }, // primary-500
+                    "&.Mui-focused fieldset": { borderColor: "#1A3C34" }, // primary-500
+                  },
+                }}
               />
             </Box>
           )}
-
           <FormControl fullWidth>
-            <InputLabel id="speakers-select-label">Speakers</InputLabel>
+            <InputLabel
+              id="speakers-select-label"
+              style={{ color: "#3B4A54" }} // neutral-700
+            >
+              Speakers
+            </InputLabel>
             <Select
               labelId="speakers-select-label"
               id="speakers"
@@ -394,7 +539,13 @@ export default function CreateEvents() {
                   })}
                 </Box>
               )}
-            >
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#D8E0E8" }, // primary-200
+                  "&:hover fieldset": { borderColor: "#1A3C34" }, // primary-500
+                  "&.Mui-focused fieldset": { borderColor: "#1A3C34" }, // primary-500
+                },
+              }}>
               {speakers.map((speaker) => (
                 <MenuItem key={speaker._id} value={speaker._id}>
                   {speaker.name}
@@ -402,8 +553,7 @@ export default function CreateEvents() {
               ))}
             </Select>
           </FormControl>
-
-          <Box className="flex gap-4 items-center justify-between border-4 border-teal-500 border-dotted p-3">
+          <Box className="flex gap-4 items-center justify-between border-4 border-primary-500 border-dotted p-3">
             <input
               type="file"
               accept="image/*"
@@ -414,7 +564,14 @@ export default function CreateEvents() {
             <Button
               variant="outlined"
               onClick={() => fileInputRef.current.click()}
-            >
+              sx={{
+                borderColor: "#D8E0E8", // primary-200
+                color: "#1A3C34", // primary-500
+                "&:hover": {
+                  borderColor: "#1A3C34", // primary-500
+                  backgroundColor: "#F7F8FA", // primary-50
+                },
+              }}>
               Choose File
             </Button>
             {imagePreview && (
@@ -425,44 +582,47 @@ export default function CreateEvents() {
               />
             )}
           </Box>
-
           <ReactQuill
             theme="snow"
             placeholder="Write event description..."
-            className="h-72 mb-12"
+            className="h-72 mb-12 text-neutral-600"
             required
             value={formData.description}
             onChange={handleQuillChange}
+            modules={quillModules}
+            formats={quillFormats}
           />
 
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={loading}
-            sx={{ marginTop: "16px" }}
-          >
-            {loading ? (
-              <CircularProgress size={24} />
-            ) : slug ? (
-              "Update Event"
-            ) : (
-              "Create Event"
-            )}
-          </Button>
+          {/* Submit Button */}
+          <div className="pt-6">
+            <button
+              type="submit"
+              disabled={loading}
+              className=" group w-auto mx-auto lg:w-[50%] bg-primary-500 text-white py-2 px-8 rounded-md font-semibold hover:bg-secondary-500 hover:text-primary-500 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2">
+              {loading ? (
+                <CircularProgress size={24} sx={{ color: "#080759" }} /> // primary-900
+              ) : slug ? (
+                "Update Event"
+              ) : (
+                "Create Event"
+              )}
+            </button>
+          </div>
         </form>
-
         <Snackbar
           open={snackbar.open}
           autoHideDuration={6000}
           onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        >
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
           <Alert
             onClose={handleCloseSnackbar}
             severity={snackbar.severity}
-            sx={{ width: "100%" }}
-          >
+            sx={{
+              width: "100%",
+              backgroundColor:
+                snackbar.severity === "success" ? "#3C6E5D" : "#EF4444", // secondary-500 for success, red-500 for error
+              color: "#FFFFFF", // white
+            }}>
             {snackbar.message}
           </Alert>
         </Snackbar>

@@ -40,15 +40,13 @@ const Pagination = ({ pagination, onPageChange }) => {
   return (
     <nav
       className="flex justify-center items-center gap-1 mt-8"
-      aria-label="Pagination"
-    >
+      aria-label="Pagination">
       {/* Previous button */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="px-3 py-2 rounded-md text-sm font-medium bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
-        aria-label="Previous page"
-      >
+        className="px-3 py-2 rounded-md text-sm font-medium bg-white border border-primary-300 text-primary-900 hover:bg-primary-50 disabled:bg-neutral-100 disabled:text-neutral-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors duration-200"
+        aria-label="Previous page">
         ←
       </button>
 
@@ -56,20 +54,21 @@ const Pagination = ({ pagination, onPageChange }) => {
       <div className="flex gap-1">
         {getPageNumbers().map((pageNum, idx) =>
           pageNum === "..." ? (
-            <span key={`ellipsis-${idx}`} className="px-3 py-2">
+            <span
+              key={`ellipsis-${idx}`}
+              className="px-3 py-2 text-primary-500">
               ...
             </span>
           ) : (
             <button
               key={pageNum}
               onClick={() => onPageChange(pageNum)}
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
+              className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
                 currentPage === pageNum
-                  ? "bg-teal-600 text-white hover:bg-teal-700"
-                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                  ? "bg-primary-900 text-white hover:bg-primary-800 shadow-md"
+                  : "bg-white border border-primary-300 text-primary-700 hover:bg-primary-50 hover:text-primary-900 hover:border-primary-400"
               }`}
-              aria-current={currentPage === pageNum ? "page" : undefined}
-            >
+              aria-current={currentPage === pageNum ? "page" : undefined}>
               {pageNum}
             </button>
           )
@@ -80,9 +79,8 @@ const Pagination = ({ pagination, onPageChange }) => {
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="px-3 py-2 rounded-md text-sm font-medium bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
-        aria-label="Next page"
-      >
+        className="px-3 py-2 rounded-md text-sm font-medium bg-white border border-primary-300 text-primary-700 hover:bg-primary-50 disabled:bg-neutral-100 disabled:text-neutral-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors duration-200"
+        aria-label="Next page">
         →
       </button>
     </nav>

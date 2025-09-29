@@ -5,6 +5,7 @@ import { IoClose } from "react-icons/io5";
 import { AiTwotoneDelete } from "react-icons/ai";
 import { Button, Snackbar, Alert, CircularProgress } from "@mui/material";
 import { BiMessageSquareAdd } from "react-icons/bi";
+import Spinner from "../../components/tools/Spinner";
 
 const backendURL =
   import.meta.env.MODE === "production"
@@ -18,7 +19,7 @@ const LoadingSpinner = () => (
 );
 
 const VoucherRow = ({ voucher, onDelete, navigate }) => (
-  <tr className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+  <tr className="bg-white text-primary-900 dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
     <td className="px-4 py-4">{voucher.code}</td>
     <td className="px-4 py-4">{voucher.discountType}</td>
     <td className="px-4 py-4">
@@ -49,7 +50,7 @@ const VoucherRow = ({ voucher, onDelete, navigate }) => (
         onClick={() =>
           navigate(`/DashBoard/Admin/CreateEditVoucher/${voucher._id}`)
         }
-        className="font-medium text-blue-500 bg-transparent border border-blue-500 rounded-md px-2 py-1 hover:bg-blue-500 hover:text-white transition">
+        className="font-medium text-primary-500 bg-transparent border border-primary-500 rounded-md px-2 py-1 hover:bg-primary-500 hover:text-white transition">
         Edit
       </button>
       <button
@@ -158,14 +159,14 @@ const AdminVoucherList = () => {
   }, [page]);
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <Spinner />;
   }
 
   return (
     <div className="flex flex-col w-full h-full p-4 md:p-6">
       <div className="my-5 ml-3 mid:mt-20">
         <Link to="/DashBoard/Admin/CreateEditVoucher">
-          <button className="text-btColour border border-btColour p-1 rounded-lg hover:font-semibold">
+          <button className="text-primary-900 hover:bg-white border border-primary-500 p-1 rounded-lg hover:font-semibold">
             <span className="flex whitespace-nowrap">
               <BiMessageSquareAdd className="mr-2 mt-1" size={16} />
               Create Voucher
@@ -174,7 +175,7 @@ const AdminVoucherList = () => {
         </Link>
       </div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">
+        <h1 className="text-2xl font-semibold text-primary-500 dark:text-white">
           Voucher Management
         </h1>
       </div>
@@ -183,7 +184,7 @@ const AdminVoucherList = () => {
         <div className="h-full overflow-y-auto">
           {vouchers.length > 0 ? (
             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 shadow-md rounded-lg">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <thead className="text-xs text-primary-500 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th scope="col" className="px-4 py-3 whitespace-nowrap">
                     Code
@@ -247,7 +248,7 @@ const AdminVoucherList = () => {
         <button
           onClick={handlePrevPage}
           disabled={page === 1}
-          className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 disabled:opacity-50">
+          className="px-4 py-2 bg-gray-200 text-primary-900 rounded hover:bg-gray-300 disabled:opacity-50">
           Previous
         </button>
         <span>
@@ -256,14 +257,14 @@ const AdminVoucherList = () => {
         <button
           onClick={handleNextPage}
           disabled={page * limit >= totalVouchers}
-          className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 disabled:opacity-50">
+          className="px-4 py-2 bg-gray-200 text-primary-900 rounded hover:bg-gray-300 disabled:opacity-50">
           Next
         </button>
       </div>
 
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className=" p-6 rounded-lg max-w-md w-full border border-red-200 bg-red-200">
+          <div className=" p-6 rounded-lg max-w-md w-full border border-red-200/10 bg-red-50">
             <h3 className="text-lg font-semibold mb-2 text-red-600">
               Delete Voucher
             </h3>

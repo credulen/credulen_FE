@@ -105,15 +105,15 @@ const ContactUs = () => {
         {props.placeholder}
       </label>
       <div className="relative group">
-        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-200 group-hover:text-btColour">
-          <Icon className="h-5 w-5 text-gray-400 group-hover:text-btColour transition-colors duration-200" />
+        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-200 group-hover:text-secondary-500">
+          <Icon className="h-5 w-5 text-primary-500 group-hover:text-secondary-500 transition-colors duration-200" />
         </div>
         <input
           id={id}
           type={type}
           value={formData[id]}
           onChange={handleChange}
-          className="appearance-none block w-full h-[50px] px-4 py-3 pl-12 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-btColour focus:border-btColour focus:z-10 sm:text-sm hover:border-btColour transition-all duration-200"
+          className="appearance-none block w-full h-[50px] px-4 py-3 pl-12 border border-primary-300 placeholder-primary-500 text-primary-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500/20 focus:border-secondary-500 focus:z-10 sm:text-sm hover:border-primary-400 transition-all duration-200"
           required
           {...props}
         />
@@ -122,16 +122,16 @@ const ContactUs = () => {
   );
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 mt-16">
-      <div className=" max-w-xl mid:px-8 mid:mx-6 w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-primary-50 py-12 px-4 sm:px-6 lg:px-8 mt-16">
+      <div className=" max-w-xl mid:px-8 mid:mx-6 w-full space-y-8 bg-white p-8 rounded-xl shadow-lg border border-primary-100">
         <div className="text-center space-y-4">
           <div className="flex justify-center">
-            <HelpCircle className="h-12 w-12 text-btColour animate-pulse" />
+            <HelpCircle className="h-12 w-12 text-secondary-500 animate-pulse" />
           </div>
-          <h2 className="text-3xl font-extrabold text-gray-900">
+          <h2 className="text-3xl font-extrabold text-primary-900">
             Have any Questions?
           </h2>
-          <p className="text-gray-600 text-lg">
+          <p className="text-neutral-600 text-lg">
             Get in touch with us and we'll help you out
           </p>
           <div className="flex justify-center space-x-6">
@@ -144,8 +144,8 @@ const ContactUs = () => {
                   className="group relative"
                   target="_blank"
                   rel="noopener noreferrer">
-                  <Icon className="h-6 w-6 text-gray-500 hover:text-btColour transition-colors duration-200 transform hover:scale-110" />
-                  <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-max opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-sm text-gray-500">
+                  <Icon className="h-6 w-6 text-primary-500 hover:text-secondary-500 transition-colors duration-200 transform hover:scale-110" />
+                  <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-max opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-sm text-neutral-600">
                     {method.label}
                   </span>
                 </a>
@@ -157,11 +157,13 @@ const ContactUs = () => {
         <form className="mt-12 space-y-6" onSubmit={sendEmail}>
           <div className="space-y-6">
             <InputField
+              className="appearance-none block w-full  px-4 py-3 pl-12 border border-primary-300 placeholder-primary-500 text-primary-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:z-10 sm:text-sm hover:border-primary-400 transition-all duration-200 placeholder:text-gray-400"
               icon={User}
               id="fullName"
               placeholder="What's your full name?"
             />
             <InputField
+              className="appearance-none block w-full px-4 py-3 pl-12 border border-primary-300 placeholder-primary-500 text-primary-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:z-10 sm:text-sm hover:border-primary-400 transition-all duration-200 placeholder:text-gray-400"
               icon={Mail}
               id="email"
               type="email"
@@ -172,14 +174,14 @@ const ContactUs = () => {
                 Message
               </label>
               <div className="relative group">
-                <div className="absolute top-4 left-4 pointer-events-none transition-colors duration-200 group-hover:text-btColour">
-                  <MessageSquare className="h-5 w-5 text-gray-400 group-hover:text-btColour transition-colors duration-200" />
+                <div className="absolute top-4 left-4 pointer-events-none transition-colors duration-200 group-hover:text-secondary-500">
+                  <MessageSquare className="h-5 w-5 text-primary-500 group-hover:text-secondary-500 transition-colors duration-200" />
                 </div>
                 <textarea
                   id="message"
                   value={formData.message}
                   onChange={handleChange}
-                  className="appearance-none block w-full h-[120px] px-4 py-3 pl-12 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-btColour focus:border-btColour focus:z-10 sm:text-sm hover:border-btColour transition-all duration-200"
+                  className="appearance-none block w-full h-[120px] px-4 py-3 pl-12 border border-primary-300 placeholder-primary-500 text-primary-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 focus:z-10 sm:text-sm hover:border-primary-400 transition-all duration-200 placeholder:text-gray-400"
                   placeholder="Type your question or request!"
                   required
                 />
@@ -190,7 +192,7 @@ const ContactUs = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-[#1e293b]  hover:bg-gradient-to-bl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-btColour transition-all duration-300 ease-in-out disabled:opacity-70 transform hover:scale-[1.02]">
+            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-500 hover:text-secondary-500 hover:font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500/20 transition-all duration-300 ease-in-out disabled:opacity-70 transform hover:scale-[1.02] shadow-lg hover:shadow-xl">
             {isLoading ? (
               "Sending..."
             ) : (

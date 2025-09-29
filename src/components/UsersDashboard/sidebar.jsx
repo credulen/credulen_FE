@@ -23,7 +23,6 @@ const Sidebar = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const user = useSelector((state) => state.auth.user);
   const sidebarRef = useRef(null);
   const { userInfo } = useSelector((state) => state.auth);
   const userId = userInfo?._id;
@@ -61,29 +60,6 @@ const Sidebar = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // const sidebarLinks = [
-  //   { path: "/", icon: FaHome, label: "Home" },
-  //   { path: "/DashBoard/profile", icon: IoPerson, label: "Profile" },
-  //   {userInfo?.role === "agent"
-  // ? {
-  //     path: "/DashBoard/referals",
-  //     icon: HiUsers,
-  //     label: "My Referals",
-  //   }
-  // : null},
-
-  //   {
-  //     path: "/DashBoard/Activities",
-  //     icon: FaHistory,
-  //     label: "Activity Log",
-  //   },
-  //   {
-  //     path: "/DashBoard/Notifications",
-  //     icon: IoMdNotificationsOutline,
-  //     label: "Notifications",
-  //     showBadge: true,
-  //   },
-  // ];
   const sidebarLinks = [
     { path: "/", icon: FaHome, label: "Home" },
     { path: "/DashBoard/profile", icon: IoPerson, label: "Profile" },
@@ -114,7 +90,7 @@ const Sidebar = () => {
       <div
         className={`fixed top-0 left-0 right-0 z-40 bg-white shadow-md p-4 flex items-center justify-between ${
           isSmallScreen ? "" : "hidden"
-        }`}>
+        } border-b border-primary-200`}>
         <div className="flex items-center">
           <span className="mb-2">
             {profile?.data?.image ? (
@@ -128,28 +104,28 @@ const Sidebar = () => {
                 }}
               />
             ) : (
-              <FaUserCircle className="w-7 h-7 text-gray-400 mr-4 cursor-pointer" />
+              <FaUserCircle className="w-7 h-7 text-primary-500 mr-4 cursor-pointer" />
             )}
           </span>
-          <span className="mb-1 mr-2 font-medium text-xs">
+          <span className="mb-1 mr-2 font-medium text-xs text-primary-900">
             {profile?.data?.username || "Guest"}
           </span>
         </div>
         <button
           onClick={toggleSidebar}
-          className="text-purple-600 p-2 rounded-md focus:outline-none">
+          className="text-primary-600 p-2 rounded-md focus:outline-none hover:bg-primary-50 transition-colors duration-200">
           {isOpen ? <HiX size={24} /> : <HiMenu size={24} />}
         </button>
       </div>
       <div
         ref={sidebarRef}
-        className={`fixed inset-y-0 left-0 z-30 w-64 bg-blue-700 text-white transition-all duration-300 ease-in-out transform 
+        className={`fixed inset-y-0 left-0 z-30 w-64 bg-primary-900 text-white transition-all duration-300 ease-in-out transform 
           ${isOpen ? "translate-x-0" : "-translate-x-full"} 
           ${isSmallScreen ? "top-16" : "top-0"}`}>
         <div className="flex flex-col h-full">
-          <div className="p-5">
-            <h1 className="text-2xl font-bold mb-1">Credulen</h1>
-            <p className="text-sm text-purple-300 mb-6">
+          <div className="p-5 border-b border-primary-800">
+            <h1 className="text-2xl font-bold mb-1 text-white">Credulen</h1>
+            <p className="text-sm text-primary-200 mb-6">
               {userInfo.role === "agent" ? "Agent DashBoard" : "User DashBoard"}
             </p>
             {!isSmallScreen && (
@@ -166,10 +142,10 @@ const Sidebar = () => {
                       }}
                     />
                   ) : (
-                    <FaUserCircle className="w-7 h-7 text-gray-400 mr-4 cursor-pointer" />
+                    <FaUserCircle className="w-7 h-7 text-primary-200 mr-4 cursor-pointer" />
                   )}
                 </span>
-                <span className="mb-1 mr-2 font-extralight text-xs">
+                <span className="mb-1 mr-2 font-extralight text-xs text-primary-200">
                   {profile?.data?.username || "Guest"}
                 </span>
               </div>
@@ -182,17 +158,19 @@ const Sidebar = () => {
                 key={link.path}
                 to={link.path}
                 onClick={() => isSmallScreen && setIsOpen(false)}
-                className={`flex items-center justify-between px-5 py-3 text-sm ${
+                className={`flex items-center justify-between px-5 py-3 text-sm transition-all duration-200 ${
                   location.pathname === link.path
-                    ? "bg-blue-500"
-                    : "hover:bg-blue-600"
+                    ? "bg-primary-500 text-white"
+                    : "hover:bg-primary-500 hover:text-secondary-500"
                 }`}>
                 <div className="flex items-center">
                   <link.icon className="w-5 h-5 mr-3" />
-                  <span>{link.label}</span>
+                  <span className="hover:text-secondary-600 hover:scale-105 transition-all duration-300 ease-out">
+                    {link.label}
+                  </span>
                 </div>
                 {link.showBadge && unreadCount > 0 && (
-                  <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  <span className="bg-secondary-500 text-primary-900 text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
                     {unreadCount}
                   </span>
                 )}
@@ -200,10 +178,10 @@ const Sidebar = () => {
             ))}
           </nav>
 
-          <div className="p-5">
+          <div className="p-5 border-t border-primary-800">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center px-1 py-1 pl- text-sm bg-red-50 hover:text-white text-red-700 rounded-md hover:bg-red-700 transition-colors">
+              className="w-full flex items-center px-1 py-1 pl- text-sm bg-primary-800 hover:bg-secondary-500 hover:text-primary-900 text-white rounded-md hover:font-bold transition-all duration-200">
               <HiOutlineLogout className="w-5 h-5 mr-3" />
               <span>Sign out</span>
             </button>
