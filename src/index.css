@@ -6,6 +6,13 @@
 
 body {
   font-family: "Poppins", sans-serif;
+  overflow-x: hidden;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+* {
+  box-sizing: border-box;
 }
 
 /* Custom placeholder styling */
@@ -31,9 +38,11 @@ body {
 
 /* Base font size for the entire application */
 html {
-  font-size: 14px; /* Default font size */
+  font-size: 14px;
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
 }
-
 /* Small screens (e.g., mobile phones) */
 @media screen and (max-width: 640px) {
   html {
